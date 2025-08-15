@@ -94,7 +94,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'cash vs tournament': 'type',
           'type': 'type',
           'location': 'location',
-          'locations': 'location',
+          'locations': 'location', // Handle plural form
           'hours': 'hours',
           'start time': 'start_time',
           'starttime': 'start_time',
@@ -105,7 +105,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'notes': 'notes'
         };
         
-        const mappedField = fieldMap[header] || header;
+        const mappedField = fieldMap[header.toLowerCase().trim()] || header;
         row[mappedField] = values[index] || '';
       });
       
@@ -209,24 +209,28 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        const parsed = parseCSV(text);
-        setCsvData(parsed);
-        
-        const mapped = mapDataToSessions(parsed);
-        setMappedData(mapped);
-        setImportStatus('preview');
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to parse CSV file. Please check the format.",
-          variant: "destructive",
-        });
-      }
-    };
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const text = e.target?.result as string;
+            console.log('CSV file content (first 500 chars):', text.substring(0, 500));
+            const parsed = parseCSV(text);
+            console.log('Parsed CSV rows:', parsed.length, 'Sample row:', parsed[0]);
+            setCsvData(parsed);
+            
+            const mapped = mapDataToSessions(parsed);
+            console.log('Mapped sessions:', mapped.length, 'Sample session:', mapped[0]);
+            setMappedData(mapped);
+            setImportStatus('preview');
+          } catch (error) {
+            console.error('CSV parsing error:', error);
+            toast({
+              title: "Error",
+              description: "Failed to parse CSV file. Please check the format.",
+              variant: "destructive",
+            });
+          }
+        };
     reader.readAsText(file);
   };
 
