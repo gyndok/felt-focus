@@ -64,6 +64,7 @@ const LiveTournament = () => {
     big_blind: '',
     current_chips: '',
     players_left: '',
+    total_entries: '',
     notes: ''
   });
 
@@ -172,9 +173,10 @@ const LiveTournament = () => {
       const currentChips = parseFloat(updateData.current_chips);
       const bigBlind = parseFloat(updateData.big_blind) || activeTournament.big_blind;
       const playersLeft = updateData.players_left ? parseInt(updateData.players_left) : activeTournament.players_left;
+      const totalEntries = updateData.total_entries ? parseInt(updateData.total_entries) : activeTournament.total_players;
       
       // Calculate total chips in play from prize pool (excluding rake)
-      const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : null;
+      const totalChipsInPlay = totalEntries ? activeTournament.starting_chips * totalEntries : null;
       const avgStack = playersLeft && totalChipsInPlay ? totalChipsInPlay / playersLeft : null;
       
       const bbStack = currentChips / bigBlind;
@@ -190,12 +192,20 @@ const LiveTournament = () => {
         notes: updateData.notes || null
       });
 
+      // Update tournament with new total entries if provided
+      if (updateData.total_entries && parseInt(updateData.total_entries) !== activeTournament.total_players) {
+        await updateTournament(activeTournament.id, {
+          total_players: totalEntries
+        });
+      }
+
       setUpdateData({
         level: 1,
         small_blind: '',
         big_blind: '',
         current_chips: '',
         players_left: '',
+        total_entries: '',
         notes: ''
       });
       setShowUpdateDialog(false);
@@ -764,14 +774,30 @@ const LiveTournament = () => {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="update_notes">Notes (Optional)</Label>
-                <Textarea
-                  id="update_notes"
-                  value={updateData.notes}
-                  onChange={(e) => setUpdateData({...updateData, notes: e.target.value})}
-                  placeholder="Any additional notes..."
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="update_total_entries">Total Entries</Label>
+                  <Input
+                    id="update_total_entries"
+                    type="number"
+                    value={updateData.total_entries}
+                    onChange={(e) => setUpdateData({...updateData, total_entries: e.target.value})}
+                    placeholder={activeTournament.total_players?.toString() || "Current entries"}
+                  />
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Current: {activeTournament.total_players || 'Not set'}
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="update_notes">Notes (Optional)</Label>
+                  <Textarea
+                    id="update_notes"
+                    value={updateData.notes}
+                    onChange={(e) => setUpdateData({...updateData, notes: e.target.value})}
+                    placeholder="Any additional notes..."
+                    rows={2}
+                  />
+                </div>
               </div>
 
               <Button onClick={handleUpdateTournament} className="w-full">
