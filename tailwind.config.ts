@@ -52,6 +52,14 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Poker-specific colors
+				profit: 'hsl(var(--profit))',
+				'profit-light': 'hsl(var(--profit-light))',
+				loss: 'hsl(var(--loss))',
+				'loss-light': 'hsl(var(--loss-light))',
+				gold: 'hsl(var(--gold))',
+				'casino-blue': 'hsl(var(--casino-blue))',
+				'casino-purple': 'hsl(var(--casino-purple))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
