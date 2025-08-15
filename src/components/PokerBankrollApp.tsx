@@ -447,11 +447,12 @@ const PokerBankrollApp = () => {
 
         {/* Session History */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between sticky top-0 bg-background/95 backdrop-blur-sm py-2 z-10">
             <h3 className="text-lg font-semibold">Recent Sessions</h3>
             <Badge variant="secondary">{filteredSessions.length}</Badge>
           </div>
           
+          <div className="max-h-96 overflow-y-auto space-y-4">
           {filteredSessions.map(session => {
             const profit = session.cash_out - session.buy_in;
             const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
@@ -502,8 +503,9 @@ const PokerBankrollApp = () => {
                   )}
                 </CardContent>
               </Card>
-            );
-          })}
+             );
+           })}
+           </div>
         </div>
 
         {/* Add Session Dialog */}
