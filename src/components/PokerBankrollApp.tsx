@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { CSVImport } from './CSVImport';
+import LiveTournament from './LiveTournament';
+
 const PokerBankrollApp = () => {
   const {
     user,
@@ -32,6 +34,7 @@ const PokerBankrollApp = () => {
   const [showBankroll, setShowBankroll] = useState(true);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>('dashboard');
 
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -217,52 +220,78 @@ const PokerBankrollApp = () => {
             </div>
           </div>
 
-          {/* Bankroll Display */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-sm opacity-90">Total Bankroll</span>
-              <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-1 h-auto">
-                {showBankroll ? <Eye size={16} /> : <EyeOff size={16} />}
-              </Button>
-            </div>
-            
-            <div className={`text-sm ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-              {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••'}
-            </div>
+          {/* Tab Navigation */}
+          <div className="flex bg-white/10 rounded-lg p-1 mb-6">
+            <Button
+              variant={activeTab === 'dashboard' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex-1 ${activeTab === 'dashboard' ? 'bg-white text-primary' : 'text-white hover:bg-white/20'}`}
+            >
+              Dashboard
+            </Button>
+            <Button
+              variant={activeTab === 'tournament' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('tournament')}
+              className={`flex-1 ${activeTab === 'tournament' ? 'bg-white text-primary' : 'text-white hover:bg-white/20'}`}
+            >
+              Live Tournament
+            </Button>
           </div>
+
+          {/* Bankroll Display - Only on Dashboard */}
+          {activeTab === 'dashboard' && (
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-sm opacity-90">Total Bankroll</span>
+                <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-1 h-auto">
+                  {showBankroll ? <Eye size={16} /> : <EyeOff size={16} />}
+                </Button>
+              </div>
+              
+              <div className={`text-sm ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••'}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 pb-20">
-        {/* Timer Section */}
-        <Card className="mb-6 glass-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="text-xl font-mono font-bold">
-                  {formatTime(currentSessionTime)}
+      {/* Render Live Tournament or Dashboard */}
+      {activeTab === 'tournament' ? (
+        <LiveTournament />
+      ) : (
+        <div className="max-w-md mx-auto px-4 pb-20">
+          {/* Timer Section */}
+          <Card className="mb-6 glass-card">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="text-xl font-mono font-bold">
+                    {formatTime(currentSessionTime)}
+                  </div>
+                  {isTimerRunning && <Badge variant="default" className="animate-pulse">
+                      Session Active
+                    </Badge>}
                 </div>
-                {isTimerRunning && <Badge variant="default" className="animate-pulse">
-                    Session Active
-                  </Badge>}
+                <div className="flex gap-2">
+                  {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
+                      <Play className="h-4 w-4 mr-1" />
+                      Start
+                    </Button> : <>
+                      <Button onClick={resetTimer} variant="outline" size="sm">
+                        <Square className="h-4 w-4" />
+                      </Button>
+                      <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
+                        <Pause className="h-4 w-4 mr-1" />
+                        End Session
+                      </Button>
+                    </>}
+                </div>
               </div>
-              <div className="flex gap-2">
-                {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
-                    <Play className="h-4 w-4 mr-1" />
-                    Start
-                  </Button> : <>
-                    <Button onClick={resetTimer} variant="outline" size="sm">
-                      <Square className="h-4 w-4" />
-                    </Button>
-                    <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
-                      <Pause className="h-4 w-4 mr-1" />
-                      End Session
-                    </Button>
-                  </>}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
         {/* Filters */}
         {showFilters && <Card className="mb-6 glass-card">
@@ -641,7 +670,8 @@ const PokerBankrollApp = () => {
         </Dialog>
 
         <CSVImport isOpen={showCSVImport} onOpenChange={setShowCSVImport} />
-      </div>
+        </div>
+      )}
     </div>;
 };
 export default PokerBankrollApp;

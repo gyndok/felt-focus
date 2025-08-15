@@ -1,0 +1,720 @@
+import React, { useState, useMemo } from 'react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { 
+  Play, 
+  Pause, 
+  Square, 
+  Trophy, 
+  Users, 
+  Clock, 
+  TrendingUp,
+  DollarSign,
+  Target
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { useTournaments, type Tournament } from '@/hooks/useTournaments';
+import { usePokerSessions } from '@/hooks/usePokerSessions';
+
+const LiveTournament = () => {
+  const { toast } = useToast();
+  const { addSession } = usePokerSessions();
+  const {
+    activeTournament,
+    createTournament,
+    updateTournament,
+    addTournamentUpdate,
+    endTournament,
+    getTournamentUpdates
+  } = useTournaments();
+
+  const [showStartDialog, setShowStartDialog] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showEndDialog, setShowEndDialog] = useState(false);
+  const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
+
+  const [newTournament, setNewTournament] = useState({
+    name: '',
+    buy_in: '',
+    house_rake: '',
+    starting_chips: '30000',
+    guarantee: '',
+    total_players: '',
+    small_blind: '100',
+    big_blind: '200'
+  });
+
+  const [updateData, setUpdateData] = useState({
+    level: 1,
+    small_blind: '',
+    big_blind: '',
+    current_chips: '',
+    players_left: '',
+    notes: ''
+  });
+
+  const [endData, setEndData] = useState({
+    final_position: '',
+    prize_won: '0'
+  });
+
+  // Calculate tournament economics
+  const economics = useMemo(() => {
+    if (!activeTournament) return null;
+
+    const totalCollected = activeTournament.buy_in * (activeTournament.total_players || 0);
+    const prizePool = totalCollected - activeTournament.house_rake;
+    const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
+    
+    return {
+      totalCollected,
+      prizePool,
+      rakePercentage,
+      overlay: activeTournament.guarantee && activeTournament.guarantee > prizePool 
+        ? activeTournament.guarantee - prizePool 
+        : 0
+    };
+  }, [activeTournament]);
+
+  // Calculate stack health
+  const stackHealth = useMemo(() => {
+    if (!activeTournament?.bb_stack) return 'unknown';
+    
+    const bb = activeTournament.bb_stack;
+    if (bb >= 20) return 'healthy';
+    if (bb >= 10) return 'caution';
+    if (bb >= 5) return 'danger';
+    return 'critical';
+  }, [activeTournament?.bb_stack]);
+
+  const handleStartTournament = async () => {
+    if (!newTournament.name || !newTournament.buy_in || !newTournament.starting_chips) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const startingChips = parseFloat(newTournament.starting_chips);
+      const bigBlind = parseFloat(newTournament.big_blind);
+      
+      await createTournament({
+        name: newTournament.name,
+        buy_in: parseFloat(newTournament.buy_in),
+        house_rake: parseFloat(newTournament.house_rake) || 0,
+        starting_chips: startingChips,
+        guarantee: newTournament.guarantee ? parseFloat(newTournament.guarantee) : null,
+        total_players: newTournament.total_players ? parseInt(newTournament.total_players) : null,
+        small_blind: parseFloat(newTournament.small_blind),
+        big_blind: bigBlind,
+        players_left: newTournament.total_players ? parseInt(newTournament.total_players) : null,
+        current_chips: startingChips,
+        bb_stack: startingChips / bigBlind
+      });
+
+      setNewTournament({
+        name: '',
+        buy_in: '',
+        house_rake: '',
+        starting_chips: '30000',
+        guarantee: '',
+        total_players: '',
+        small_blind: '100',
+        big_blind: '200'
+      });
+      setShowStartDialog(false);
+      
+      toast({
+        title: "Tournament Started",
+        description: "Good luck at the tables!"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start tournament",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateTournament = async () => {
+    if (!activeTournament || !updateData.current_chips) {
+      toast({
+        title: "Error",
+        description: "Please fill in required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const currentChips = parseFloat(updateData.current_chips);
+      const bigBlind = parseFloat(updateData.big_blind) || activeTournament.big_blind;
+      const playersLeft = updateData.players_left ? parseInt(updateData.players_left) : activeTournament.players_left;
+      
+      const avgStack = playersLeft && activeTournament.total_players 
+        ? (activeTournament.starting_chips * activeTournament.total_players) / playersLeft
+        : null;
+      
+      const bbStack = currentChips / bigBlind;
+
+      await addTournamentUpdate(activeTournament.id, {
+        level: updateData.level || activeTournament.level,
+        small_blind: parseFloat(updateData.small_blind) || activeTournament.small_blind,
+        big_blind: bigBlind,
+        current_chips: currentChips,
+        players_left: playersLeft,
+        avg_stack: avgStack,
+        bb_stack: bbStack,
+        notes: updateData.notes || null
+      });
+
+      setUpdateData({
+        level: 1,
+        small_blind: '',
+        big_blind: '',
+        current_chips: '',
+        players_left: '',
+        notes: ''
+      });
+      setShowUpdateDialog(false);
+      
+      toast({
+        title: "Tournament Updated",
+        description: "Progress saved successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update tournament",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEndTournament = async () => {
+    if (!activeTournament) return;
+
+    try {
+      const finalPosition = endData.final_position ? parseInt(endData.final_position) : undefined;
+      const prizeWon = parseFloat(endData.prize_won) || 0;
+      
+      const endedTournament = await endTournament(activeTournament.id, finalPosition, prizeWon);
+      
+      // Add to poker sessions for bankroll tracking
+      const profit = prizeWon - activeTournament.buy_in;
+      const duration = endedTournament.ended_at && activeTournament.started_at
+        ? (new Date(endedTournament.ended_at).getTime() - new Date(activeTournament.started_at).getTime()) / (1000 * 60 * 60)
+        : 0;
+
+      await addSession({
+        date: new Date().toISOString().split('T')[0],
+        type: 'mtt',
+        game_type: 'Tournament',
+        stakes: `$${activeTournament.buy_in}`,
+        location: activeTournament.name,
+        buy_in: activeTournament.buy_in,
+        cash_out: prizeWon,
+        duration: duration,
+        notes: finalPosition ? `Finished ${finalPosition}` : 'Eliminated'
+      });
+
+      setEndData({ final_position: '', prize_won: '0' });
+      setShowEndDialog(false);
+      
+      toast({
+        title: "Tournament Ended",
+        description: "Results saved to bankroll"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to end tournament",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (!activeTournament) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="space-y-4">
+            <Trophy className="w-16 h-16 mx-auto text-muted-foreground" />
+            <h2 className="text-2xl font-bold">No Active Tournament</h2>
+            <p className="text-muted-foreground">
+              Start tracking a live tournament to monitor your stack health and progress.
+            </p>
+          </div>
+          
+          <Dialog open={showStartDialog} onOpenChange={setShowStartDialog}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="bg-primary hover:bg-primary/90">
+                Start New Tournament
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Start Tournament</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Tournament Name</Label>
+                  <Input
+                    id="name"
+                    value={newTournament.name}
+                    onChange={(e) => setNewTournament({...newTournament, name: e.target.value})}
+                    placeholder="Main Event"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="buy_in">Buy-in ($)</Label>
+                    <Input
+                      id="buy_in"
+                      type="number"
+                      value={newTournament.buy_in}
+                      onChange={(e) => setNewTournament({...newTournament, buy_in: e.target.value})}
+                      placeholder="240"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="house_rake">House Rake ($)</Label>
+                    <Input
+                      id="house_rake"
+                      type="number"
+                      value={newTournament.house_rake}
+                      onChange={(e) => setNewTournament({...newTournament, house_rake: e.target.value})}
+                      placeholder="55"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="starting_chips">Starting Chips</Label>
+                    <Input
+                      id="starting_chips"
+                      type="number"
+                      value={newTournament.starting_chips}
+                      onChange={(e) => setNewTournament({...newTournament, starting_chips: e.target.value})}
+                      placeholder="30000"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="guarantee">Guarantee ($) - Optional</Label>
+                    <Input
+                      id="guarantee"
+                      type="number"
+                      value={newTournament.guarantee}
+                      onChange={(e) => setNewTournament({...newTournament, guarantee: e.target.value})}
+                      placeholder="25000"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="total_players">Total Players</Label>
+                    <Input
+                      id="total_players"
+                      type="number"
+                      value={newTournament.total_players}
+                      onChange={(e) => setNewTournament({...newTournament, total_players: e.target.value})}
+                      placeholder="125"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="small_blind">Small Blind</Label>
+                    <Input
+                      id="small_blind"
+                      type="number"
+                      value={newTournament.small_blind}
+                      onChange={(e) => setNewTournament({...newTournament, small_blind: e.target.value})}
+                      placeholder="100"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="big_blind">Big Blind</Label>
+                    <Input
+                      id="big_blind"
+                      type="number"
+                      value={newTournament.big_blind}
+                      onChange={(e) => setNewTournament({...newTournament, big_blind: e.target.value})}
+                      placeholder="200"
+                    />
+                  </div>
+                </div>
+                
+                <Button onClick={handleStartTournament} className="w-full">
+                  Start Tournament
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="gradient-casino text-white p-6 sticky top-0 z-10">
+        <div className="max-w-md mx-auto text-center">
+          <div className="mb-4">
+            <h1 className="text-xl font-bold mb-1">{activeTournament.name}</h1>
+            <div className="text-2xl font-bold">
+              {activeTournament.current_chips.toLocaleString()} chips
+            </div>
+            <div className="text-sm opacity-90">
+              {activeTournament.bb_stack?.toFixed(1)} Big Blinds
+            </div>
+            <Badge 
+              className={`mt-2 ${
+                stackHealth === 'healthy' ? 'bg-green-500' :
+                stackHealth === 'caution' ? 'bg-yellow-500' :
+                stackHealth === 'danger' ? 'bg-orange-500' :
+                'bg-red-500'
+              }`}
+            >
+              {stackHealth === 'healthy' ? 'Healthy Stack' :
+               stackHealth === 'caution' ? 'Caution' :
+               stackHealth === 'danger' ? 'Danger' :
+               'Critical'}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-md mx-auto px-4 pb-20 space-y-6">
+        {/* Tournament Economics */}
+        {economics && (
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="text-lg">Tournament Economics</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-muted-foreground">Buy-in</div>
+                  <div className="font-bold">
+                    ${activeTournament.buy_in.toLocaleString()} ({economics.rakePercentage.toFixed(1)}% rake)
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    ${activeTournament.house_rake} rake, ${(activeTournament.buy_in - activeTournament.house_rake).toLocaleString()} to prizes
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">Prize Pool</div>
+                  <div className="font-bold text-green-600">
+                    ${economics.prizePool.toLocaleString()}
+                  </div>
+                  {economics.overlay > 0 && (
+                    <div className="text-xs text-orange-500">
+                      +${economics.overlay.toLocaleString()} overlay
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground">
+                    ${(economics.prizePool / (activeTournament.total_players || 1)).toLocaleString()}/player
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-muted-foreground">Total Collected</div>
+                  <div className="font-bold">${economics.totalCollected.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">House Rake</div>
+                  <div className="font-bold text-red-600">
+                    ${activeTournament.house_rake.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    ${(activeTournament.house_rake / (activeTournament.total_players || 1)).toFixed(0)}/player
+                  </div>
+                </div>
+              </div>
+
+              {activeTournament.guarantee && (
+                <>
+                  <Separator />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground">Guarantee</div>
+                      <div className="font-bold text-orange-600">
+                        ${activeTournament.guarantee.toLocaleString()} {economics.overlay > 0 ? '(overlay)' : ''}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {economics.overlay > 0 ? `Overlay: +$${economics.overlay.toLocaleString()} added to prize pool` : ''}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Players Needed</div>
+                      <div className="font-bold">
+                        {Math.ceil(activeTournament.guarantee / (activeTournament.buy_in - activeTournament.house_rake))} {activeTournament.total_players ? `(have ${activeTournament.total_players})` : ''}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Current Status */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold">Level {activeTournament.level}</div>
+              <div className="text-sm text-muted-foreground">Current Level</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold">
+                {activeTournament.players_left || activeTournament.total_players}
+              </div>
+              <div className="text-sm text-muted-foreground">Players Left</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold">
+                {activeTournament.small_blind}/{activeTournament.big_blind}
+              </div>
+              <div className="text-sm text-muted-foreground">Current Blinds</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold">
+                {activeTournament.avg_stack?.toFixed(0).toLocaleString() || 'N/A'} BB
+              </div>
+              <div className="text-sm text-muted-foreground">Avg Stack</div>
+              <div className="text-xs text-muted-foreground">
+                {activeTournament.avg_stack ? `${(activeTournament.avg_stack / activeTournament.big_blind).toFixed(0)} chips` : ''}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Stack Health Guide */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="text-lg">Stack Health Guide</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div>
+                <div className="font-medium">20+ BB - Healthy</div>
+                <div className="text-sm text-muted-foreground">Play your normal ranges</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div>
+                <div className="font-medium">10-20 BB - Caution</div>
+                <div className="text-sm text-muted-foreground">Tighten up, look for spots</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+              <div>
+                <div className="font-medium">5-10 BB - Danger</div>
+                <div className="text-sm text-muted-foreground">Push/fold territory</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div>
+                <div className="font-medium">&lt;5 BB - Critical</div>
+                <div className="text-sm text-muted-foreground">Shove or fold only</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Updates */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="text-lg">Quick Updates</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+              <DialogTrigger asChild>
+                <Button className="w-full bg-primary hover:bg-primary/90">
+                  Update Stack & Blinds
+                  <br />
+                  <span className="text-xs opacity-80">
+                    {activeTournament.current_chips.toLocaleString()} chips • Level {activeTournament.level} • {activeTournament.small_blind}/{activeTournament.big_blind}
+                  </span>
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+
+            {activeTournament.players_left && (
+              <Button 
+                variant="secondary" 
+                className="w-full"
+                onClick={() => setShowUpdateDialog(true)}
+              >
+                Update Players ({activeTournament.players_left} remaining)
+              </Button>
+            )}
+
+            <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
+              <DialogTrigger asChild>
+                <Button variant="destructive" className="w-full">
+                  End Tournament
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        {/* Update Dialog */}
+        <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Update Tournament</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label htmlFor="level">Level</Label>
+                  <Input
+                    id="level"
+                    type="number"
+                    value={updateData.level}
+                    onChange={(e) => setUpdateData({...updateData, level: parseInt(e.target.value) || 1})}
+                    placeholder="1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="update_small_blind">Small Blind</Label>
+                  <Input
+                    id="update_small_blind"
+                    type="number"
+                    value={updateData.small_blind}
+                    onChange={(e) => setUpdateData({...updateData, small_blind: e.target.value})}
+                    placeholder={activeTournament.small_blind.toString()}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="update_big_blind">Big Blind</Label>
+                  <Input
+                    id="update_big_blind"
+                    type="number"
+                    value={updateData.big_blind}
+                    onChange={(e) => setUpdateData({...updateData, big_blind: e.target.value})}
+                    placeholder={activeTournament.big_blind.toString()}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="update_current_chips">Current Chips *</Label>
+                  <Input
+                    id="update_current_chips"
+                    type="number"
+                    value={updateData.current_chips}
+                    onChange={(e) => setUpdateData({...updateData, current_chips: e.target.value})}
+                    placeholder={activeTournament.current_chips.toString()}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="update_players_left">Players Left</Label>
+                  <Input
+                    id="update_players_left"
+                    type="number"
+                    value={updateData.players_left}
+                    onChange={(e) => setUpdateData({...updateData, players_left: e.target.value})}
+                    placeholder={activeTournament.players_left?.toString()}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="update_notes">Notes (Optional)</Label>
+                <Textarea
+                  id="update_notes"
+                  value={updateData.notes}
+                  onChange={(e) => setUpdateData({...updateData, notes: e.target.value})}
+                  placeholder="Any additional notes..."
+                />
+              </div>
+
+              <Button onClick={handleUpdateTournament} className="w-full">
+                Update Tournament
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* End Tournament Dialog */}
+        <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>End Tournament</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="final_position">Final Position (Optional)</Label>
+                  <Input
+                    id="final_position"
+                    type="number"
+                    value={endData.final_position}
+                    onChange={(e) => setEndData({...endData, final_position: e.target.value})}
+                    placeholder="e.g. 3"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="prize_won">Prize Won ($)</Label>
+                  <Input
+                    id="prize_won"
+                    type="number"
+                    value={endData.prize_won}
+                    onChange={(e) => setEndData({...endData, prize_won: e.target.value})}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div className="text-sm text-muted-foreground">
+                This will end the tournament and save the results to your bankroll.
+              </div>
+
+              <Button onClick={handleEndTournament} variant="destructive" className="w-full">
+                End Tournament
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+export default LiveTournament;

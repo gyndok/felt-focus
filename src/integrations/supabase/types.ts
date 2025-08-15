@@ -83,6 +83,131 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_updates: {
+        Row: {
+          avg_stack: number | null
+          bb_stack: number | null
+          big_blind: number
+          current_chips: number
+          id: string
+          level: number
+          notes: string | null
+          players_left: number | null
+          small_blind: number
+          timestamp: string
+          tournament_id: string
+        }
+        Insert: {
+          avg_stack?: number | null
+          bb_stack?: number | null
+          big_blind: number
+          current_chips: number
+          id?: string
+          level: number
+          notes?: string | null
+          players_left?: number | null
+          small_blind: number
+          timestamp?: string
+          tournament_id: string
+        }
+        Update: {
+          avg_stack?: number | null
+          bb_stack?: number | null
+          big_blind?: number
+          current_chips?: number
+          id?: string
+          level?: number
+          notes?: string | null
+          players_left?: number | null
+          small_blind?: number
+          timestamp?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_updates_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournaments: {
+        Row: {
+          avg_stack: number | null
+          bb_stack: number | null
+          big_blind: number
+          buy_in: number
+          created_at: string
+          current_chips: number
+          ended_at: string | null
+          final_position: number | null
+          guarantee: number | null
+          house_rake: number
+          id: string
+          level: number
+          name: string
+          players_left: number | null
+          prize_won: number | null
+          small_blind: number
+          started_at: string
+          starting_chips: number
+          status: string
+          total_players: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_stack?: number | null
+          bb_stack?: number | null
+          big_blind: number
+          buy_in: number
+          created_at?: string
+          current_chips: number
+          ended_at?: string | null
+          final_position?: number | null
+          guarantee?: number | null
+          house_rake?: number
+          id?: string
+          level?: number
+          name: string
+          players_left?: number | null
+          prize_won?: number | null
+          small_blind: number
+          started_at?: string
+          starting_chips: number
+          status?: string
+          total_players?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_stack?: number | null
+          bb_stack?: number | null
+          big_blind?: number
+          buy_in?: number
+          created_at?: string
+          current_chips?: number
+          ended_at?: string | null
+          final_position?: number | null
+          guarantee?: number | null
+          house_rake?: number
+          id?: string
+          level?: number
+          name?: string
+          players_left?: number | null
+          prize_won?: number | null
+          small_blind?: number
+          started_at?: string
+          starting_chips?: number
+          status?: string
+          total_players?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
