@@ -108,10 +108,14 @@ const PokerBankrollApp = () => {
   const stats = useMemo(() => {
     const totalProfit = filteredSessions.reduce((sum, session) => sum + (session.cash_out - session.buy_in), 0);
     const totalHours = filteredSessions.reduce((sum, session) => sum + session.duration, 0);
+    const totalBuyIn = filteredSessions.reduce((sum, session) => sum + session.buy_in, 0);
+    const totalCashOut = filteredSessions.reduce((sum, session) => sum + session.cash_out, 0);
     const winRate = filteredSessions.filter(s => s.cash_out > s.buy_in).length / filteredSessions.length * 100;
     
     return {
       totalProfit,
+      totalBuyIn,
+      totalCashOut,
       hourlyRate: totalHours > 0 ? totalProfit / totalHours : 0,
       totalSessions: filteredSessions.length,
       winRate: isNaN(winRate) ? 0 : winRate,
@@ -380,6 +384,26 @@ const PokerBankrollApp = () => {
               </div>
               <div className="text-2xl font-bold">{stats.winRate.toFixed(0)}%</div>
               <div className="text-sm text-muted-foreground">Win Rate</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center text-blue-500 mb-2">
+                <DollarSign size={20} />
+              </div>
+              <div className="text-2xl font-bold">${stats.totalBuyIn.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Total Buy-In</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center text-green-500 mb-2">
+                <DollarSign size={20} />
+              </div>
+              <div className="text-2xl font-bold">${stats.totalCashOut.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Total Cash-Out</div>
             </CardContent>
           </Card>
         </div>
