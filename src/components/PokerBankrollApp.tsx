@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,9 @@ const PokerBankrollApp = () => {
   const {
     sessions,
     loading,
-    addSession
+    addSession,
+    updateSession,
+    deleteSession
   } = usePokerSessions();
   const {
     toast
@@ -34,6 +36,7 @@ const PokerBankrollApp = () => {
   const [showBankroll, setShowBankroll] = useState(true);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
+  const [editSession, setEditSession] = useState<PokerSession | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>('dashboard');
 
   // Timer state
@@ -47,6 +50,18 @@ const PokerBankrollApp = () => {
     dateRange: 30
   });
   const [newSession, setNewSession] = useState({
+    type: 'cash' as 'cash' | 'mtt',
+    game_type: 'NLHE',
+    stakes: '',
+    location: '',
+    buy_in: '',
+    cash_out: '',
+    duration: '',
+    notes: ''
+  });
+
+  // Edit session form data
+  const [editSessionData, setEditSessionData] = useState({
     type: 'cash' as 'cash' | 'mtt',
     game_type: 'NLHE',
     stakes: '',
@@ -180,6 +195,77 @@ const PokerBankrollApp = () => {
       });
     }
   };
+
+  // Handle edit session
+  const handleEditSession = async () => {
+    if (!editSession || !editSessionData.stakes || !editSessionData.location || !editSessionData.buy_in || !editSessionData.cash_out) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await updateSession(editSession.id, {
+        type: editSessionData.type,
+        game_type: editSessionData.game_type,
+        stakes: editSessionData.stakes,
+        location: editSessionData.location,
+        buy_in: parseFloat(editSessionData.buy_in),
+        cash_out: parseFloat(editSessionData.cash_out),
+        duration: parseFloat(editSessionData.duration) || 0,
+        notes: editSessionData.notes || null
+      });
+
+      setEditSession(null);
+      toast({
+        title: "Success",
+        description: "Session updated successfully!"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update session. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Handle delete session
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      await deleteSession(sessionId);
+      setSelectedSession(null);
+      toast({
+        title: "Success",
+        description: "Session deleted successfully!"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete session. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Open edit dialog
+  const openEditDialog = (session: PokerSession) => {
+    setEditSession(session);
+    setEditSessionData({
+      type: session.type as 'cash' | 'mtt',
+      game_type: session.game_type,
+      stakes: session.stakes,
+      location: session.location,
+      buy_in: session.buy_in.toString(),
+      cash_out: session.cash_out.toString(),
+      duration: session.duration.toString(),
+      notes: session.notes || ''
+    });
+  };
+
   const getUniqueValues = (key: keyof PokerSession) => {
     return [...new Set(sessions.map(session => String(session[key])))];
   };
@@ -446,10 +532,10 @@ const PokerBankrollApp = () => {
           {filteredSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(session => {
             const profit = session.cash_out - session.buy_in;
             const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
-            return <Card key={session.id} className={`glass-card border-l-4 cursor-pointer hover:shadow-lg transition-shadow ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`} onClick={() => setSelectedSession(session)}>
+            return <Card key={session.id} className={`glass-card border-l-4 hover:shadow-lg transition-shadow ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`}>
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <div>
+                    <div className="flex-1 cursor-pointer" onClick={() => setSelectedSession(session)}>
                       <div className="font-semibold flex items-center gap-2">
                         {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
                         <Badge variant="outline" className="text-xs">
@@ -461,12 +547,38 @@ const PokerBankrollApp = () => {
                         {session.location}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className={`text-xl font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
-                        {profit >= 0 ? '+' : ''}${profit}
+                    <div className="flex items-center gap-2">
+                      <div className="text-right">
+                        <div className={`text-xl font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                          {profit >= 0 ? '+' : ''}${profit}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          ${hourlyRate.toFixed(0)}/hr
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        ${hourlyRate.toFixed(0)}/hr
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditDialog(session);
+                          }}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit size={14} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSession(session.id);
+                          }}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -665,6 +777,127 @@ const PokerBankrollApp = () => {
               <Button onClick={handleAddSession} className="w-full">
                 Add Session
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Session Dialog */}
+        <Dialog open={!!editSession} onOpenChange={() => setEditSession(null)}>
+          <DialogContent className="max-w-md mx-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Session</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  variant={editSessionData.type === 'cash' ? 'default' : 'outline'} 
+                  onClick={() => setEditSessionData({...editSessionData, type: 'cash'})} 
+                  className="h-12"
+                >
+                  Cash Game
+                </Button>
+                <Button 
+                  variant={editSessionData.type === 'mtt' ? 'default' : 'outline'} 
+                  onClick={() => setEditSessionData({...editSessionData, type: 'mtt'})} 
+                  className="h-12"
+                >
+                  Tournament
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Game Type</Label>
+                  <Select 
+                    value={editSessionData.game_type} 
+                    onValueChange={value => setEditSessionData({...editSessionData, game_type: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NLHE">NLHE</SelectItem>
+                      <SelectItem value="PLO">PLO</SelectItem>
+                      <SelectItem value="Mix">Mixed Games</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{editSessionData.type === 'cash' ? 'Stakes' : 'Buy-in'}</Label>
+                  <Input 
+                    placeholder={editSessionData.type === 'cash' ? "1/2" : "$150"} 
+                    value={editSessionData.stakes} 
+                    onChange={e => setEditSessionData({...editSessionData, stakes: e.target.value})} 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Location</Label>
+                <Input 
+                  placeholder="Casino name" 
+                  value={editSessionData.location} 
+                  onChange={e => setEditSessionData({...editSessionData, location: e.target.value})} 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Buy-in ($)</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="300" 
+                    value={editSessionData.buy_in} 
+                    onChange={e => setEditSessionData({...editSessionData, buy_in: e.target.value})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Cash-out ($)</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="485" 
+                    value={editSessionData.cash_out} 
+                    onChange={e => setEditSessionData({...editSessionData, cash_out: e.target.value})} 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Duration (hours)</Label>
+                <Input 
+                  type="number" 
+                  step="0.5" 
+                  placeholder="4.5" 
+                  value={editSessionData.duration} 
+                  onChange={e => setEditSessionData({...editSessionData, duration: e.target.value})} 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Notes (optional)</Label>
+                <Textarea 
+                  placeholder="Session notes..." 
+                  value={editSessionData.notes} 
+                  onChange={e => setEditSessionData({...editSessionData, notes: e.target.value})} 
+                  className="resize-none" 
+                  rows={3} 
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setEditSession(null)} 
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleEditSession} className="flex-1">
+                  Update Session
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
