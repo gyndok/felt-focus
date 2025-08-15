@@ -54,11 +54,21 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
 
   const parseCSV = (text: string): CSVRow[] => {
     const lines = text.trim().split('\n');
-    if (lines.length < 2) return [];
+    if (lines.length < 1) return [];
     
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+    // Check if first line looks like headers or data
+    const firstLine = lines[0].toLowerCase();
+    const hasHeaders = firstLine.includes('date') || firstLine.includes('description') || firstLine.includes('buy');
     
-    return lines.slice(1).map(line => {
+    const dataStartIndex = hasHeaders ? 1 : 0;
+    const actualHeaders = hasHeaders ? 
+      lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, '')) :
+      // Default headers based on your CSV structure: date, description, buy_in, cash_out, game, type, location, hours, start_time, end_time, notes
+      ['date', 'description', 'buy_in', 'cash_out', 'game', 'type', 'location', 'hours', 'start_time', 'end_time', 'notes'];
+    
+    console.log('Headers detected:', actualHeaders, 'Has headers:', hasHeaders);
+    
+    return lines.slice(dataStartIndex).map((line, lineIndex) => {
       // Handle CSV values that might contain commas within quotes
       const values = [];
       let current = '';
@@ -79,7 +89,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
       
       const row: any = {};
       
-      headers.forEach((header, index) => {
+      actualHeaders.forEach((header, index) => {
         // Map your column names to our expected format
         const fieldMap: { [key: string]: string } = {
           'date': 'date',
@@ -87,21 +97,25 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'buy in': 'buy_in',
           'buyin': 'buy_in',
           'buy-in': 'buy_in',
+          'buy_in': 'buy_in',
           'cash out': 'cash_out',
           'cashout': 'cash_out',
           'cash-out': 'cash_out',
+          'cash_out': 'cash_out',
           'game': 'game',
           'cash vs tournament': 'type',
           'type': 'type',
           'location': 'location',
-          'locations': 'location', // Handle plural form
+          'locations': 'location',
           'hours': 'hours',
           'start time': 'start_time',
           'starttime': 'start_time',
           'start-time': 'start_time',
+          'start_time': 'start_time',
           'end time': 'end_time',
           'endtime': 'end_time',
           'end-time': 'end_time',
+          'end_time': 'end_time',
           'notes': 'notes'
         };
         
@@ -109,6 +123,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
         row[mappedField] = values[index] || '';
       });
       
+      console.log(`Row ${lineIndex + 1} mapped:`, row);
       return row as CSVRow;
     }).filter(row => row && typeof row === 'object');
   };
