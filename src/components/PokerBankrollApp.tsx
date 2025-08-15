@@ -24,6 +24,7 @@ const PokerBankrollApp = () => {
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(true);
   const [showCSVImport, setShowCSVImport] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
   
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -458,7 +459,11 @@ const PokerBankrollApp = () => {
             const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
             
             return (
-              <Card key={session.id} className={`glass-card border-l-4 ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`}>
+              <Card 
+                key={session.id} 
+                className={`glass-card border-l-4 cursor-pointer hover:shadow-lg transition-shadow ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`}
+                onClick={() => setSelectedSession(session)}
+              >
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -507,6 +512,87 @@ const PokerBankrollApp = () => {
            })}
            </div>
         </div>
+
+        {/* Session Detail Dialog */}
+        <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Session Details</DialogTitle>
+            </DialogHeader>
+            {selectedSession && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Date</Label>
+                    <p className="text-lg">{new Date(selectedSession.date).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Type</Label>
+                    <Badge variant="outline" className="ml-2">
+                      {selectedSession.type.toUpperCase()}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Game</Label>
+                    <p className="text-lg">{selectedSession.game_type}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Stakes</Label>
+                    <p className="text-lg">{selectedSession.stakes}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Location</Label>
+                  <p className="text-lg">{selectedSession.location}</p>
+                </div>
+
+                <Separator />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Buy-in</Label>
+                    <p className="text-2xl font-bold">${selectedSession.buy_in.toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Cash-out</Label>
+                    <p className="text-2xl font-bold">${selectedSession.cash_out.toLocaleString()}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Profit/Loss</Label>
+                    <p className={`text-2xl font-bold ${(selectedSession.cash_out - selectedSession.buy_in) >= 0 ? 'text-profit' : 'text-loss'}`}>
+                      {(selectedSession.cash_out - selectedSession.buy_in) >= 0 ? '+' : ''}${(selectedSession.cash_out - selectedSession.buy_in).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Duration</Label>
+                    <p className="text-2xl font-bold">{selectedSession.duration.toFixed(1)}h</p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Hourly Rate</Label>
+                  <p className="text-xl font-bold">
+                    ${selectedSession.duration > 0 ? ((selectedSession.cash_out - selectedSession.buy_in) / selectedSession.duration).toFixed(0) : '0'}/hr
+                  </p>
+                </div>
+
+                {selectedSession.notes && (
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Notes</Label>
+                    <p className="text-sm bg-muted p-3 rounded-md mt-1">{selectedSession.notes}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Add Session Dialog */}
         <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
