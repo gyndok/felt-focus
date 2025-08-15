@@ -416,7 +416,7 @@ const PokerBankrollApp = () => {
           </div>
           
           <div className="max-h-96 overflow-y-auto space-y-4">
-          {filteredSessions.map(session => {
+          {filteredSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(session => {
             const profit = session.cash_out - session.buy_in;
             const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
             return <Card key={session.id} className={`glass-card border-l-4 cursor-pointer hover:shadow-lg transition-shadow ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`} onClick={() => setSelectedSession(session)}>
