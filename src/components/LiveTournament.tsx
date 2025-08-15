@@ -1,19 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
-import { 
-  Play, 
-  Pause, 
-  Square, 
-  Trophy, 
-  Users, 
-  Clock, 
-  TrendingUp,
-  DollarSign,
-  Target,
-  BarChart3,
-  ToggleLeft,
-  ToggleRight
-} from 'lucide-react';
+import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,11 +14,16 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
-
 const LiveTournament = () => {
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const { addSession } = usePokerSessions();
+  const {
+    toast
+  } = useToast();
+  const {
+    user
+  } = useAuth();
+  const {
+    addSession
+  } = usePokerSessions();
   const {
     activeTournament,
     createTournament,
@@ -40,13 +32,11 @@ const LiveTournament = () => {
     endTournament,
     getTournamentUpdates
   } = useTournaments();
-
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
   const [chartViewMode, setChartViewMode] = useState<'chips' | 'bb'>('chips');
-
   const [newTournament, setNewTournament] = useState({
     name: '',
     buy_in: '',
@@ -57,17 +47,14 @@ const LiveTournament = () => {
     small_blind: '100',
     big_blind: '200'
   });
-
   const [updateData, setUpdateData] = useState({
     level: 1,
     small_blind: '',
     big_blind: '',
     current_chips: '',
     players_left: '',
-    total_entries: '',
     notes: ''
   });
-
   const [endData, setEndData] = useState({
     final_position: '',
     prize_won: '0'
@@ -76,40 +63,26 @@ const LiveTournament = () => {
   // Calculate tournament economics
   const economics = useMemo(() => {
     if (!activeTournament) return null;
-
-    const totalEntries = activeTournament.total_players || 0;
-    const buyIn = activeTournament.buy_in;
-    const totalRake = activeTournament.house_rake;
-    const rakePerEntry = totalRake / totalEntries;
-    const prizesPerEntry = buyIn - rakePerEntry;
-    
-    const totalCollected = buyIn * totalEntries;
-    const prizePool = prizesPerEntry * totalEntries;
-    const rakePercentage = (rakePerEntry / buyIn) * 100;
-    
+    const totalCollected = activeTournament.buy_in * (activeTournament.total_players || 0);
+    const prizePool = totalCollected - activeTournament.house_rake;
+    const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
     return {
       totalCollected,
       prizePool,
       rakePercentage,
-      rakePerEntry,
-      prizesPerEntry,
-      overlay: activeTournament.guarantee && activeTournament.guarantee > prizePool 
-        ? activeTournament.guarantee - prizePool 
-        : 0
+      overlay: activeTournament.guarantee && activeTournament.guarantee > prizePool ? activeTournament.guarantee - prizePool : 0
     };
   }, [activeTournament]);
 
   // Calculate stack health
   const stackHealth = useMemo(() => {
     if (!activeTournament?.bb_stack) return 'unknown';
-    
     const bb = activeTournament.bb_stack;
     if (bb >= 20) return 'healthy';
     if (bb >= 10) return 'caution';
     if (bb >= 5) return 'danger';
     return 'critical';
   }, [activeTournament?.bb_stack]);
-
   const handleStartTournament = async () => {
     if (!newTournament.name || !newTournament.buy_in || !newTournament.starting_chips) {
       toast({
@@ -119,7 +92,6 @@ const LiveTournament = () => {
       });
       return;
     }
-
     try {
       console.log('Creating tournament with user:', user);
       if (!user) {
@@ -127,7 +99,6 @@ const LiveTournament = () => {
       }
       const startingChips = parseFloat(newTournament.starting_chips);
       const bigBlind = parseFloat(newTournament.big_blind);
-      
       await createTournament({
         name: newTournament.name,
         buy_in: parseFloat(newTournament.buy_in),
@@ -141,7 +112,6 @@ const LiveTournament = () => {
         current_chips: startingChips,
         bb_stack: startingChips / bigBlind
       });
-
       setNewTournament({
         name: '',
         buy_in: '',
@@ -153,7 +123,6 @@ const LiveTournament = () => {
         big_blind: '200'
       });
       setShowStartDialog(false);
-      
       toast({
         title: "Tournament Started",
         description: "Good luck at the tables!"
@@ -166,7 +135,6 @@ const LiveTournament = () => {
       });
     }
   };
-
   const handleUpdateTournament = async () => {
     if (!activeTournament || !updateData.current_chips) {
       toast({
@@ -176,19 +144,15 @@ const LiveTournament = () => {
       });
       return;
     }
-
     try {
       const currentChips = parseFloat(updateData.current_chips);
       const bigBlind = parseFloat(updateData.big_blind) || activeTournament.big_blind;
       const playersLeft = updateData.players_left ? parseInt(updateData.players_left) : activeTournament.players_left;
-      const totalEntries = updateData.total_entries ? parseInt(updateData.total_entries) : activeTournament.total_players;
-      
-      // Calculate total chips in play from prize pool (excluding rake)
-      const totalChipsInPlay = totalEntries ? activeTournament.starting_chips * totalEntries : null;
-      const avgStack = playersLeft && totalChipsInPlay ? totalChipsInPlay / playersLeft : null;
-      
-      const bbStack = currentChips / bigBlind;
 
+      // Calculate total chips in play from prize pool (excluding rake)
+      const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : null;
+      const avgStack = playersLeft && totalChipsInPlay ? totalChipsInPlay / playersLeft : null;
+      const bbStack = currentChips / bigBlind;
       await addTournamentUpdate(activeTournament.id, {
         level: updateData.level || activeTournament.level,
         small_blind: parseFloat(updateData.small_blind) || activeTournament.small_blind,
@@ -199,25 +163,15 @@ const LiveTournament = () => {
         bb_stack: bbStack,
         notes: updateData.notes || null
       });
-
-      // Update tournament with new total entries if provided
-      if (updateData.total_entries && parseInt(updateData.total_entries) !== activeTournament.total_players) {
-        await updateTournament(activeTournament.id, {
-          total_players: totalEntries
-        });
-      }
-
       setUpdateData({
         level: 1,
         small_blind: '',
         big_blind: '',
         current_chips: '',
         players_left: '',
-        total_entries: '',
         notes: ''
       });
       setShowUpdateDialog(false);
-      
       toast({
         title: "Tournament Updated",
         description: "Progress saved successfully"
@@ -230,22 +184,16 @@ const LiveTournament = () => {
       });
     }
   };
-
   const handleEndTournament = async () => {
     if (!activeTournament) return;
-
     try {
       const finalPosition = endData.final_position ? parseInt(endData.final_position) : undefined;
       const prizeWon = parseFloat(endData.prize_won) || 0;
-      
       const endedTournament = await endTournament(activeTournament.id, finalPosition, prizeWon);
-      
+
       // Add to poker sessions for bankroll tracking
       const profit = prizeWon - activeTournament.buy_in;
-      const duration = endedTournament.ended_at && activeTournament.started_at
-        ? (new Date(endedTournament.ended_at).getTime() - new Date(activeTournament.started_at).getTime()) / (1000 * 60 * 60)
-        : 0;
-
+      const duration = endedTournament.ended_at && activeTournament.started_at ? (new Date(endedTournament.ended_at).getTime() - new Date(activeTournament.started_at).getTime()) / (1000 * 60 * 60) : 0;
       await addSession({
         date: new Date(activeTournament.started_at).toISOString().split('T')[0],
         type: 'mtt',
@@ -257,10 +205,11 @@ const LiveTournament = () => {
         duration: duration,
         notes: finalPosition ? `Finished ${finalPosition}` : 'Eliminated'
       });
-
-      setEndData({ final_position: '', prize_won: '0' });
+      setEndData({
+        final_position: '',
+        prize_won: '0'
+      });
       setShowEndDialog(false);
-      
       toast({
         title: "Tournament Ended",
         description: "Results saved to bankroll"
@@ -285,38 +234,23 @@ const LiveTournament = () => {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-    if (!activeTournament) return [];
-    
+    if (!activeTournament || !tournamentUpdates.length) return [];
     const data = [{
       level: 1,
       chips: activeTournament.starting_chips,
-      bb: Number((activeTournament.starting_chips / activeTournament.big_blind).toFixed(2))
+      bb: activeTournament.starting_chips / activeTournament.big_blind
     }];
-    
-    // Add tournament updates if they exist
-    if (tournamentUpdates.length > 0) {
-      tournamentUpdates.forEach((update) => {
-        // Ensure we have valid numbers
-        const chips = Number(update.current_chips);
-        const bbStack = update.bb_stack ? Number(update.bb_stack) : Number((chips / update.big_blind).toFixed(2));
-        
-        if (!isNaN(chips) && !isNaN(bbStack) && chips > 0) {
-          data.push({
-            level: Number(update.level),
-            chips: chips,
-            bb: Number(bbStack.toFixed(2))
-          });
-        }
+    tournamentUpdates.forEach((update, index) => {
+      data.push({
+        level: update.level,
+        chips: update.current_chips,
+        bb: update.bb_stack || update.current_chips / update.big_blind
       });
-    }
-    
-    // Sort by level to ensure proper line drawing
-    return data.sort((a, b) => a.level - b.level);
+    });
+    return data;
   }, [activeTournament, tournamentUpdates]);
-
   if (!activeTournament) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+    return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-6">
           <div className="space-y-4">
             <Trophy className="w-16 h-16 mx-auto text-muted-foreground" />
@@ -339,90 +273,67 @@ const LiveTournament = () => {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name">Tournament Name</Label>
-                  <Input
-                    id="name"
-                    value={newTournament.name}
-                    onChange={(e) => setNewTournament({...newTournament, name: e.target.value})}
-                    placeholder="Main Event"
-                  />
+                  <Input id="name" value={newTournament.name} onChange={e => setNewTournament({
+                  ...newTournament,
+                  name: e.target.value
+                })} placeholder="Main Event" />
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <Label htmlFor="buy_in">Buy-in ($)</Label>
-                    <Input
-                      id="buy_in"
-                      type="number"
-                      value={newTournament.buy_in}
-                      onChange={(e) => setNewTournament({...newTournament, buy_in: e.target.value})}
-                      placeholder="240"
-                    />
+                    <Input id="buy_in" type="number" value={newTournament.buy_in} onChange={e => setNewTournament({
+                    ...newTournament,
+                    buy_in: e.target.value
+                  })} placeholder="240" />
                   </div>
                   <div>
                     <Label htmlFor="house_rake">House Rake ($)</Label>
-                    <Input
-                      id="house_rake"
-                      type="number"
-                      value={newTournament.house_rake}
-                      onChange={(e) => setNewTournament({...newTournament, house_rake: e.target.value})}
-                      placeholder="55"
-                    />
+                    <Input id="house_rake" type="number" value={newTournament.house_rake} onChange={e => setNewTournament({
+                    ...newTournament,
+                    house_rake: e.target.value
+                  })} placeholder="55" />
                   </div>
                   <div>
                     <Label htmlFor="starting_chips">Starting Chips</Label>
-                    <Input
-                      id="starting_chips"
-                      type="number"
-                      value={newTournament.starting_chips}
-                      onChange={(e) => setNewTournament({...newTournament, starting_chips: e.target.value})}
-                      placeholder="30000"
-                    />
+                    <Input id="starting_chips" type="number" value={newTournament.starting_chips} onChange={e => setNewTournament({
+                    ...newTournament,
+                    starting_chips: e.target.value
+                  })} placeholder="30000" />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="guarantee">Guarantee ($) - Optional</Label>
-                    <Input
-                      id="guarantee"
-                      type="number"
-                      value={newTournament.guarantee}
-                      onChange={(e) => setNewTournament({...newTournament, guarantee: e.target.value})}
-                      placeholder="25000"
-                    />
+                    <Input id="guarantee" type="number" value={newTournament.guarantee} onChange={e => setNewTournament({
+                    ...newTournament,
+                    guarantee: e.target.value
+                  })} placeholder="25000" />
                   </div>
                   <div>
                     <Label htmlFor="total_players">Total Entries</Label>
-                    <Input
-                      id="total_players"
-                      type="number"
-                      value={newTournament.total_players}
-                      onChange={(e) => setNewTournament({...newTournament, total_players: e.target.value})}
-                      placeholder="125"
-                    />
+                    <Input id="total_players" type="number" value={newTournament.total_players} onChange={e => setNewTournament({
+                    ...newTournament,
+                    total_players: e.target.value
+                  })} placeholder="125" />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="small_blind">Small Blind</Label>
-                    <Input
-                      id="small_blind"
-                      type="number"
-                      value={newTournament.small_blind}
-                      onChange={(e) => setNewTournament({...newTournament, small_blind: e.target.value})}
-                      placeholder="100"
-                    />
+                    <Input id="small_blind" type="number" value={newTournament.small_blind} onChange={e => setNewTournament({
+                    ...newTournament,
+                    small_blind: e.target.value
+                  })} placeholder="100" />
                   </div>
                   <div>
                     <Label htmlFor="big_blind">Big Blind</Label>
-                    <Input
-                      id="big_blind"
-                      type="number"
-                      value={newTournament.big_blind}
-                      onChange={(e) => setNewTournament({...newTournament, big_blind: e.target.value})}
-                      placeholder="200"
-                    />
+                    <Input id="big_blind" type="number" value={newTournament.big_blind} onChange={e => setNewTournament({
+                    ...newTournament,
+                    big_blind: e.target.value
+                  })} placeholder="200" />
                   </div>
                 </div>
                 
@@ -433,12 +344,9 @@ const LiveTournament = () => {
             </DialogContent>
           </Dialog>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="gradient-casino text-white p-6 sticky top-0 z-10">
         <div className="max-w-md mx-auto text-center">
@@ -450,18 +358,8 @@ const LiveTournament = () => {
             <div className="text-sm opacity-90">
               {activeTournament.bb_stack?.toFixed(1)} Big Blinds
             </div>
-            <Badge 
-              className={`mt-2 ${
-                stackHealth === 'healthy' ? 'bg-green-500' :
-                stackHealth === 'caution' ? 'bg-yellow-500' :
-                stackHealth === 'danger' ? 'bg-orange-500' :
-                'bg-red-500'
-              }`}
-            >
-              {stackHealth === 'healthy' ? 'Healthy Stack' :
-               stackHealth === 'caution' ? 'Caution' :
-               stackHealth === 'danger' ? 'Danger' :
-               'Critical'}
+            <Badge className={`mt-2 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
+              {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
             </Badge>
           </div>
         </div>
@@ -469,8 +367,7 @@ const LiveTournament = () => {
 
       <div className="max-w-md mx-auto px-4 pb-20 space-y-6">
         {/* Tournament Economics */}
-        {economics && (
-          <Card className="glass-card">
+        {economics && <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-lg">Tournament Economics</CardTitle>
             </CardHeader>
@@ -482,7 +379,7 @@ const LiveTournament = () => {
                     ${activeTournament.buy_in.toLocaleString()} ({economics.rakePercentage.toFixed(1)}% rake)
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    ${economics.rakePerEntry.toFixed(0)} rake, ${economics.prizesPerEntry.toFixed(0)} to prizes
+                    ${activeTournament.house_rake} rake, ${(activeTournament.buy_in - activeTournament.house_rake).toLocaleString()} to prizes
                   </div>
                 </div>
                 <div>
@@ -490,13 +387,11 @@ const LiveTournament = () => {
                   <div className="font-bold text-green-600">
                     ${economics.prizePool.toLocaleString()}
                   </div>
-                  {economics.overlay > 0 && (
-                    <div className="text-xs text-orange-500">
+                  {economics.overlay > 0 && <div className="text-xs text-orange-500">
                       +${economics.overlay.toLocaleString()} overlay
-                    </div>
-                  )}
+                    </div>}
                   <div className="text-xs text-muted-foreground">
-                    ${economics.prizesPerEntry.toFixed(0)}/entry
+                    ${(economics.prizePool / (activeTournament.total_players || 1)).toLocaleString()}/entry
                   </div>
                 </div>
               </div>
@@ -514,13 +409,12 @@ const LiveTournament = () => {
                     ${activeTournament.house_rake.toLocaleString()}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    ${economics.rakePerEntry.toFixed(0)}/entry
+                    ${(activeTournament.house_rake / (activeTournament.total_players || 1)).toFixed(0)}/entry
                   </div>
                 </div>
               </div>
 
-              {activeTournament.guarantee && (
-                <>
+              {activeTournament.guarantee && <>
                   <Separator />
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -532,18 +426,11 @@ const LiveTournament = () => {
                         {economics.overlay > 0 ? `Overlay: +$${economics.overlay.toLocaleString()} added to prize pool` : ''}
                       </div>
                     </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Players Needed</div>
-                      <div className="font-bold">
-                        {Math.ceil(activeTournament.guarantee / (activeTournament.buy_in - activeTournament.house_rake))} {activeTournament.total_players ? `(have ${activeTournament.total_players})` : ''}
-                      </div>
-                    </div>
+                    
                   </div>
-                </>
-              )}
+                </>}
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Current Status */}
         <div className="grid grid-cols-2 gap-4">
@@ -623,17 +510,11 @@ const LiveTournament = () => {
         </Card>
 
         {/* Stack Progression Chart */}
-        {chartData.length > 0 && (
-          <Card className="glass-card">
+        {chartData.length > 0 && <Card className="glass-card">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Stack Progression</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setChartViewMode(chartViewMode === 'chips' ? 'bb' : 'chips')}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" size="sm" onClick={() => setChartViewMode(chartViewMode === 'chips' ? 'bb' : 'chips')} className="flex items-center gap-2">
                   {chartViewMode === 'chips' ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
                   {chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'}
                 </Button>
@@ -644,47 +525,25 @@ const LiveTournament = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                     <XAxis 
-                       dataKey="level" 
-                       stroke="hsl(var(--muted-foreground))"
-                       tick={{ fontSize: 12 }}
-                       type="number"
-                       scale="linear"
-                       domain={['dataMin', 'dataMax']}
-                     />
-                     <YAxis 
-                       stroke="hsl(var(--muted-foreground))"
-                       tick={{ fontSize: 12 }}
-                       domain={['dataMin - 1', 'dataMax + 1']}
-                       tickFormatter={(value) => 
-                         chartViewMode === 'chips' 
-                           ? `${(value / 1000).toFixed(0)}k`
-                           : `${value.toFixed(0)} BB`
-                       }
-                     />
-                     <Tooltip 
-                       labelFormatter={(value) => `Level ${value}`}
-                       formatter={(value: number) => [
-                         chartViewMode === 'chips' 
-                           ? `${value.toLocaleString()} chips`
-                           : `${value.toFixed(1)} BB`,
-                         chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'
-                       ]}
-                       contentStyle={{
-                         backgroundColor: 'hsl(var(--popover))',
-                         border: '1px solid hsl(var(--border))',
-                         borderRadius: '6px'
-                       }}
-                     />
-                     <Line 
-                       type="monotone" 
-                       dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'}
-                       stroke="hsl(var(--primary))" 
-                       strokeWidth={3}
-                       dot={{ fill: 'hsl(var(--primary))', strokeWidth: 0, r: 4 }}
-                       activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2, fill: 'hsl(var(--background))' }}
-                       connectNulls={false}
-                     />
+                    <XAxis dataKey="level" stroke="hsl(var(--muted-foreground))" tick={{
+                  fontSize: 12
+                }} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" tick={{
+                  fontSize: 12
+                }} tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)} BB`} />
+                    <Tooltip labelFormatter={value => `Level ${value}`} formatter={(value: number) => [chartViewMode === 'chips' ? `${value.toLocaleString()} chips` : `${value.toFixed(1)} BB`, chartViewMode === 'chips' ? 'Chips' : 'Big Blinds']} contentStyle={{
+                  backgroundColor: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }} />
+                    <Line type="monotone" dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} stroke="hsl(var(--primary))" strokeWidth={2} dot={{
+                  fill: 'hsl(var(--primary))',
+                  strokeWidth: 2
+                }} activeDot={{
+                  r: 6,
+                  stroke: 'hsl(var(--primary))',
+                  strokeWidth: 2
+                }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -693,8 +552,7 @@ const LiveTournament = () => {
                 <span>{chartViewMode === 'chips' ? 'Stack in Chips' : 'Stack in Big Blinds'}</span>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Quick Updates */}
         <Card className="glass-card">
@@ -714,15 +572,9 @@ const LiveTournament = () => {
               </DialogTrigger>
             </Dialog>
 
-            {activeTournament.players_left && (
-              <Button 
-                variant="secondary" 
-                className="w-full"
-                onClick={() => setShowUpdateDialog(true)}
-              >
+            {activeTournament.players_left && <Button variant="secondary" className="w-full" onClick={() => setShowUpdateDialog(true)}>
                 Update Players ({activeTournament.players_left} remaining)
-              </Button>
-            )}
+              </Button>}
 
             <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
               <DialogTrigger asChild>
@@ -744,83 +596,50 @@ const LiveTournament = () => {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <Label htmlFor="level">Level</Label>
-                  <Input
-                    id="level"
-                    type="number"
-                    value={updateData.level}
-                    onChange={(e) => setUpdateData({...updateData, level: parseInt(e.target.value) || 1})}
-                    placeholder="1"
-                  />
+                  <Input id="level" type="number" value={updateData.level} onChange={e => setUpdateData({
+                  ...updateData,
+                  level: parseInt(e.target.value) || 1
+                })} placeholder="1" />
                 </div>
                 <div>
                   <Label htmlFor="update_small_blind">Small Blind</Label>
-                  <Input
-                    id="update_small_blind"
-                    type="number"
-                    value={updateData.small_blind}
-                    onChange={(e) => setUpdateData({...updateData, small_blind: e.target.value})}
-                    placeholder={activeTournament.small_blind.toString()}
-                  />
+                  <Input id="update_small_blind" type="number" value={updateData.small_blind} onChange={e => setUpdateData({
+                  ...updateData,
+                  small_blind: e.target.value
+                })} placeholder={activeTournament.small_blind.toString()} />
                 </div>
                 <div>
                   <Label htmlFor="update_big_blind">Big Blind</Label>
-                  <Input
-                    id="update_big_blind"
-                    type="number"
-                    value={updateData.big_blind}
-                    onChange={(e) => setUpdateData({...updateData, big_blind: e.target.value})}
-                    placeholder={activeTournament.big_blind.toString()}
-                  />
+                  <Input id="update_big_blind" type="number" value={updateData.big_blind} onChange={e => setUpdateData({
+                  ...updateData,
+                  big_blind: e.target.value
+                })} placeholder={activeTournament.big_blind.toString()} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="update_current_chips">Current Chips *</Label>
-                  <Input
-                    id="update_current_chips"
-                    type="number"
-                    value={updateData.current_chips}
-                    onChange={(e) => setUpdateData({...updateData, current_chips: e.target.value})}
-                    placeholder={activeTournament.current_chips.toString()}
-                  />
+                  <Input id="update_current_chips" type="number" value={updateData.current_chips} onChange={e => setUpdateData({
+                  ...updateData,
+                  current_chips: e.target.value
+                })} placeholder={activeTournament.current_chips.toString()} />
                 </div>
                 <div>
                   <Label htmlFor="update_players_left">Players Left</Label>
-                  <Input
-                    id="update_players_left"
-                    type="number"
-                    value={updateData.players_left}
-                    onChange={(e) => setUpdateData({...updateData, players_left: e.target.value})}
-                    placeholder={activeTournament.players_left?.toString()}
-                  />
+                  <Input id="update_players_left" type="number" value={updateData.players_left} onChange={e => setUpdateData({
+                  ...updateData,
+                  players_left: e.target.value
+                })} placeholder={activeTournament.players_left?.toString()} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="update_total_entries">Total Entries</Label>
-                  <Input
-                    id="update_total_entries"
-                    type="number"
-                    value={updateData.total_entries}
-                    onChange={(e) => setUpdateData({...updateData, total_entries: e.target.value})}
-                    placeholder={activeTournament.total_players?.toString() || "Current entries"}
-                  />
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Current: {activeTournament.total_players || 'Not set'}
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="update_notes">Notes (Optional)</Label>
-                  <Textarea
-                    id="update_notes"
-                    value={updateData.notes}
-                    onChange={(e) => setUpdateData({...updateData, notes: e.target.value})}
-                    placeholder="Any additional notes..."
-                    rows={2}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="update_notes">Notes (Optional)</Label>
+                <Textarea id="update_notes" value={updateData.notes} onChange={e => setUpdateData({
+                ...updateData,
+                notes: e.target.value
+              })} placeholder="Any additional notes..." />
               </div>
 
               <Button onClick={handleUpdateTournament} className="w-full">
@@ -840,23 +659,17 @@ const LiveTournament = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="final_position">Final Position (Optional)</Label>
-                  <Input
-                    id="final_position"
-                    type="number"
-                    value={endData.final_position}
-                    onChange={(e) => setEndData({...endData, final_position: e.target.value})}
-                    placeholder="e.g. 3"
-                  />
+                  <Input id="final_position" type="number" value={endData.final_position} onChange={e => setEndData({
+                  ...endData,
+                  final_position: e.target.value
+                })} placeholder="e.g. 3" />
                 </div>
                 <div>
                   <Label htmlFor="prize_won">Prize Won ($)</Label>
-                  <Input
-                    id="prize_won"
-                    type="number"
-                    value={endData.prize_won}
-                    onChange={(e) => setEndData({...endData, prize_won: e.target.value})}
-                    placeholder="0"
-                  />
+                  <Input id="prize_won" type="number" value={endData.prize_won} onChange={e => setEndData({
+                  ...endData,
+                  prize_won: e.target.value
+                })} placeholder="0" />
                 </div>
               </div>
 
@@ -871,8 +684,6 @@ const LiveTournament = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default LiveTournament;
