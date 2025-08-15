@@ -24,11 +24,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
 
 const LiveTournament = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const { addSession } = usePokerSessions();
   const {
     activeTournament,
@@ -110,6 +112,10 @@ const LiveTournament = () => {
     }
 
     try {
+      console.log('Creating tournament with user:', user);
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
       const startingChips = parseFloat(newTournament.starting_chips);
       const bigBlind = parseFloat(newTournament.big_blind);
       
