@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
 import { Upload, FileSpreadsheet, Check, AlertCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface CSVRow {
   date: string;
@@ -54,10 +54,29 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
 
   const parseCSV = (text: string): CSVRow[] => {
     const lines = text.trim().split('\n');
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+    if (lines.length < 2) return [];
+    
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
     
     return lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+      // Handle CSV values that might contain commas within quotes
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          values.push(current.trim().replace(/"/g, ''));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      values.push(current.trim().replace(/"/g, ''));
+      
       const row: any = {};
       
       headers.forEach((header, index) => {
@@ -67,8 +86,10 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'description': 'description',
           'buy in': 'buy_in',
           'buyin': 'buy_in',
+          'buy-in': 'buy_in',
           'cash out': 'cash_out',
           'cashout': 'cash_out',
+          'cash-out': 'cash_out',
           'game': 'game',
           'cash vs tournament': 'type',
           'type': 'type',
@@ -77,8 +98,10 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'hours': 'hours',
           'start time': 'start_time',
           'starttime': 'start_time',
+          'start-time': 'start_time',
           'end time': 'end_time',
           'endtime': 'end_time',
+          'end-time': 'end_time',
           'notes': 'notes'
         };
         
@@ -87,7 +110,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
       });
       
       return row as CSVRow;
-    });
+    }).filter(row => row && typeof row === 'object');
   };
 
   const mapDataToSessions = (csvRows: CSVRow[]): MappedSession[] => {
@@ -95,60 +118,81 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
     
     const mapped = csvRows.map((row, index) => {
       try {
+        // Validate required fields
+        if (!row || typeof row !== 'object') {
+          errors.push(`Row ${index + 1}: Invalid row data`);
+          return null;
+        }
+
+        if (!row.date || !row.buy_in || !row.cash_out) {
+          errors.push(`Row ${index + 1}: Missing required fields (date, buy_in, cash_out)`);
+          return null;
+        }
+
         // Parse date
         let date = row.date;
         if (date.includes('/')) {
-          const [month, day, year] = date.split('/');
-          date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          const parts = date.split('/');
+          if (parts.length === 3) {
+            const [month, day, year] = parts;
+            const fullYear = year.length === 2 ? `20${year}` : year;
+            date = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          }
         }
 
         // Extract game type and stakes from description
         let game_type = row.game || 'NLHE';
         let stakes = '';
         
-        // Try to extract stakes from description (e.g., "$600", "100k", "1/3")
-        const stakeMatch = row.description.match(/\$?(\d+[kmKM]?|\d+\/\d+)/);
-        if (stakeMatch) {
-          stakes = stakeMatch[1];
-        } else {
-          stakes = row.description.split(' ')[0] || '';
+        if (row.description) {
+          // Try to extract stakes from description (e.g., "$600", "100k", "1/3")
+          const stakeMatch = row.description.match(/\$?(\d+[kmKM]?|\d+\/\d+)/);
+          if (stakeMatch) {
+            stakes = stakeMatch[1];
+          } else {
+            stakes = row.description.split(' ')[0] || '';
+          }
         }
 
         // Map type
         let type: 'cash' | 'mtt' = 'cash';
-        if (row.type?.toLowerCase().includes('mtt') || row.type?.toLowerCase().includes('tournament') || 
-            row.description?.toLowerCase().includes('gtd') || row.description?.toLowerCase().includes('tournament')) {
+        const typeIndicators = [row.type, row.description].join(' ').toLowerCase();
+        if (typeIndicators.includes('mtt') || typeIndicators.includes('tournament') || 
+            typeIndicators.includes('gtd')) {
           type = 'mtt';
         }
 
         // Parse financial values
-        const buy_in = parseFloat(row.buy_in.replace(/[$,]/g, '')) || 0;
-        const cash_out = parseFloat(row.cash_out.replace(/[$,]/g, '')) || 0;
+        const buy_in = parseFloat(String(row.buy_in).replace(/[$,]/g, '')) || 0;
+        const cash_out = parseFloat(String(row.cash_out).replace(/[$,]/g, '')) || 0;
         
         // Parse duration
-        let duration = parseFloat(row.hours) || 0;
+        let duration = parseFloat(String(row.hours)) || 0;
         
         // If hours is 0 or missing, try to calculate from start/end times
         if (duration === 0 && row.start_time && row.end_time) {
-          // This is a simplified calculation - might need refinement based on your time format
-          const start = new Date(`1970/01/01 ${row.start_time}`);
-          const end = new Date(`1970/01/01 ${row.end_time}`);
-          if (end < start) {
-            // Next day
-            end.setDate(end.getDate() + 1);
+          try {
+            const start = new Date(`1970/01/01 ${row.start_time}`);
+            const end = new Date(`1970/01/01 ${row.end_time}`);
+            if (end < start) {
+              // Next day
+              end.setDate(end.getDate() + 1);
+            }
+            duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+          } catch {
+            // If time parsing fails, keep duration as 0
           }
-          duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
         }
 
         return {
           date,
           game_type,
-          stakes,
+          stakes: stakes || 'Unknown',
           type,
-          location: row.location || '',
+          location: row.location || 'Unknown',
           buy_in,
           cash_out,
-          duration,
+          duration: Math.max(0, duration),
           notes: row.notes || row.description || null
         };
       } catch (error) {
@@ -240,6 +284,9 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
             <FileSpreadsheet size={20} />
             Import Sessions from CSV
           </DialogTitle>
+          <DialogDescription>
+            Upload your poker session data in CSV format. Expected columns: date, description, buy_in, cash_out, game, type, location, hours, start_time, end_time, notes
+          </DialogDescription>
         </DialogHeader>
 
         {importStatus === 'idle' && (
