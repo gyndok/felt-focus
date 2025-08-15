@@ -223,7 +223,7 @@ const LiveTournament = () => {
         : 0;
 
       await addSession({
-        date: new Date().toISOString().split('T')[0],
+        date: new Date(activeTournament.started_at).toISOString().split('T')[0],
         type: 'mtt',
         game_type: 'Tournament',
         stakes: `$${activeTournament.buy_in}`,
