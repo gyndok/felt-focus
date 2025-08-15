@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      poker_sessions: {
+        Row: {
+          buy_in: number
+          cash_out: number
+          created_at: string
+          date: string
+          duration: number
+          game_type: string
+          id: string
+          location: string
+          notes: string | null
+          stakes: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          buy_in: number
+          cash_out: number
+          created_at?: string
+          date?: string
+          duration: number
+          game_type: string
+          id?: string
+          location: string
+          notes?: string | null
+          stakes: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          buy_in?: number
+          cash_out?: number
+          created_at?: string
+          date?: string
+          duration?: number
+          game_type?: string
+          id?: string
+          location?: string
+          notes?: string | null
+          stakes?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
