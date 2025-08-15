@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,21 +12,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-
-interface Session {
-  id: number;
-  date: string;
-  type: string;
-  gameType: string;
-  stakes: string;
-  location: string;
-  buyIn: number;
-  cashOut: number;
-  duration: number;
-  notes: string;
-}
+import { useToast } from '@/hooks/use-toast';
 
 const PokerBankrollApp = () => {
+  const { user, signOut } = useAuth();
+  const { sessions, loading, addSession } = usePokerSessions();
+  const { toast } = useToast();
+  
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(true);
@@ -33,85 +27,21 @@ const PokerBankrollApp = () => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
   const [currentSessionTime, setCurrentSessionTime] = useState(0);
-  
-  // Sample data - in a real app this would be persistent
-  const [sessions, setSessions] = useState<Session[]>([
-    {
-      id: 1,
-      date: '2025-08-14',
-      type: 'cash',
-      gameType: 'NLHE',
-      stakes: '1/2',
-      location: 'Aria Casino',
-      buyIn: 300,
-      cashOut: 485,
-      duration: 4.5,
-      notes: 'Good session, ran well'
-    },
-    {
-      id: 2,
-      date: '2025-08-13',
-      type: 'mtt',
-      gameType: 'NLHE',
-      stakes: '150',
-      location: 'Bellagio',
-      buyIn: 150,
-      cashOut: 0,
-      duration: 2.5,
-      notes: 'Busted with AK vs QQ'
-    },
-    {
-      id: 3,
-      date: '2025-08-12',
-      type: 'cash',
-      gameType: 'PLO',
-      stakes: '2/5',
-      location: 'Wynn',
-      buyIn: 800,
-      cashOut: 1240,
-      duration: 6.0,
-      notes: 'Great PLO session'
-    },
-    {
-      id: 4,
-      date: '2025-08-11',
-      type: 'cash',
-      gameType: 'NLHE',
-      stakes: '1/2',
-      location: 'Aria Casino',
-      buyIn: 300,
-      cashOut: 250,
-      duration: 3.0,
-      notes: 'Tough table'
-    },
-    {
-      id: 5,
-      date: '2025-08-10',
-      type: 'mtt',
-      gameType: 'NLHE',
-      stakes: '200',
-      location: 'WSOP',
-      buyIn: 200,
-      cashOut: 680,
-      duration: 8.5,
-      notes: 'Final table finish!'
-    }
-  ]);
 
   const [filters, setFilters] = useState({
     type: 'all',
-    gameType: 'all',
+    game_type: 'all',
     location: 'all',
     dateRange: 30
   });
 
   const [newSession, setNewSession] = useState({
-    type: 'cash',
-    gameType: 'NLHE',
+    type: 'cash' as 'cash' | 'mtt',
+    game_type: 'NLHE',
     stakes: '',
     location: '',
-    buyIn: '',
-    cashOut: '',
+    buy_in: '',
+    cash_out: '',
     duration: '',
     notes: ''
   });
@@ -165,7 +95,7 @@ const PokerBankrollApp = () => {
       
       return (
         (filters.type === 'all' || session.type === filters.type) &&
-        (filters.gameType === 'all' || session.gameType === filters.gameType) &&
+        (filters.game_type === 'all' || session.game_type === filters.game_type) &&
         (filters.location === 'all' || session.location === filters.location) &&
         daysDiff <= filters.dateRange
       );
@@ -174,67 +104,100 @@ const PokerBankrollApp = () => {
 
   // Calculate stats
   const stats = useMemo(() => {
-    const totalProfit = filteredSessions.reduce((sum, session) => sum + (session.cashOut - session.buyIn), 0);
+    const totalProfit = filteredSessions.reduce((sum, session) => sum + (session.cash_out - session.buy_in), 0);
     const totalHours = filteredSessions.reduce((sum, session) => sum + session.duration, 0);
-    const totalBuyIns = filteredSessions.reduce((sum, session) => sum + session.buyIn, 0);
-    const winRate = filteredSessions.filter(s => s.cashOut > s.buyIn).length / filteredSessions.length * 100;
+    const winRate = filteredSessions.filter(s => s.cash_out > s.buy_in).length / filteredSessions.length * 100;
     
     return {
       totalProfit,
       hourlyRate: totalHours > 0 ? totalProfit / totalHours : 0,
       totalSessions: filteredSessions.length,
       winRate: isNaN(winRate) ? 0 : winRate,
-      totalBankroll: 5000 + totalProfit
+      totalBankroll: 5000 + totalProfit // Assuming starting bankroll of 5000
     };
   }, [filteredSessions]);
 
   // Chart data
   const chartData = useMemo(() => {
-    let runningTotal = 5000;
+    let runningTotal = 5000; // Starting bankroll
     return filteredSessions
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map(session => {
-        runningTotal += (session.cashOut - session.buyIn);
+        runningTotal += (session.cash_out - session.buy_in);
         return {
           date: session.date,
           bankroll: runningTotal,
-          profit: session.cashOut - session.buyIn
+          profit: session.cash_out - session.buy_in
         };
       });
   }, [filteredSessions]);
 
-  const addSession = () => {
-    if (!newSession.stakes || !newSession.location || !newSession.buyIn || !newSession.cashOut) {
-      alert('Please fill in all required fields');
+  const handleAddSession = async () => {
+    if (!newSession.stakes || !newSession.location || !newSession.buy_in || !newSession.cash_out) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
       return;
     }
 
-    const session: Session = {
-      id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
-      ...newSession,
-      buyIn: parseFloat(newSession.buyIn),
-      cashOut: parseFloat(newSession.cashOut),
-      duration: parseFloat(newSession.duration) || 0
-    };
+    try {
+      await addSession({
+        date: new Date().toISOString().split('T')[0],
+        type: newSession.type,
+        game_type: newSession.game_type,
+        stakes: newSession.stakes,
+        location: newSession.location,
+        buy_in: parseFloat(newSession.buy_in),
+        cash_out: parseFloat(newSession.cash_out),
+        duration: parseFloat(newSession.duration) || 0,
+        notes: newSession.notes || null
+      });
 
-    setSessions([session, ...sessions]);
-    setNewSession({
-      type: 'cash',
-      gameType: 'NLHE',
-      stakes: '',
-      location: '',
-      buyIn: '',
-      cashOut: '',
-      duration: '',
-      notes: ''
-    });
-    setShowAddSession(false);
+      setNewSession({
+        type: 'cash',
+        game_type: 'NLHE',
+        stakes: '',
+        location: '',
+        buy_in: '',
+        cash_out: '',
+        duration: '',
+        notes: ''
+      });
+      setShowAddSession(false);
+      
+      toast({
+        title: "Success",
+        description: "Session added successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add session. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const getUniqueValues = (key: keyof Session): string[] => {
+  const getUniqueValues = (key: keyof PokerSession) => {
     return [...new Set(sessions.map(session => String(session[key])))];
   };
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading your poker sessions...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -251,6 +214,14 @@ const PokerBankrollApp = () => {
                 className="bg-white/20 hover:bg-white/30 border-white/30"
               >
                 <Filter size={18} />
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleLogout}
+                className="bg-white/20 hover:bg-white/30 border-white/30"
+              >
+                <LogOut size={18} />
               </Button>
               <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
                 <DialogTrigger asChild>
@@ -338,13 +309,13 @@ const PokerBankrollApp = () => {
                   </SelectContent>
                 </Select>
                 
-                <Select value={filters.gameType} onValueChange={(value) => setFilters({...filters, gameType: value})}>
+                <Select value={filters.game_type} onValueChange={(value) => setFilters({...filters, game_type: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Variant" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Games</SelectItem>
-                    {getUniqueValues('gameType').map(game => (
+                    {getUniqueValues('game_type').map(game => (
                       <SelectItem key={game} value={game}>{game}</SelectItem>
                     ))}
                   </SelectContent>
@@ -447,7 +418,7 @@ const PokerBankrollApp = () => {
           </div>
           
           {filteredSessions.map(session => {
-            const profit = session.cashOut - session.buyIn;
+            const profit = session.cash_out - session.buy_in;
             const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
             
             return (
@@ -456,7 +427,7 @@ const PokerBankrollApp = () => {
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="font-semibold flex items-center gap-2">
-                        {session.type === 'cash' ? `${session.gameType} ${session.stakes}` : `${session.gameType} $${session.stakes}`}
+                        {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
                         <Badge variant="outline" className="text-xs">
                           {session.type.toUpperCase()}
                         </Badge>
@@ -528,7 +499,7 @@ const PokerBankrollApp = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Game Type</Label>
-                  <Select value={newSession.gameType} onValueChange={(value) => setNewSession({...newSession, gameType: value})}>
+                  <Select value={newSession.game_type} onValueChange={(value) => setNewSession({...newSession, game_type: value})}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -565,8 +536,8 @@ const PokerBankrollApp = () => {
                   <Input
                     type="number"
                     placeholder="300"
-                    value={newSession.buyIn}
-                    onChange={(e) => setNewSession({...newSession, buyIn: e.target.value})}
+                    value={newSession.buy_in}
+                    onChange={(e) => setNewSession({...newSession, buy_in: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
@@ -574,8 +545,8 @@ const PokerBankrollApp = () => {
                   <Input
                     type="number"
                     placeholder="485"
-                    value={newSession.cashOut}
-                    onChange={(e) => setNewSession({...newSession, cashOut: e.target.value})}
+                    value={newSession.cash_out}
+                    onChange={(e) => setNewSession({...newSession, cash_out: e.target.value})}
                   />
                 </div>
               </div>
@@ -602,7 +573,7 @@ const PokerBankrollApp = () => {
                 />
               </div>
 
-              <Button onClick={addSession} className="w-full">
+              <Button onClick={handleAddSession} className="w-full">
                 Add Session
               </Button>
             </div>
