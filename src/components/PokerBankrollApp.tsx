@@ -585,7 +585,7 @@ const PokerBankrollApp = () => {
 
                 {selectedSession.notes && (
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Notes</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Description</Label>
                     <p className="text-sm bg-muted p-3 rounded-md mt-1">{selectedSession.notes}</p>
                   </div>
                 )}
