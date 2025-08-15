@@ -225,9 +225,7 @@ const PokerBankrollApp = () => {
                 {showBankroll ? <Eye size={16} /> : <EyeOff size={16} />}
               </Button>
             </div>
-            <div className={`text-4xl font-bold mb-2 ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-              {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••'}
-            </div>
+            
             <div className={`text-sm ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
               {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••'}
             </div>
