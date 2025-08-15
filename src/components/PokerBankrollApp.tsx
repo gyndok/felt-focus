@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,11 @@ const PokerBankrollApp = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(true);
+  
+  // Timer state
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+  const [currentSessionTime, setCurrentSessionTime] = useState(0);
   
   // Sample data - in a real app this would be persistent
   const [sessions, setSessions] = useState<Session[]>([
@@ -110,6 +115,48 @@ const PokerBankrollApp = () => {
     duration: '',
     notes: ''
   });
+
+  // Timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning && timerStartTime) {
+      interval = setInterval(() => {
+        setCurrentSessionTime(Math.floor((Date.now() - timerStartTime) / 1000));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timerStartTime]);
+
+  const startTimer = () => {
+    setTimerStartTime(Date.now());
+    setIsTimerRunning(true);
+    setCurrentSessionTime(0);
+  };
+
+  const stopTimer = () => {
+    if (timerStartTime) {
+      const totalSeconds = Math.floor((Date.now() - timerStartTime) / 1000);
+      const hours = (totalSeconds / 3600).toFixed(1);
+      setNewSession(prev => ({ ...prev, duration: hours }));
+      setShowAddSession(true);
+    }
+    setIsTimerRunning(false);
+    setTimerStartTime(null);
+    setCurrentSessionTime(0);
+  };
+
+  const resetTimer = () => {
+    setIsTimerRunning(false);
+    setTimerStartTime(null);
+    setCurrentSessionTime(0);
+  };
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Filter sessions based on current filters
   const filteredSessions = useMemo(() => {
@@ -239,6 +286,42 @@ const PokerBankrollApp = () => {
       </div>
 
       <div className="max-w-md mx-auto px-4 pb-20">
+        {/* Timer Section */}
+        <Card className="mb-6 glass-card">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="text-xl font-mono font-bold">
+                  {formatTime(currentSessionTime)}
+                </div>
+                {isTimerRunning && (
+                  <Badge variant="default" className="animate-pulse">
+                    Session Active
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {!isTimerRunning ? (
+                  <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Play className="h-4 w-4 mr-1" />
+                    Start
+                  </Button>
+                ) : (
+                  <>
+                    <Button onClick={resetTimer} variant="outline" size="sm">
+                      <Square className="h-4 w-4" />
+                    </Button>
+                    <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
+                      <Pause className="h-4 w-4 mr-1" />
+                      End Session
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Filters */}
         {showFilters && (
           <Card className="mb-6 glass-card">
