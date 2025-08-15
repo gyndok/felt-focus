@@ -77,14 +77,22 @@ const LiveTournament = () => {
   const economics = useMemo(() => {
     if (!activeTournament) return null;
 
-    const totalCollected = activeTournament.buy_in * (activeTournament.total_players || 0);
-    const prizePool = totalCollected - activeTournament.house_rake;
-    const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
+    const totalEntries = activeTournament.total_players || 0;
+    const buyIn = activeTournament.buy_in;
+    const totalRake = activeTournament.house_rake;
+    const rakePerEntry = totalRake / totalEntries;
+    const prizesPerEntry = buyIn - rakePerEntry;
+    
+    const totalCollected = buyIn * totalEntries;
+    const prizePool = prizesPerEntry * totalEntries;
+    const rakePercentage = (rakePerEntry / buyIn) * 100;
     
     return {
       totalCollected,
       prizePool,
       rakePercentage,
+      rakePerEntry,
+      prizesPerEntry,
       overlay: activeTournament.guarantee && activeTournament.guarantee > prizePool 
         ? activeTournament.guarantee - prizePool 
         : 0
@@ -474,7 +482,7 @@ const LiveTournament = () => {
                     ${activeTournament.buy_in.toLocaleString()} ({economics.rakePercentage.toFixed(1)}% rake)
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    ${activeTournament.house_rake} rake, ${(activeTournament.buy_in - activeTournament.house_rake).toLocaleString()} to prizes
+                    ${economics.rakePerEntry.toFixed(0)} rake, ${economics.prizesPerEntry.toFixed(0)} to prizes
                   </div>
                 </div>
                 <div>
@@ -488,7 +496,7 @@ const LiveTournament = () => {
                     </div>
                   )}
                   <div className="text-xs text-muted-foreground">
-                    ${(economics.prizePool / (activeTournament.total_players || 1)).toLocaleString()}/entry
+                    ${economics.prizesPerEntry.toFixed(0)}/entry
                   </div>
                 </div>
               </div>
@@ -506,7 +514,7 @@ const LiveTournament = () => {
                     ${activeTournament.house_rake.toLocaleString()}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    ${(activeTournament.house_rake / (activeTournament.total_players || 1)).toFixed(0)}/entry
+                    ${economics.rakePerEntry.toFixed(0)}/entry
                   </div>
                 </div>
               </div>
