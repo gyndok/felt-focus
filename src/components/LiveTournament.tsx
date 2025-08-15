@@ -277,23 +277,33 @@ const LiveTournament = () => {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-    if (!activeTournament || !tournamentUpdates.length) return [];
+    if (!activeTournament) return [];
     
     const data = [{
       level: 1,
       chips: activeTournament.starting_chips,
-      bb: activeTournament.starting_chips / activeTournament.big_blind
+      bb: Number((activeTournament.starting_chips / activeTournament.big_blind).toFixed(2))
     }];
     
-    tournamentUpdates.forEach((update, index) => {
-      data.push({
-        level: update.level,
-        chips: update.current_chips,
-        bb: update.bb_stack || (update.current_chips / update.big_blind)
+    // Add tournament updates if they exist
+    if (tournamentUpdates.length > 0) {
+      tournamentUpdates.forEach((update) => {
+        // Ensure we have valid numbers
+        const chips = Number(update.current_chips);
+        const bbStack = update.bb_stack ? Number(update.bb_stack) : Number((chips / update.big_blind).toFixed(2));
+        
+        if (!isNaN(chips) && !isNaN(bbStack) && chips > 0) {
+          data.push({
+            level: Number(update.level),
+            chips: chips,
+            bb: Number(bbStack.toFixed(2))
+          });
+        }
       });
-    });
+    }
     
-    return data;
+    // Sort by level to ensure proper line drawing
+    return data.sort((a, b) => a.level - b.level);
   }, [activeTournament, tournamentUpdates]);
 
   if (!activeTournament) {
@@ -626,42 +636,47 @@ const LiveTournament = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis 
-                      dataKey="level" 
-                      stroke="hsl(var(--muted-foreground))"
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))"
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => 
-                        chartViewMode === 'chips' 
-                          ? `${(value / 1000).toFixed(0)}k`
-                          : `${value.toFixed(0)} BB`
-                      }
-                    />
-                    <Tooltip 
-                      labelFormatter={(value) => `Level ${value}`}
-                      formatter={(value: number) => [
-                        chartViewMode === 'chips' 
-                          ? `${value.toLocaleString()} chips`
-                          : `${value.toFixed(1)} BB`,
-                        chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'
-                      ]}
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--popover))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '6px'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'}
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2 }}
-                      activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
-                    />
+                     <XAxis 
+                       dataKey="level" 
+                       stroke="hsl(var(--muted-foreground))"
+                       tick={{ fontSize: 12 }}
+                       type="number"
+                       scale="linear"
+                       domain={['dataMin', 'dataMax']}
+                     />
+                     <YAxis 
+                       stroke="hsl(var(--muted-foreground))"
+                       tick={{ fontSize: 12 }}
+                       domain={['dataMin - 1', 'dataMax + 1']}
+                       tickFormatter={(value) => 
+                         chartViewMode === 'chips' 
+                           ? `${(value / 1000).toFixed(0)}k`
+                           : `${value.toFixed(0)} BB`
+                       }
+                     />
+                     <Tooltip 
+                       labelFormatter={(value) => `Level ${value}`}
+                       formatter={(value: number) => [
+                         chartViewMode === 'chips' 
+                           ? `${value.toLocaleString()} chips`
+                           : `${value.toFixed(1)} BB`,
+                         chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'
+                       ]}
+                       contentStyle={{
+                         backgroundColor: 'hsl(var(--popover))',
+                         border: '1px solid hsl(var(--border))',
+                         borderRadius: '6px'
+                       }}
+                     />
+                     <Line 
+                       type="monotone" 
+                       dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'}
+                       stroke="hsl(var(--primary))" 
+                       strokeWidth={3}
+                       dot={{ fill: 'hsl(var(--primary))', strokeWidth: 0, r: 4 }}
+                       activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2, fill: 'hsl(var(--background))' }}
+                       connectNulls={false}
+                     />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
