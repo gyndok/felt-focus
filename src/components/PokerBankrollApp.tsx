@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { CSVImport } from './CSVImport';
 
 const PokerBankrollApp = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +23,7 @@ const PokerBankrollApp = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(true);
+  const [showCSVImport, setShowCSVImport] = useState(false);
   
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -214,6 +216,15 @@ const PokerBankrollApp = () => {
                 className="bg-white/20 hover:bg-white/30 border-white/30"
               >
                 <Filter size={18} />
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowCSVImport(true)}
+                className="bg-white/20 hover:bg-white/30 border-white/30"
+                title="Import CSV"
+              >
+                📊
               </Button>
               <Button
                 variant="secondary"
@@ -579,6 +590,11 @@ const PokerBankrollApp = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        <CSVImport 
+          isOpen={showCSVImport} 
+          onOpenChange={setShowCSVImport} 
+        />
       </div>
     </div>
   );
