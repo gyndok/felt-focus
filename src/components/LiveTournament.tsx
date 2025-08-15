@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import React, { useState, useMemo, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
 import { 
   Play, 
   Pause, 
@@ -9,7 +9,10 @@ import {
   Clock, 
   TrendingUp,
   DollarSign,
-  Target
+  Target,
+  BarChart3,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +43,7 @@ const LiveTournament = () => {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
+  const [chartViewMode, setChartViewMode] = useState<'chips' | 'bb'>('chips');
 
   const [newTournament, setNewTournament] = useState({
     name: '',
@@ -163,9 +167,9 @@ const LiveTournament = () => {
       const bigBlind = parseFloat(updateData.big_blind) || activeTournament.big_blind;
       const playersLeft = updateData.players_left ? parseInt(updateData.players_left) : activeTournament.players_left;
       
-      const avgStack = playersLeft && activeTournament.total_players 
-        ? (activeTournament.starting_chips * activeTournament.total_players) / playersLeft
-        : null;
+      // Calculate total chips in play from prize pool (excluding rake)
+      const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : null;
+      const avgStack = playersLeft && totalChipsInPlay ? totalChipsInPlay / playersLeft : null;
       
       const bbStack = currentChips / bigBlind;
 
@@ -246,6 +250,36 @@ const LiveTournament = () => {
     }
   };
 
+  // Load tournament updates for chart
+  useEffect(() => {
+    if (activeTournament) {
+      getTournamentUpdates(activeTournament.id).then(updates => {
+        setTournamentUpdates(updates || []);
+      }).catch(console.error);
+    }
+  }, [activeTournament, getTournamentUpdates]);
+
+  // Prepare chart data
+  const chartData = useMemo(() => {
+    if (!activeTournament || !tournamentUpdates.length) return [];
+    
+    const data = [{
+      level: 1,
+      chips: activeTournament.starting_chips,
+      bb: activeTournament.starting_chips / activeTournament.big_blind
+    }];
+    
+    tournamentUpdates.forEach((update, index) => {
+      data.push({
+        level: update.level,
+        chips: update.current_chips,
+        bb: update.bb_stack || (update.current_chips / update.big_blind)
+      });
+    });
+    
+    return data;
+  }, [activeTournament, tournamentUpdates]);
+
   if (!activeTournament) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
@@ -324,7 +358,7 @@ const LiveTournament = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="total_players">Total Players</Label>
+                    <Label htmlFor="total_players">Total Entries</Label>
                     <Input
                       id="total_players"
                       type="number"
@@ -428,7 +462,7 @@ const LiveTournament = () => {
                     </div>
                   )}
                   <div className="text-xs text-muted-foreground">
-                    ${(economics.prizePool / (activeTournament.total_players || 1)).toLocaleString()}/player
+                    ${(economics.prizePool / (activeTournament.total_players || 1)).toLocaleString()}/entry
                   </div>
                 </div>
               </div>
@@ -446,7 +480,7 @@ const LiveTournament = () => {
                     ${activeTournament.house_rake.toLocaleString()}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    ${(activeTournament.house_rake / (activeTournament.total_players || 1)).toFixed(0)}/player
+                    ${(activeTournament.house_rake / (activeTournament.total_players || 1)).toFixed(0)}/entry
                   </div>
                 </div>
               </div>
@@ -507,11 +541,11 @@ const LiveTournament = () => {
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold">
-                {activeTournament.avg_stack?.toFixed(0).toLocaleString() || 'N/A'} BB
+                {activeTournament.avg_stack ? (activeTournament.avg_stack / activeTournament.big_blind).toFixed(0) : 'N/A'} BB
               </div>
               <div className="text-sm text-muted-foreground">Avg Stack</div>
               <div className="text-xs text-muted-foreground">
-                {activeTournament.avg_stack ? `${(activeTournament.avg_stack / activeTournament.big_blind).toFixed(0)} chips` : ''}
+                {activeTournament.avg_stack ? `${activeTournament.avg_stack.toFixed(0).toLocaleString()} chips` : ''}
               </div>
             </CardContent>
           </Card>
@@ -553,6 +587,75 @@ const LiveTournament = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Stack Progression Chart */}
+        {chartData.length > 0 && (
+          <Card className="glass-card">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Stack Progression</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setChartViewMode(chartViewMode === 'chips' ? 'bb' : 'chips')}
+                  className="flex items-center gap-2"
+                >
+                  {chartViewMode === 'chips' ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
+                  {chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-48 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="level" 
+                      stroke="hsl(var(--muted-foreground))"
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))"
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => 
+                        chartViewMode === 'chips' 
+                          ? `${(value / 1000).toFixed(0)}k`
+                          : `${value.toFixed(0)} BB`
+                      }
+                    />
+                    <Tooltip 
+                      labelFormatter={(value) => `Level ${value}`}
+                      formatter={(value: number) => [
+                        chartViewMode === 'chips' 
+                          ? `${value.toLocaleString()} chips`
+                          : `${value.toFixed(1)} BB`,
+                        chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'
+                      ]}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--popover))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '6px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'}
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2 }}
+                      activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+                <span>Tournament Level</span>
+                <span>{chartViewMode === 'chips' ? 'Stack in Chips' : 'Stack in Big Blinds'}</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Updates */}
         <Card className="glass-card">
