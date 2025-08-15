@@ -550,6 +550,13 @@ const PokerBankrollApp = () => {
                   <p className="text-lg">{selectedSession.location}</p>
                 </div>
 
+                {selectedSession.notes && (
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Description</Label>
+                    <p className="text-sm bg-muted p-3 rounded-md mt-1">{selectedSession.notes}</p>
+                  </div>
+                )}
+
                 <Separator />
 
                 <div className="grid grid-cols-2 gap-4">
@@ -583,12 +590,6 @@ const PokerBankrollApp = () => {
                   </p>
                 </div>
 
-                {selectedSession.notes && (
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Description</Label>
-                    <p className="text-sm bg-muted p-3 rounded-md mt-1">{selectedSession.notes}</p>
-                  </div>
-                )}
               </div>
             )}
           </DialogContent>
