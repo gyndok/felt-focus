@@ -34,6 +34,7 @@ const LiveTournament = () => {
   } = useTournaments();
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showQuickUpdateDialog, setShowQuickUpdateDialog] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
   const [chartViewMode, setChartViewMode] = useState<'chips' | 'bb'>('chips');
@@ -58,6 +59,11 @@ const LiveTournament = () => {
     total_entries: '',
     percent_paid: '',
     notes: ''
+  });
+  const [quickUpdateData, setQuickUpdateData] = useState({
+    total_entries: '',
+    players_left: '',
+    percent_paid: ''
   });
   const [endData, setEndData] = useState({
     final_position: '',
@@ -210,6 +216,48 @@ const LiveTournament = () => {
       toast({
         title: "Tournament Updated",
         description: "Progress saved successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update tournament",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleQuickUpdate = async () => {
+    if (!activeTournament) return;
+    
+    try {
+      const totalEntries = quickUpdateData.total_entries ? parseInt(quickUpdateData.total_entries) : activeTournament.total_players;
+      const playersLeft = quickUpdateData.players_left ? parseInt(quickUpdateData.players_left) : activeTournament.players_left;
+      
+      // Update tournament with new values if provided
+      const updates: any = {};
+      if (quickUpdateData.total_entries && totalEntries !== activeTournament.total_players) {
+        updates.total_players = totalEntries;
+      }
+      if (quickUpdateData.players_left && playersLeft !== activeTournament.players_left) {
+        updates.players_left = playersLeft;
+      }
+      if (quickUpdateData.percent_paid) {
+        updates.percent_paid = parseFloat(quickUpdateData.percent_paid);
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        await updateTournament(activeTournament.id, updates);
+      }
+
+      setQuickUpdateData({
+        total_entries: '',
+        players_left: '',
+        percent_paid: ''
+      });
+      setShowQuickUpdateDialog(false);
+      toast({
+        title: "Tournament Updated",
+        description: "Quick update completed successfully"
       });
     } catch (error) {
       toast({
@@ -668,35 +716,23 @@ const LiveTournament = () => {
             </CardContent>
           </Card>}
 
-        {/* Quick Updates */}
+        {/* Action Buttons */}
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="text-lg">Quick Updates</CardTitle>
+            <CardTitle className="text-lg">Tournament Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-              <DialogTrigger asChild>
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  Update Stack & Blinds
-                  <br />
-                  <span className="text-xs opacity-80">
-                    {activeTournament.current_chips.toLocaleString()} chips • Level {activeTournament.level} • {activeTournament.small_blind}/{activeTournament.big_blind}
-                  </span>
-                </Button>
-              </DialogTrigger>
-            </Dialog>
-
-            {activeTournament.players_left && <Button variant="secondary" className="w-full" onClick={() => setShowUpdateDialog(true)}>
-                Update Players ({activeTournament.players_left} remaining)
-              </Button>}
-
-            <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
-              <DialogTrigger asChild>
-                <Button variant="destructive" className="w-full">
-                  End Tournament
-                </Button>
-              </DialogTrigger>
-            </Dialog>
+            <div className="flex gap-2">
+              <Button onClick={() => setShowQuickUpdateDialog(true)} size="sm" variant="outline" className="flex-1">
+                Quick Update
+              </Button>
+              <Button onClick={() => setShowUpdateDialog(true)} size="sm" className="flex-1">
+                Full Update
+              </Button>
+            </div>
+            <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="w-full">
+              End Tournament
+            </Button>
           </CardContent>
         </Card>
 
@@ -783,7 +819,68 @@ const LiveTournament = () => {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+      </Dialog>
+
+      {/* Quick Update Dialog */}
+      <Dialog open={showQuickUpdateDialog} onOpenChange={setShowQuickUpdateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Quick Update Tournament</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="quick_total_entries">Total Entries</Label>
+              <Input
+                id="quick_total_entries"
+                type="number"
+                value={quickUpdateData.total_entries}
+                onChange={e => setQuickUpdateData({
+                  ...quickUpdateData,
+                  total_entries: e.target.value
+                })}
+                placeholder={activeTournament?.total_players?.toString() || ""}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="quick_players_left">Players Left</Label>
+              <Input
+                id="quick_players_left"
+                type="number"
+                value={quickUpdateData.players_left}
+                onChange={e => setQuickUpdateData({
+                  ...quickUpdateData,
+                  players_left: e.target.value
+                })}
+                placeholder={activeTournament?.players_left?.toString() || ""}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="quick_percent_paid">% Field Paid</Label>
+              <Input
+                id="quick_percent_paid"
+                type="number"
+                step="0.1"
+                value={quickUpdateData.percent_paid}
+                onChange={e => setQuickUpdateData({
+                  ...quickUpdateData,
+                  percent_paid: e.target.value
+                })}
+                placeholder={activeTournament?.percent_paid?.toString() || "15"}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={() => setShowQuickUpdateDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleQuickUpdate}>
+              Update
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
         {/* End Tournament Dialog */}
         <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
