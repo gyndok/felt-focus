@@ -488,9 +488,9 @@ const LiveTournament = () => {
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold">
-                {activeTournament.players_left || activeTournament.total_players}
+                {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
               </div>
-              <div className="text-sm text-muted-foreground">Players Left</div>
+              <div className="text-sm text-muted-foreground">Players Left/Entered</div>
             </CardContent>
           </Card>
 
