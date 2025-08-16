@@ -339,7 +339,8 @@ const LiveTournament = () => {
       sortedUpdates.forEach((update) => {
         const chips = Number(update.current_chips);
         const bigBlind = Number(update.big_blind);
-        const bbStack = update.bb_stack ? Number(update.bb_stack) : chips / bigBlind;
+        // Always calculate BB stack using the big blind from that specific level
+        const bbStack = chips / bigBlind;
         
         // Only add valid data points
         if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack)) {
