@@ -69,10 +69,13 @@ const LiveTournament = () => {
     const totalRake = activeTournament.house_rake * (activeTournament.total_players || 0);
     const prizePool = totalCollected - totalRake;
     const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
+    const prizePoolPerPlayer = activeTournament.buy_in - activeTournament.house_rake;
+    const playersNeededForGuarantee = activeTournament.guarantee ? Math.ceil(activeTournament.guarantee / prizePoolPerPlayer) : 0;
     return {
       totalCollected,
       prizePool,
       rakePercentage,
+      playersNeededForGuarantee,
       overlay: activeTournament.guarantee && activeTournament.guarantee > prizePool ? activeTournament.guarantee - prizePool : 0
     };
   }, [activeTournament]);
@@ -471,7 +474,15 @@ const LiveTournament = () => {
                         {economics.overlay > 0 ? `Overlay: +$${economics.overlay.toLocaleString()} added to prize pool` : ''}
                       </div>
                     </div>
-                    
+                    <div>
+                      <div className="text-sm text-muted-foreground">Players Needed</div>
+                      <div className="font-bold text-blue-600">
+                        {economics.playersNeededForGuarantee}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        To reach guarantee
+                      </div>
+                    </div>
                   </div>
                 </>}
             </CardContent>
