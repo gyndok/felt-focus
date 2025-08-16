@@ -583,7 +583,7 @@ const LiveTournament = () => {
                     <div>
                       <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
                       <div className="font-bold text-purple-600">
-                        {economics.avgStackAtBubble.toLocaleString()}
+                        {Math.floor(economics.avgStackAtBubble).toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         chips
