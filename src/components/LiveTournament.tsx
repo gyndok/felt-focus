@@ -696,70 +696,70 @@ const LiveTournament = () => {
             <CardContent>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <defs>
-                      <linearGradient id="stackGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
+                    <CartesianGrid strokeDasharray="2 2" stroke="hsl(var(--muted-foreground))" opacity={0.2} />
                     {chartViewMode === 'bb' && (
                       <>
-                        <ReferenceLine y={20} stroke="hsl(var(--emerald-500))" strokeDasharray="5 5" strokeOpacity={0.6} />
-                        <ReferenceLine y={10} stroke="hsl(var(--yellow-500))" strokeDasharray="5 5" strokeOpacity={0.6} />
-                        <ReferenceLine y={5} stroke="hsl(var(--orange-500))" strokeDasharray="5 5" strokeOpacity={0.6} />
+                        <ReferenceLine y={20} stroke="#10b981" strokeDasharray="4 4" strokeOpacity={0.7} />
+                        <ReferenceLine y={10} stroke="#f59e0b" strokeDasharray="4 4" strokeOpacity={0.7} />
+                        <ReferenceLine y={5} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.7} />
                       </>
                     )}
                     <XAxis 
                       dataKey="level" 
                       stroke="hsl(var(--muted-foreground))" 
-                      tick={{ fontSize: 12 }}
-                      tickLine={{ stroke: "hsl(var(--border))" }}
-                      label={{ value: 'Level', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fontSize: '12px' } }}
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      tickLine={{ stroke: "hsl(var(--muted-foreground))", opacity: 0.5 }}
+                      axisLine={{ stroke: "hsl(var(--muted-foreground))", opacity: 0.5 }}
+                      label={{ 
+                        value: 'Tournament Level', 
+                        position: 'insideBottom', 
+                        offset: -10, 
+                        style: { textAnchor: 'middle', fontSize: '12px', fill: "hsl(var(--muted-foreground))" }
+                      }}
                     />
                     <YAxis 
                       stroke="hsl(var(--muted-foreground))" 
-                      tick={{ fontSize: 12 }}
-                      tickLine={{ stroke: "hsl(var(--border))" }}
-                      tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)} BB`}
-                      label={{ value: chartViewMode === 'chips' ? 'Chips' : 'Big Blinds', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fontSize: '12px' } }}
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      tickLine={{ stroke: "hsl(var(--muted-foreground))", opacity: 0.5 }}
+                      axisLine={{ stroke: "hsl(var(--muted-foreground))", opacity: 0.5 }}
+                      tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)}`}
+                      label={{ 
+                        value: chartViewMode === 'chips' ? 'Chips' : 'Big Blinds', 
+                        angle: -90, 
+                        position: 'insideLeft', 
+                        style: { textAnchor: 'middle', fontSize: '12px', fill: "hsl(var(--muted-foreground))" }
+                      }}
                     />
                     <Tooltip 
                       labelFormatter={value => `Level ${value}`} 
                       formatter={(value: number) => [
                         chartViewMode === 'chips' ? `${value.toLocaleString()} chips` : `${value.toFixed(1)} BB`, 
-                        chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'
+                        chartViewMode === 'chips' ? 'Stack' : 'Big Blinds'
                       ]} 
                       contentStyle={{
-                        backgroundColor: 'hsl(var(--popover))',
+                        backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                        boxShadow: '0 4px 12px -4px hsl(var(--foreground) / 0.1)',
+                        fontSize: '12px'
                       }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={3}
-                      fill="url(#stackGradient)"
-                      fillOpacity={0.6}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
                     />
                     <Line 
                       type="monotone" 
                       dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} 
                       stroke="hsl(var(--primary))" 
-                      strokeWidth={3}
+                      strokeWidth={2}
                       dot={{
                         fill: 'hsl(var(--primary))',
                         strokeWidth: 2,
-                        r: 4
+                        r: 3
                       }} 
                       activeDot={{
-                        r: 8,
+                        r: 5,
                         stroke: 'hsl(var(--primary))',
-                        strokeWidth: 3,
+                        strokeWidth: 2,
                         fill: 'hsl(var(--background))'
                       }}
                     />
