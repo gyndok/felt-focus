@@ -66,7 +66,8 @@ const LiveTournament = () => {
   const economics = useMemo(() => {
     if (!activeTournament) return null;
     const totalCollected = activeTournament.buy_in * (activeTournament.total_players || 0);
-    const prizePool = totalCollected - activeTournament.house_rake;
+    const totalRake = activeTournament.house_rake * (activeTournament.total_players || 0);
+    const prizePool = totalCollected - totalRake;
     const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
     return {
       totalCollected,
