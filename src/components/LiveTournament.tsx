@@ -447,15 +447,15 @@ const LiveTournament = () => {
                   <div className="text-sm text-muted-foreground">Total Collected</div>
                   <div className="font-bold">${economics.totalCollected.toLocaleString()}</div>
                 </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">House Rake</div>
-                  <div className="font-bold text-red-600">
-                    ${activeTournament.house_rake.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    ${(activeTournament.house_rake / (activeTournament.total_players || 1)).toFixed(0)}/entry
-                  </div>
-                </div>
+                 <div>
+                   <div className="text-sm text-muted-foreground">House Rake</div>
+                   <div className="font-bold text-red-600">
+                     ${((activeTournament.total_players || 0) * activeTournament.house_rake).toLocaleString()}
+                   </div>
+                   <div className="text-xs text-muted-foreground">
+                     ${activeTournament.house_rake}/entry
+                   </div>
+                 </div>
               </div>
 
               {activeTournament.guarantee && <>
