@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine, Area } from 'recharts';
 import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -683,7 +683,10 @@ const LiveTournament = () => {
         {chartData.length > 0 && <Card className="glass-card">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Stack Progression</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Stack Progression
+                </CardTitle>
                 <Button variant="outline" size="sm" onClick={() => setChartViewMode(chartViewMode === 'chips' ? 'bb' : 'chips')} className="flex items-center gap-2">
                   {chartViewMode === 'chips' ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
                   {chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'}
@@ -691,29 +694,75 @@ const LiveTournament = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-48 w-full">
+              <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="level" stroke="hsl(var(--muted-foreground))" tick={{
-                  fontSize: 12
-                }} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" tick={{
-                  fontSize: 12
-                }} tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)} BB`} />
-                    <Tooltip labelFormatter={value => `Level ${value}`} formatter={(value: number) => [chartViewMode === 'chips' ? `${value.toLocaleString()} chips` : `${value.toFixed(1)} BB`, chartViewMode === 'chips' ? 'Chips' : 'Big Blinds']} contentStyle={{
-                  backgroundColor: 'hsl(var(--popover))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px'
-                }} />
-                    <Line type="monotone" dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} stroke="hsl(var(--primary))" strokeWidth={2} dot={{
-                  fill: 'hsl(var(--primary))',
-                  strokeWidth: 2
-                }} activeDot={{
-                  r: 6,
-                  stroke: 'hsl(var(--primary))',
-                  strokeWidth: 2
-                }} />
+                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="stackGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                    {chartViewMode === 'bb' && (
+                      <>
+                        <ReferenceLine y={20} stroke="hsl(var(--emerald-500))" strokeDasharray="5 5" strokeOpacity={0.6} />
+                        <ReferenceLine y={10} stroke="hsl(var(--yellow-500))" strokeDasharray="5 5" strokeOpacity={0.6} />
+                        <ReferenceLine y={5} stroke="hsl(var(--orange-500))" strokeDasharray="5 5" strokeOpacity={0.6} />
+                      </>
+                    )}
+                    <XAxis 
+                      dataKey="level" 
+                      stroke="hsl(var(--muted-foreground))" 
+                      tick={{ fontSize: 12 }}
+                      tickLine={{ stroke: "hsl(var(--border))" }}
+                      label={{ value: 'Level', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fontSize: '12px' } }}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))" 
+                      tick={{ fontSize: 12 }}
+                      tickLine={{ stroke: "hsl(var(--border))" }}
+                      tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)} BB`}
+                      label={{ value: chartViewMode === 'chips' ? 'Chips' : 'Big Blinds', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fontSize: '12px' } }}
+                    />
+                    <Tooltip 
+                      labelFormatter={value => `Level ${value}`} 
+                      formatter={(value: number) => [
+                        chartViewMode === 'chips' ? `${value.toLocaleString()} chips` : `${value.toFixed(1)} BB`, 
+                        chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'
+                      ]} 
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--popover))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      fill="url(#stackGradient)"
+                      fillOpacity={0.6}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      dot={{
+                        fill: 'hsl(var(--primary))',
+                        strokeWidth: 2,
+                        r: 4
+                      }} 
+                      activeDot={{
+                        r: 8,
+                        stroke: 'hsl(var(--primary))',
+                        strokeWidth: 3,
+                        fill: 'hsl(var(--background))'
+                      }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
