@@ -56,6 +56,7 @@ const LiveTournament = () => {
     current_chips: '',
     players_left: '',
     total_entries: '',
+    percent_paid: '',
     notes: ''
   });
   const [endData, setEndData] = useState({
@@ -196,6 +197,7 @@ const LiveTournament = () => {
         current_chips: '',
         players_left: '',
         total_entries: '',
+        percent_paid: '',
         notes: ''
       });
       setShowUpdateDialog(false);
@@ -527,10 +529,10 @@ const LiveTournament = () => {
                     <div>
                       <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
                       <div className="font-bold text-purple-600">
-                        {(economics.avgStackAtBubble / activeTournament.big_blind).toFixed(0)} BB
+                        {economics.avgStackAtBubble.toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {economics.avgStackAtBubble.toLocaleString()} chips
+                        chips
                       </div>
                     </div>
                   </div>
@@ -748,6 +750,17 @@ const LiveTournament = () => {
               })} placeholder={activeTournament.total_players?.toString()} />
                 <div className="text-xs text-muted-foreground mt-1">
                   Current: {activeTournament.total_players || 'Not set'}
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="update_percent_paid">% Field Paid</Label>
+                <Input id="update_percent_paid" type="number" value={updateData.percent_paid} onChange={e => setUpdateData({
+                ...updateData,
+                percent_paid: e.target.value
+              })} placeholder="15" />
+                <div className="text-xs text-muted-foreground mt-1">
+                  Percentage of field that cashes
                 </div>
               </div>
 
