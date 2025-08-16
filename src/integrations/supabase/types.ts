@@ -149,6 +149,7 @@ export type Database = {
           id: string
           level: number
           name: string
+          percent_paid: number | null
           players_left: number | null
           prize_won: number | null
           small_blind: number
@@ -174,6 +175,7 @@ export type Database = {
           id?: string
           level?: number
           name: string
+          percent_paid?: number | null
           players_left?: number | null
           prize_won?: number | null
           small_blind: number
@@ -199,6 +201,7 @@ export type Database = {
           id?: string
           level?: number
           name?: string
+          percent_paid?: number | null
           players_left?: number | null
           prize_won?: number | null
           small_blind?: number
