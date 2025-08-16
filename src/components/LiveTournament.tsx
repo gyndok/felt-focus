@@ -13,8 +13,12 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
+
+console.log('LiveTournament component loading...');
 import { usePokerSessions } from '@/hooks/usePokerSessions';
 const LiveTournament = () => {
+  console.log('LiveTournament rendering...');
+  
   const {
     toast
   } = useToast();
@@ -32,6 +36,8 @@ const LiveTournament = () => {
     endTournament,
     getTournamentUpdates
   } = useTournaments();
+  
+  console.log('useTournaments hook loaded successfully', { activeTournament });
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showQuickUpdateDialog, setShowQuickUpdateDialog] = useState(false);
