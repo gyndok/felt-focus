@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
+import { useTournaments } from '@/hooks/useTournaments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,9 @@ const PokerBankrollApp = () => {
     deleteSession
   } = usePokerSessions();
   const {
+    activeTournament
+  } = useTournaments();
+  const {
     toast
   } = useToast();
   const [showFilters, setShowFilters] = useState(false);
@@ -37,7 +41,14 @@ const PokerBankrollApp = () => {
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
   const [editSession, setEditSession] = useState<PokerSession | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>(activeTournament ? 'tournament' : 'dashboard');
+
+  // Auto-switch to tournament tab when there's an active tournament
+  useEffect(() => {
+    if (activeTournament) {
+      setActiveTab('tournament');
+    }
+  }, [activeTournament]);
 
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false);
