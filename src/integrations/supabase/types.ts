@@ -143,6 +143,7 @@ export type Database = {
           current_chips: number
           ended_at: string | null
           final_position: number | null
+          game_type: string
           guarantee: number | null
           house_rake: number
           id: string
@@ -167,6 +168,7 @@ export type Database = {
           current_chips: number
           ended_at?: string | null
           final_position?: number | null
+          game_type?: string
           guarantee?: number | null
           house_rake?: number
           id?: string
@@ -191,6 +193,7 @@ export type Database = {
           current_chips?: number
           ended_at?: string | null
           final_position?: number | null
+          game_type?: string
           guarantee?: number | null
           house_rake?: number
           id?: string

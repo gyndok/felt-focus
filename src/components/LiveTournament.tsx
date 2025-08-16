@@ -45,7 +45,8 @@ const LiveTournament = () => {
     guarantee: '',
     total_players: '',
     small_blind: '100',
-    big_blind: '200'
+    big_blind: '200',
+    game_type: 'NLH'
   });
   const [updateData, setUpdateData] = useState({
     level: 1,
@@ -111,7 +112,8 @@ const LiveTournament = () => {
         big_blind: bigBlind,
         players_left: newTournament.total_players ? parseInt(newTournament.total_players) : null,
         current_chips: startingChips,
-        bb_stack: startingChips / bigBlind
+        bb_stack: startingChips / bigBlind,
+        game_type: newTournament.game_type
       });
       setNewTournament({
         name: '',
@@ -121,7 +123,8 @@ const LiveTournament = () => {
         guarantee: '',
         total_players: '',
         small_blind: '100',
-        big_blind: '200'
+        big_blind: '200',
+        game_type: 'NLH'
       });
       setShowStartDialog(false);
       toast({
@@ -206,7 +209,7 @@ const LiveTournament = () => {
       await addSession({
         date: new Date(activeTournament.started_at).toISOString().split('T')[0],
         type: 'mtt',
-        game_type: 'Tournament',
+        game_type: activeTournament.game_type,
         stakes: `$${activeTournament.buy_in}`,
         location: activeTournament.name,
         buy_in: activeTournament.buy_in,
@@ -359,6 +362,23 @@ const LiveTournament = () => {
                     big_blind: e.target.value
                   })} placeholder="200" />
                   </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="game_type">Game Type</Label>
+                  <select
+                    id="game_type"
+                    value={newTournament.game_type}
+                    onChange={(e) => setNewTournament({...newTournament, game_type: e.target.value})}
+                    className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="NLH">No Limit Hold'em</option>
+                    <option value="PLO">Pot Limit Omaha</option>
+                    <option value="PLO5">Pot Limit Omaha Hi-Lo</option>
+                    <option value="Stud">Seven Card Stud</option>
+                    <option value="Mixed">Mixed Games</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
                 
                 <Button onClick={handleStartTournament} className="w-full">
