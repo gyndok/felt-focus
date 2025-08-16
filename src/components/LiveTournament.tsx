@@ -53,6 +53,7 @@ const LiveTournament = () => {
     big_blind: '',
     current_chips: '',
     players_left: '',
+    total_entries: '',
     notes: ''
   });
   const [endData, setEndData] = useState({
@@ -148,11 +149,18 @@ const LiveTournament = () => {
       const currentChips = parseFloat(updateData.current_chips);
       const bigBlind = parseFloat(updateData.big_blind) || activeTournament.big_blind;
       const playersLeft = updateData.players_left ? parseInt(updateData.players_left) : activeTournament.players_left;
+      const totalEntries = updateData.total_entries ? parseInt(updateData.total_entries) : activeTournament.total_players;
 
-      // Calculate total chips in play from prize pool (excluding rake)
-      const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : null;
+      // Calculate total chips in play from total entries
+      const totalChipsInPlay = totalEntries ? activeTournament.starting_chips * totalEntries : null;
       const avgStack = playersLeft && totalChipsInPlay ? totalChipsInPlay / playersLeft : null;
       const bbStack = currentChips / bigBlind;
+
+      // Update tournament with new total entries if provided
+      if (updateData.total_entries && totalEntries !== activeTournament.total_players) {
+        await updateTournament(activeTournament.id, { total_players: totalEntries });
+      }
+
       await addTournamentUpdate(activeTournament.id, {
         level: updateData.level || activeTournament.level,
         small_blind: parseFloat(updateData.small_blind) || activeTournament.small_blind,
@@ -169,6 +177,7 @@ const LiveTournament = () => {
         big_blind: '',
         current_chips: '',
         players_left: '',
+        total_entries: '',
         notes: ''
       });
       setShowUpdateDialog(false);
@@ -631,6 +640,17 @@ const LiveTournament = () => {
                   ...updateData,
                   players_left: e.target.value
                 })} placeholder={activeTournament.players_left?.toString()} />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="update_total_entries">Total Entries</Label>
+                <Input id="update_total_entries" type="number" value={updateData.total_entries} onChange={e => setUpdateData({
+                ...updateData,
+                total_entries: e.target.value
+              })} placeholder={activeTournament.total_players?.toString()} />
+                <div className="text-xs text-muted-foreground mt-1">
+                  Current: {activeTournament.total_players || 'Not set'}
                 </div>
               </div>
 
