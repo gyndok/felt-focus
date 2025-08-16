@@ -97,6 +97,13 @@ const LiveTournament = () => {
     };
   }, [activeTournament]);
 
+  // Calculate current average stack
+  const currentAvgStack = useMemo(() => {
+    if (!activeTournament?.players_left || !activeTournament?.total_players) return null;
+    const totalChipsInPlay = activeTournament.starting_chips * activeTournament.total_players;
+    return totalChipsInPlay / activeTournament.players_left;
+  }, [activeTournament]);
+
   // Calculate stack health
   const stackHealth = useMemo(() => {
     if (!activeTournament?.bb_stack) return 'unknown';
@@ -624,12 +631,12 @@ const LiveTournament = () => {
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold">
-                {activeTournament.avg_stack ? (activeTournament.avg_stack / activeTournament.big_blind).toFixed(0) : 'N/A'} BB
-              </div>
-              <div className="text-sm text-muted-foreground">Avg Stack</div>
-              <div className="text-xs text-muted-foreground">
-                {activeTournament.avg_stack ? `${activeTournament.avg_stack.toFixed(0).toLocaleString()} chips` : ''}
-              </div>
+                 {currentAvgStack ? (currentAvgStack / activeTournament.big_blind).toFixed(0) : 'N/A'} BB
+               </div>
+               <div className="text-sm text-muted-foreground">Avg Stack</div>
+               <div className="text-xs text-muted-foreground">
+                 {currentAvgStack ? `${Math.floor(currentAvgStack).toLocaleString()} chips` : ''}
+               </div>
             </CardContent>
           </Card>
         </div>
