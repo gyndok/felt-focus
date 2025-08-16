@@ -180,6 +180,11 @@ const LiveTournament = () => {
         await updateTournament(activeTournament.id, { total_players: totalEntries });
       }
 
+      // Update tournament with new percent paid if provided
+      if (updateData.percent_paid) {
+        await updateTournament(activeTournament.id, { percent_paid: parseFloat(updateData.percent_paid) });
+      }
+
       await addTournamentUpdate(activeTournament.id, {
         level: updateData.level || activeTournament.level,
         small_blind: parseFloat(updateData.small_blind) || activeTournament.small_blind,
