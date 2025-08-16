@@ -243,19 +243,34 @@ const LiveTournament = () => {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-    if (!activeTournament || !tournamentUpdates.length) return [];
+    if (!activeTournament) return [];
+    
     const data = [{
       level: 1,
-      chips: activeTournament.starting_chips,
-      bb: activeTournament.starting_chips / activeTournament.big_blind
+      chips: Number(activeTournament.starting_chips),
+      bb: Number(activeTournament.starting_chips) / Number(activeTournament.big_blind)
     }];
-    tournamentUpdates.forEach((update, index) => {
-      data.push({
-        level: update.level,
-        chips: update.current_chips,
-        bb: update.bb_stack || update.current_chips / update.big_blind
+    
+    if (tournamentUpdates && tournamentUpdates.length > 0) {
+      // Sort updates by level to ensure proper line drawing
+      const sortedUpdates = [...tournamentUpdates].sort((a, b) => a.level - b.level);
+      
+      sortedUpdates.forEach((update) => {
+        const chips = Number(update.current_chips);
+        const bigBlind = Number(update.big_blind);
+        const bbStack = update.bb_stack ? Number(update.bb_stack) : chips / bigBlind;
+        
+        // Only add valid data points
+        if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack)) {
+          data.push({
+            level: Number(update.level),
+            chips: chips,
+            bb: bbStack
+          });
+        }
       });
-    });
+    }
+    
     return data;
   }, [activeTournament, tournamentUpdates]);
   if (!activeTournament) {
