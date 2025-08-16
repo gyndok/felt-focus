@@ -46,7 +46,8 @@ const LiveTournament = () => {
     total_players: '',
     small_blind: '100',
     big_blind: '200',
-    game_type: 'NLH'
+    game_type: 'NLH',
+    percent_paid: '15'
   });
   const [updateData, setUpdateData] = useState({
     level: 1,
@@ -71,11 +72,20 @@ const LiveTournament = () => {
     const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
     const prizePoolPerPlayer = activeTournament.buy_in - activeTournament.house_rake;
     const playersNeededForGuarantee = activeTournament.guarantee ? Math.ceil(activeTournament.guarantee / prizePoolPerPlayer) : 0;
+    
+    // Money bubble calculations (using 15% default for now)
+    const percentPaid = 15; // Default value - will be stored in DB later
+    const playersInMoney = activeTournament.total_players ? Math.floor((activeTournament.total_players * percentPaid) / 100) : 0;
+    const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : 0;
+    const avgStackAtBubble = playersInMoney > 0 && totalChipsInPlay > 0 ? totalChipsInPlay / playersInMoney : 0;
+    
     return {
       totalCollected,
       prizePool,
       rakePercentage,
       playersNeededForGuarantee,
+      playersInMoney,
+      avgStackAtBubble,
       overlay: activeTournament.guarantee && activeTournament.guarantee > prizePool ? activeTournament.guarantee - prizePool : 0
     };
   }, [activeTournament]);
@@ -128,7 +138,8 @@ const LiveTournament = () => {
         total_players: '',
         small_blind: '100',
         big_blind: '200',
-        game_type: 'NLH'
+        game_type: 'NLH',
+        percent_paid: '15'
       });
       setShowStartDialog(false);
       toast({
@@ -367,22 +378,37 @@ const LiveTournament = () => {
                   })} placeholder="200" />
                   </div>
                 </div>
-                
-                <div>
-                  <Label htmlFor="game_type">Game Type</Label>
-                  <select
-                    id="game_type"
-                    value={newTournament.game_type}
-                    onChange={(e) => setNewTournament({...newTournament, game_type: e.target.value})}
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <option value="NLH">No Limit Hold'em</option>
-                    <option value="PLO">Pot Limit Omaha</option>
-                    <option value="PLO5">Pot Limit Omaha Hi-Lo</option>
-                    <option value="Stud">Seven Card Stud</option>
-                    <option value="Mixed">Mixed Games</option>
-                    <option value="Other">Other</option>
-                  </select>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="game_type">Game Type</Label>
+                    <select
+                      id="game_type"
+                      value={newTournament.game_type}
+                      onChange={(e) => setNewTournament({...newTournament, game_type: e.target.value})}
+                      className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="NLH">No Limit Hold'em</option>
+                      <option value="PLO">Pot Limit Omaha</option>
+                      <option value="PLO5">Pot Limit Omaha Hi-Lo</option>
+                      <option value="Stud">Seven Card Stud</option>
+                      <option value="Mixed">Mixed Games</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="percent_paid">% Field Paid</Label>
+                    <Input 
+                      id="percent_paid" 
+                      type="number" 
+                      value={newTournament.percent_paid} 
+                      onChange={e => setNewTournament({
+                        ...newTournament,
+                        percent_paid: e.target.value
+                      })} 
+                      placeholder="15" 
+                    />
+                  </div>
                 </div>
                 
                 <Button onClick={handleStartTournament} className="w-full">
@@ -481,6 +507,30 @@ const LiveTournament = () => {
                       </div>
                       <div className="text-xs text-muted-foreground">
                         To reach guarantee
+                      </div>
+                     </div>
+                   </div>
+                 </>}
+
+              {economics.playersInMoney > 0 && <>
+                  <Separator />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground">In the Money</div>
+                      <div className="font-bold text-green-600">
+                        {economics.playersInMoney} players
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        15% of field cashes
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
+                      <div className="font-bold text-purple-600">
+                        {(economics.avgStackAtBubble / activeTournament.big_blind).toFixed(0)} BB
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {economics.avgStackAtBubble.toLocaleString()} chips
                       </div>
                     </div>
                   </div>
