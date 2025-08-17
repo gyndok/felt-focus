@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
 import { useTournaments } from '@/hooks/useTournaments';
@@ -625,9 +626,25 @@ const PokerBankrollApp = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
-                            window.open(session.receipt_image_url, '_blank');
+                            try {
+                              // Create a signed URL for private bucket access
+                              const fileName = session.receipt_image_url.split('/').pop();
+                              const { data } = await supabase.storage
+                                .from('receipts')
+                                .createSignedUrl(`${user?.id}/${fileName}`, 3600);
+                              
+                              if (data?.signedUrl) {
+                                window.open(data.signedUrl, '_blank');
+                              } else {
+                                // Fallback to direct URL
+                                window.open(session.receipt_image_url, '_blank');
+                              }
+                            } catch (error) {
+                              console.error('Error accessing receipt:', error);
+                              window.open(session.receipt_image_url, '_blank');
+                            }
                           }}
                           className="h-8 w-8 p-0 hover:bg-muted"
                           title="View receipt"
