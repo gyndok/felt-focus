@@ -36,8 +36,8 @@ export const useTournaments = () => {
       const tournamentList = (data as Tournament[]) || [];
       setTournaments(tournamentList);
       
-      // Find active tournament
-      const active = tournamentList.find(t => t.status === 'active');
+      // Find active tournament (including paused ones)
+      const active = tournamentList.find(t => t.status === 'active' || t.status === 'paused');
       setActiveTournament(active || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -177,6 +177,55 @@ export const useTournaments = () => {
     }
   };
 
+  const pauseTournament = async (tournamentId: string) => {
+    try {
+      const pausedAt = new Date().toISOString();
+      
+      const { error } = await supabase
+        .from('tournaments')
+        .update({
+          is_paused: true,
+          paused_at: pausedAt,
+          status: 'paused',
+          updated_at: pausedAt
+        })
+        .eq('id', tournamentId);
+
+      if (error) throw error;
+      await fetchTournaments();
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to pause tournament');
+    }
+  };
+
+  const resumeTournament = async (tournamentId: string) => {
+    try {
+      const tournament = tournaments.find(t => t.id === tournamentId);
+      if (!tournament) throw new Error('Tournament not found');
+
+      const resumedAt = new Date().toISOString();
+      const pausedDuration = tournament.paused_at 
+        ? Math.floor((new Date(resumedAt).getTime() - new Date(tournament.paused_at).getTime()) / 1000)
+        : 0;
+
+      const { error } = await supabase
+        .from('tournaments')
+        .update({
+          is_paused: false,
+          resumed_at: resumedAt,
+          status: 'active',
+          total_paused_duration: (tournament.total_paused_duration || 0) + pausedDuration,
+          updated_at: resumedAt
+        })
+        .eq('id', tournamentId);
+
+      if (error) throw error;
+      await fetchTournaments();
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to resume tournament');
+    }
+  };
+
   useEffect(() => {
     fetchTournaments();
   }, [user]);
@@ -191,6 +240,8 @@ export const useTournaments = () => {
     addTournamentUpdate,
     endTournament,
     getTournamentUpdates,
+    pauseTournament,
+    resumeTournament,
     refetch: fetchTournaments
   };
 };

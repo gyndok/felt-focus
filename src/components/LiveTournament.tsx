@@ -31,7 +31,9 @@ const LiveTournament = () => {
     updateTournament,
     addTournamentUpdate,
     endTournament,
-    getTournamentUpdates
+    getTournamentUpdates,
+    pauseTournament,
+    resumeTournament
   } = useTournaments();
   
   const [showStartDialog, setShowStartDialog] = useState(false);
@@ -315,6 +317,40 @@ const LiveTournament = () => {
     }
   };
 
+  const handlePauseTournament = async () => {
+    if (!activeTournament) return;
+    try {
+      await pauseTournament(activeTournament.id);
+      toast({
+        title: "Tournament Paused",
+        description: "Tournament has been paused for multi-day tracking"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to pause tournament",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleResumeTournament = async () => {
+    if (!activeTournament) return;
+    try {
+      await resumeTournament(activeTournament.id);
+      toast({
+        title: "Tournament Resumed",
+        description: "Tournament has been resumed"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to resume tournament",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Load tournament updates for chart
   useEffect(() => {
     if (activeTournament) {
@@ -501,9 +537,16 @@ const LiveTournament = () => {
             <div className="text-sm opacity-90">
               {activeTournament.bb_stack?.toFixed(1)} Big Blinds
             </div>
-            <Badge className={`mt-2 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
-              {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
-            </Badge>
+            {activeTournament.is_paused && (
+              <Badge className="mt-2 bg-orange-500">
+                Tournament Paused
+              </Badge>
+            )}
+            {!activeTournament.is_paused && (
+              <Badge className={`mt-2 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
+                {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
+              </Badge>
+            )}
           </div>
         </div>
       </div>
@@ -767,9 +810,22 @@ const LiveTournament = () => {
                 Full Update
               </Button>
             </div>
-            <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="w-full">
-              End Tournament
-            </Button>
+            <div className="flex gap-2">
+              {activeTournament.is_paused ? (
+                <Button onClick={handleResumeTournament} size="sm" variant="outline" className="flex-1">
+                  <Play className="w-4 h-4 mr-2" />
+                  Resume
+                </Button>
+              ) : (
+                <Button onClick={handlePauseTournament} size="sm" variant="outline" className="flex-1">
+                  <Pause className="w-4 h-4 mr-2" />
+                  Pause
+                </Button>
+              )}
+              <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="flex-1">
+                End Tournament
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
