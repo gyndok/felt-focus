@@ -43,6 +43,7 @@ const PokerBankrollApp = () => {
   const [editSession, setEditSession] = useState<PokerSession | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>(activeTournament ? 'tournament' : 'dashboard');
   const [showSettings, setShowSettings] = useState(false);
+  const [startingBankroll, setStartingBankroll] = useState(0);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -152,13 +153,13 @@ const PokerBankrollApp = () => {
       hourlyRate: totalHours > 0 ? totalProfit / totalHours : 0,
       totalSessions: filteredSessions.length,
       winRate: isNaN(winRate) ? 0 : winRate,
-      totalBankroll: 5000 + totalProfit // Assuming starting bankroll of 5000
+      totalBankroll: startingBankroll + totalProfit
     };
-  }, [filteredSessions]);
+  }, [filteredSessions, startingBankroll]);
 
   // Chart data
   const chartData = useMemo(() => {
-    let runningTotal = 5000; // Starting bankroll
+    let runningTotal = startingBankroll;
     return filteredSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(session => {
       runningTotal += session.cash_out - session.buy_in;
       return {
@@ -167,7 +168,7 @@ const PokerBankrollApp = () => {
         profit: session.cash_out - session.buy_in
       };
     });
-  }, [filteredSessions]);
+  }, [filteredSessions, startingBankroll]);
   const handleAddSession = async () => {
     if (!newSession.stakes || !newSession.location || !newSession.buy_in || !newSession.cash_out) {
       toast({
@@ -980,6 +981,22 @@ const PokerBankrollApp = () => {
             </DialogHeader>
 
             <div className="space-y-6">
+              {/* Starting Bankroll Setting */}
+              <div className="space-y-2">
+                <Label>Starting Bankroll ($)</Label>
+                <Input 
+                  type="number" 
+                  placeholder="0"
+                  value={startingBankroll}
+                  onChange={e => setStartingBankroll(Number(e.target.value) || 0)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Set your initial bankroll amount before any sessions
+                </p>
+              </div>
+
+              <Separator />
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Current Password</Label>
