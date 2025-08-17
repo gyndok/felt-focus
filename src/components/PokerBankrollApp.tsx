@@ -189,6 +189,7 @@ const PokerBankrollApp = () => {
       totalProfit,
       totalBuyIn,
       totalCashOut,
+      totalHours,
       hourlyRate: totalHours > 0 ? totalProfit / totalHours : 0,
       totalSessions: filteredSessions.length,
       winRate: isNaN(winRate) ? 0 : winRate,
@@ -664,6 +665,7 @@ const PokerBankrollApp = () => {
               </div>
               <div className="text-2xl font-bold">${stats.hourlyRate.toFixed(0)}</div>
               <div className="text-sm text-muted-foreground">Hourly Rate</div>
+              <div className="text-xs text-muted-foreground mt-1">{stats.totalHours.toFixed(1)}h total</div>
             </CardContent>
           </Card>
 
