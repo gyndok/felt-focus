@@ -137,6 +137,11 @@ const LiveTournament = () => {
       }
       const startingChips = parseFloat(newTournament.starting_chips);
       const bigBlind = parseFloat(newTournament.big_blind);
+      // Use day 2 stack if entering day 2, otherwise use starting chips
+      const currentChips = newTournament.is_day_2 && newTournament.day_2_stack 
+        ? parseFloat(newTournament.day_2_stack) 
+        : startingChips;
+
       await createTournament({
         name: newTournament.name,
         buy_in: parseFloat(newTournament.buy_in),
@@ -147,8 +152,8 @@ const LiveTournament = () => {
         small_blind: parseFloat(newTournament.small_blind),
         big_blind: bigBlind,
         players_left: newTournament.total_players ? parseInt(newTournament.total_players) : null,
-        current_chips: startingChips,
-        bb_stack: startingChips / bigBlind,
+        current_chips: currentChips,
+        bb_stack: currentChips / bigBlind,
         game_type: newTournament.game_type,
         percent_paid: parseFloat(newTournament.percent_paid) || 15
       });
