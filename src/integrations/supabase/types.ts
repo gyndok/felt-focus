@@ -25,6 +25,7 @@ export type Database = {
           id: string
           location: string
           notes: string | null
+          receipt_image_url: string | null
           stakes: string
           type: string
           updated_at: string
@@ -40,6 +41,7 @@ export type Database = {
           id?: string
           location: string
           notes?: string | null
+          receipt_image_url?: string | null
           stakes: string
           type: string
           updated_at?: string
@@ -55,6 +57,7 @@ export type Database = {
           id?: string
           location?: string
           notes?: string | null
+          receipt_image_url?: string | null
           stakes?: string
           type?: string
           updated_at?: string

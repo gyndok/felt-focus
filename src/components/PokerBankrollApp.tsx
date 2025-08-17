@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { CSVImport } from './CSVImport';
+import { PhotoCapture } from './PhotoCapture';
 import LiveTournament from './LiveTournament';
 
 const PokerBankrollApp = () => {
@@ -75,7 +76,8 @@ const PokerBankrollApp = () => {
     buy_in: '',
     cash_out: '',
     duration: '',
-    notes: ''
+    notes: '',
+    receipt_image_url: null as string | null
   });
 
   // Edit session form data
@@ -87,7 +89,8 @@ const PokerBankrollApp = () => {
     buy_in: '',
     cash_out: '',
     duration: '',
-    notes: ''
+    notes: '',
+    receipt_image_url: null as string | null
   });
 
   // Timer effect
@@ -188,7 +191,7 @@ const PokerBankrollApp = () => {
         buy_in: parseFloat(newSession.buy_in),
         cash_out: parseFloat(newSession.cash_out),
         duration: parseFloat(newSession.duration) || 0,
-        notes: newSession.notes || null
+        receipt_image_url: newSession.receipt_image_url
       });
       setNewSession({
         type: 'cash',
@@ -198,7 +201,8 @@ const PokerBankrollApp = () => {
         buy_in: '',
         cash_out: '',
         duration: '',
-        notes: ''
+        notes: '',
+        receipt_image_url: null
       });
       setShowAddSession(false);
       toast({
@@ -234,7 +238,7 @@ const PokerBankrollApp = () => {
         buy_in: parseFloat(editSessionData.buy_in),
         cash_out: parseFloat(editSessionData.cash_out),
         duration: parseFloat(editSessionData.duration) || 0,
-        notes: editSessionData.notes || null
+        receipt_image_url: editSessionData.receipt_image_url
       });
 
       setEditSession(null);
@@ -280,7 +284,8 @@ const PokerBankrollApp = () => {
       buy_in: session.buy_in.toString(),
       cash_out: session.cash_out.toString(),
       duration: session.duration.toString(),
-      notes: session.notes || ''
+      notes: session.notes || '',
+      receipt_image_url: session.receipt_image_url || null
     });
   };
 
@@ -715,6 +720,22 @@ const PokerBankrollApp = () => {
                     <p className="text-sm bg-muted p-3 rounded-md mt-1">{selectedSession.notes}</p>
                   </div>}
 
+                {selectedSession.receipt_image_url && (
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Receipt Photo</Label>
+                    <div className="mt-2 rounded-lg overflow-hidden bg-muted">
+                      <img 
+                        src={selectedSession.receipt_image_url} 
+                        alt="Receipt" 
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <Separator />
 
                 <div className="grid grid-cols-2 gap-4">
@@ -843,6 +864,11 @@ const PokerBankrollApp = () => {
               })} className="resize-none" rows={3} />
               </div>
 
+              <PhotoCapture
+                onPhotoCapture={(url) => setNewSession({...newSession, receipt_image_url: url})}
+                currentPhoto={newSession.receipt_image_url}
+              />
+
               <Button onClick={handleAddSession} className="w-full">
                 Add Session
               </Button>
@@ -954,6 +980,11 @@ const PokerBankrollApp = () => {
                   rows={3} 
                 />
               </div>
+
+              <PhotoCapture
+                onPhotoCapture={(url) => setEditSessionData({...editSessionData, receipt_image_url: url})}
+                currentPhoto={editSessionData.receipt_image_url}
+              />
 
               <div className="flex gap-3">
                 <Button 
