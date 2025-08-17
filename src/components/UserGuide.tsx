@@ -2,13 +2,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertCircle, DollarSign, BarChart3, Trophy, Camera, FileSpreadsheet, TrendingUp } from "lucide-react";
+import { AlertCircle, DollarSign, BarChart3, Trophy, Camera, FileSpreadsheet, TrendingUp, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 const UserGuide = () => {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => window.location.href = '/'} 
+          className="mb-4 p-2 h-auto"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
         <h1 className="text-2xl md:text-3xl font-bold mb-2">Poker Bankroll Tracker - User Guide</h1>
         <p className="text-muted-foreground text-sm md:text-base">
           Learn how to effectively track your poker sessions and manage your bankroll
