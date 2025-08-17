@@ -614,38 +614,26 @@ const PokerBankrollApp = () => {
                         {session.location}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-right">
-                        <div className={`text-xl font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
-                          {profit >= 0 ? '+' : ''}${profit}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          ${hourlyRate.toFixed(0)}/hr
-                        </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditDialog(session);
+                      }}
+                      className="h-8 w-8 p-0 hover:bg-muted"
+                    >
+                      <Edit size={14} />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div className={`text-xl font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                        {profit >= 0 ? '+' : ''}${profit}
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditDialog(session);
-                          }}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Edit size={14} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteSession(session.id);
-                          }}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
+                      <div className="text-xs text-muted-foreground">
+                        ${hourlyRate.toFixed(0)}/hr
                       </div>
                     </div>
                   </div>
@@ -669,7 +657,7 @@ const PokerBankrollApp = () => {
                 </CardContent>
               </Card>;
           })}
-           </div>
+          </div>
         </div>
 
         {/* Session Detail Dialog */}
