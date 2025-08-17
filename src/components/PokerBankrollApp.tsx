@@ -199,13 +199,10 @@ const PokerBankrollApp = () => {
   // Chart data
   const chartData = useMemo(() => {
     let runningTotal = startingBankroll;
-    const sortedSessions = filteredSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    
-    return sortedSessions.map((session, index) => {
+    return filteredSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(session => {
       runningTotal += session.cash_out - session.buy_in;
       return {
         date: session.date,
-        monthIndex: index, // Simple index for months
         bankroll: runningTotal,
         profit: session.cash_out - session.buy_in
       };
@@ -707,10 +704,13 @@ const PokerBankrollApp = () => {
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
-                  <XAxis dataKey="monthIndex" tick={{
+                  <XAxis dataKey="date" tick={{
                   fontSize: 12,
                   fill: 'hsl(var(--muted-foreground))'
-                }} tickFormatter={monthIndex => `Month ${monthIndex + 1}`} />
+                }} tickFormatter={date => new Date(date).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric'
+                })} />
                   <YAxis tick={{
                   fontSize: 12,
                   fill: 'hsl(var(--muted-foreground))'
