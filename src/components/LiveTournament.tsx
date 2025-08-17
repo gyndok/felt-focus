@@ -910,7 +910,13 @@ const LiveTournament = () => {
                       />
                     </AreaChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id="bbGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
                       <XAxis 
                         dataKey="level" 
                         tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
@@ -932,11 +938,12 @@ const LiveTournament = () => {
                           borderRadius: '8px'
                         }}
                       />
-                      <Line 
+                      <Area 
                         type="monotone" 
                         dataKey="bb" 
                         stroke="hsl(var(--primary))" 
                         strokeWidth={3}
+                        fill="url(#bbGradient)"
                         dot={{
                           fill: 'hsl(var(--primary))',
                           strokeWidth: 2,
@@ -949,7 +956,7 @@ const LiveTournament = () => {
                           fill: 'hsl(var(--background))'
                         }}
                       />
-                    </LineChart>
+                    </AreaChart>
                   )}
                 </ResponsiveContainer>
               </div>
