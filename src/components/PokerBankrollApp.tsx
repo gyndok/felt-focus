@@ -37,7 +37,7 @@ const PokerBankrollApp = () => {
   } = useToast();
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
-  const [showBankroll, setShowBankroll] = useState(true);
+  const [showBankroll, setShowBankroll] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
   const [editSession, setEditSession] = useState<PokerSession | null>(null);
