@@ -1050,6 +1050,6 @@ const PokerBankrollApp = () => {
         </Dialog>
         </div>
       )}
-    </div>;
+    </div>
 };
 export default PokerBankrollApp;
