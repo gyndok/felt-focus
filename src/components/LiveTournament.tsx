@@ -48,6 +48,8 @@ const LiveTournament = () => {
     buy_in: '',
     house_rake: '',
     starting_chips: '30000',
+    day_2_stack: '',
+    is_day_2: false,
     guarantee: '',
     total_players: '',
     small_blind: '100',
@@ -154,6 +156,8 @@ const LiveTournament = () => {
         buy_in: '',
         house_rake: '',
         starting_chips: '30000',
+        day_2_stack: '',
+        is_day_2: false,
         guarantee: '',
         total_players: '',
         small_blind: '100',
@@ -531,6 +535,45 @@ const LiveTournament = () => {
                     starting_chips: e.target.value
                   })} placeholder="30000" />
                   </div>
+                </div>
+                
+                {/* Day 2 Stack Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_day_2"
+                      checked={newTournament.is_day_2}
+                      onChange={e => setNewTournament({
+                        ...newTournament,
+                        is_day_2: e.target.checked,
+                        day_2_stack: e.target.checked ? newTournament.starting_chips : ''
+                      })}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor="is_day_2" className="text-sm font-medium">
+                      Day 2 Start (use different stack than starting chips)
+                    </Label>
+                  </div>
+                  
+                  {newTournament.is_day_2 && (
+                    <div>
+                      <Label htmlFor="day_2_stack">Day 2 Starting Stack</Label>
+                      <Input 
+                        id="day_2_stack" 
+                        type="number" 
+                        value={newTournament.day_2_stack} 
+                        onChange={e => setNewTournament({
+                          ...newTournament,
+                          day_2_stack: e.target.value
+                        })} 
+                        placeholder="45000" 
+                      />
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Your actual stack size for day 2. Starting chips ({newTournament.starting_chips}) will still be used for calculations.
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
