@@ -201,18 +201,11 @@ const PokerBankrollApp = () => {
     let runningTotal = startingBankroll;
     const sortedSessions = filteredSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
-    if (sortedSessions.length === 0) return [];
-    
-    const firstDate = new Date(sortedSessions[0].date);
-    
     return sortedSessions.map((session, index) => {
       runningTotal += session.cash_out - session.buy_in;
-      const sessionDate = new Date(session.date);
-      const monthsFromStart = Math.floor((sessionDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
-      
       return {
         date: session.date,
-        monthIndex: Math.max(0, monthsFromStart),
+        monthIndex: index, // Simple index for months
         bankroll: runningTotal,
         profit: session.cash_out - session.buy_in
       };
