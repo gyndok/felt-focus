@@ -691,27 +691,51 @@ const LiveTournament = () => {
               </div>
               <div className="text-sm text-muted-foreground">Players Left/Entered</div>
               
-              {/* In the Money Indicator */}
+              {/* Enhanced In the Money Indicator */}
               {(() => {
                 const playersLeft = activeTournament.players_left || activeTournament.total_players;
                 const totalPlayers = activeTournament.total_players;
                 const percentPaid = activeTournament.percent_paid || 15;
                 const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
                 const isInMoney = playersLeft <= playersPaid;
+                const eliminationsToMoney = playersPaid - playersLeft;
+                const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
                 
                 return (
-                  <div className="mt-3 space-y-1">
+                  <div className="mt-3 space-y-2">
                     {isInMoney ? (
-                      <Badge className="bg-green-500 text-white animate-pulse">
-                        🏆 IN THE MONEY! 🏆
-                      </Badge>
+                      <div className="animate-fade-in">
+                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
+                          🏆 IN THE MONEY! 🏆
+                        </Badge>
+                        <div className="text-xs text-green-600 font-medium mt-1">
+                          Congratulations! Minimum payout secured 🎉
+                        </div>
+                      </div>
+                    ) : bubbleZone ? (
+                      <div className="animate-fade-in">
+                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse border-2 border-orange-300">
+                          🫧 BUBBLE TIME! 🫧
+                        </Badge>
+                        <div className="text-xs text-orange-600 font-medium">
+                          Just {eliminationsToMoney} elimination{eliminationsToMoney > 1 ? 's' : ''} to the money!
+                        </div>
+                      </div>
                     ) : (
-                      <div className="text-xs text-muted-foreground">
-                        {playersPaid - playersLeft} eliminations to the money
+                      <div className="space-y-1">
+                        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+                            style={{ width: `${Math.max(10, ((totalPlayers - playersLeft) / (totalPlayers - playersPaid)) * 100)}%` }}
+                          />
+                        </div>
+                        <div className="text-xs text-muted-foreground text-center">
+                          {eliminationsToMoney} eliminations to money
+                        </div>
                       </div>
                     )}
-                    <div className="text-xs text-muted-foreground">
-                      Top {playersPaid} players paid ({percentPaid}%)
+                    <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
+                      💰 Top {playersPaid} players paid ({percentPaid}%) • Min cash: ~${Math.round(economics?.prizePool * 0.4 / playersPaid || 0)}
                     </div>
                   </div>
                 );
