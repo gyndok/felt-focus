@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
 import { useTournaments } from '@/hooks/useTournaments';
@@ -621,6 +621,20 @@ const PokerBankrollApp = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-1">
+                      {session.receipt_image_url && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(session.receipt_image_url, '_blank');
+                          }}
+                          className="h-8 w-8 p-0 hover:bg-muted"
+                          title="View receipt"
+                        >
+                          <Paperclip size={14} />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
