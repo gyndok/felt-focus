@@ -453,7 +453,13 @@ const PokerBankrollApp = () => {
       <div className="gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-md mx-auto">
           <div className="flex flex-col gap-4 mb-6">
-            <h1 className="text-2xl font-bold text-center">Felt Focus</h1>
+            <div className="flex justify-center">
+              <img 
+                src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
+                alt="Felt Focus" 
+                className="h-12 w-12 rounded-xl"
+              />
+            </div>
             <div className="flex flex-col gap-2">
               {/* First row */}
               <div className="flex justify-center gap-2">
