@@ -332,6 +332,68 @@ const PokerBankrollApp = () => {
     await signOut();
   };
 
+  // Export sessions to CSV
+  const exportSessionsToCSV = (sessions: PokerSession[]) => {
+    const csvHeaders = [
+      'Date',
+      'Type',
+      'Game Type',
+      'Stakes',
+      'Location',
+      'Buy-in ($)',
+      'Cash-out ($)',
+      'Profit/Loss ($)',
+      'Duration (hours)',
+      'Hourly Rate ($/hr)',
+      'Notes'
+    ];
+
+    const csvData = sessions.map(session => {
+      const profit = session.cash_out - session.buy_in;
+      const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
+      
+      return [
+        session.date,
+        session.type.toUpperCase(),
+        session.game_type,
+        session.stakes,
+        session.location,
+        session.buy_in,
+        session.cash_out,
+        profit,
+        session.duration,
+        hourlyRate.toFixed(2),
+        session.notes || ''
+      ];
+    });
+
+    const csvContent = [
+      csvHeaders.join(','),
+      ...csvData.map(row => 
+        row.map(field => 
+          typeof field === 'string' && field.includes(',') 
+            ? `"${field}"` 
+            : field
+        ).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `poker-sessions-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Success",
+      description: `Exported ${sessions.length} sessions to CSV`
+    });
+  };
+
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
@@ -666,6 +728,14 @@ const PokerBankrollApp = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Recent Sessions</h3>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportSessionsToCSV(filteredSessions)}
+                className="h-8"
+              >
+                Export CSV
+              </Button>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
