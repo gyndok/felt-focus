@@ -708,17 +708,17 @@ const LiveTournament = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            {activeTournament.is_paused && (
-              <Badge className="mt-2 bg-orange-500">
-                Tournament Paused
-              </Badge>
-            )}
-            {!activeTournament.is_paused && (
-              <Badge className={`mt-2 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
-                {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
-              </Badge>
-            )}
           </div>
+          {activeTournament.is_paused && (
+            <Badge className="bg-orange-500">
+              Tournament Paused
+            </Badge>
+          )}
+          {!activeTournament.is_paused && (
+            <Badge className={`${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
+              {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
+            </Badge>
+          )}
         </div>
       </div>
 
