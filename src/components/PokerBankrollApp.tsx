@@ -208,11 +208,11 @@ const PokerBankrollApp = () => {
     return sortedSessions.map((session, index) => {
       runningTotal += session.cash_out - session.buy_in;
       const sessionDate = new Date(session.date);
-      const monthsFromStart = Math.round((sessionDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
+      const monthsFromStart = Math.floor((sessionDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
       
       return {
         date: session.date,
-        monthIndex: monthsFromStart,
+        monthIndex: Math.max(0, monthsFromStart),
         bankroll: runningTotal,
         profit: session.cash_out - session.buy_in
       };
