@@ -543,6 +543,36 @@ const PokerBankrollApp = () => {
           {/* Bankroll Display - Only on Dashboard */}
           {activeTab === 'dashboard' && (
             <div className="text-center">
+              {/* Time Frame Display */}
+              {filteredSessions.length > 0 && (() => {
+                const dates = filteredSessions.map(s => new Date(s.date)).sort((a, b) => a.getTime() - b.getTime());
+                const startDate = dates[0];
+                const endDate = dates[dates.length - 1];
+                const diffMs = endDate.getTime() - startDate.getTime();
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                let timeFrame = '';
+                if (diffDays >= 365) {
+                  const years = Math.floor(diffDays / 365);
+                  const remainingDays = diffDays % 365;
+                  const months = Math.floor(remainingDays / 30);
+                  timeFrame = years === 1 ? '1 year' : `${years} years`;
+                  if (months > 0) timeFrame += months === 1 ? ', 1 month' : `, ${months} months`;
+                } else if (diffDays >= 30) {
+                  const months = Math.floor(diffDays / 30);
+                  const remainingDays = diffDays % 30;
+                  timeFrame = months === 1 ? '1 month' : `${months} months`;
+                  if (remainingDays > 0) timeFrame += remainingDays === 1 ? ', 1 day' : `, ${remainingDays} days`;
+                } else {
+                  timeFrame = diffDays === 0 ? 'Same day' : diffDays === 1 ? '1 day' : `${diffDays} days`;
+                }
+                
+                return (
+                  <div className="text-xs opacity-75 mb-2">
+                    Session range: {timeFrame}
+                  </div>
+                );
+              })()}
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-sm opacity-90">Total Bankroll</span>
                 <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-1 h-auto">
