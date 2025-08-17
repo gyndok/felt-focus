@@ -738,30 +738,45 @@ const LiveTournament = () => {
           </Card>}
 
         {/* Current Status */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">Level {activeTournament.level}</div>
-              <div className="text-sm text-muted-foreground">Current Level</div>
+              <div className="text-xl lg:text-2xl font-bold">Level {activeTournament.level}</div>
+              <div className="text-xs lg:text-sm text-muted-foreground">Current Level</div>
             </CardContent>
           </Card>
 
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">
+              <div className="text-lg lg:text-xl font-bold">
                 {Math.floor(activeTournament.total_players * activeTournament.starting_chips).toLocaleString()}
               </div>
-              <div className="text-sm text-muted-foreground">Total Chips in Play</div>
+              <div className="text-xs lg:text-sm text-muted-foreground">Total Chips in Play</div>
             </CardContent>
           </Card>
 
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">
+              <div className="text-xl lg:text-2xl font-bold">
                 {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
               </div>
-              <div className="text-sm text-muted-foreground">Players Left/Entered</div>
-              
+              <div className="text-xs lg:text-sm text-muted-foreground">Players Left/Entered</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-xl lg:text-2xl font-bold">
+                {activeTournament.small_blind}/{activeTournament.big_blind}
+              </div>
+              <div className="text-xs lg:text-sm text-muted-foreground">Current Blinds</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* In the Money Status */}
+        <Card className="glass-card">
+          <CardContent className="p-4 text-center">
               {/* Enhanced In the Money Indicator */}
               {(() => {
                 const playersLeft = activeTournament.players_left || activeTournament.total_players;
@@ -773,7 +788,7 @@ const LiveTournament = () => {
                 const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
                 
                 return (
-                  <div className="mt-3 space-y-2">
+                  <div className="space-y-2">
                     {isInMoney ? (
                       <div className="animate-fade-in">
                         <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
@@ -814,27 +829,19 @@ const LiveTournament = () => {
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">
-                {activeTournament.small_blind}/{activeTournament.big_blind}
-              </div>
-              <div className="text-sm text-muted-foreground">Current Blinds</div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">
-                 {currentAvgStack ? (currentAvgStack / activeTournament.big_blind).toFixed(0) : 'N/A'} BB
-               </div>
-               <div className="text-sm text-muted-foreground">Avg Stack</div>
-               <div className="text-xs text-muted-foreground">
-                 {currentAvgStack ? `${Math.floor(currentAvgStack).toLocaleString()} chips` : ''}
-               </div>
-            </CardContent>
-          </Card>
-        </div>
+          {currentAvgStack && (
+            <Card className="glass-card">
+              <CardContent className="p-4 text-center">
+                <div className="text-xl lg:text-2xl font-bold">
+                  {(currentAvgStack / activeTournament.big_blind).toFixed(0)} BB
+                </div>
+                <div className="text-xs lg:text-sm text-muted-foreground">Average Stack</div>
+                <div className="text-xs text-muted-foreground">
+                  {Math.floor(currentAvgStack).toLocaleString()} chips
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
 
         {/* Stack Progression Chart */}
