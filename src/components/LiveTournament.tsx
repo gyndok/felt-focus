@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
 import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -881,49 +881,96 @@ const LiveTournament = () => {
             <CardContent>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <XAxis 
-                      dataKey="level" 
-                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis 
-                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)}`}
-                    />
-                    <Tooltip 
-                      labelFormatter={value => `Level ${value}`} 
-                      formatter={(value: number) => [
-                        chartViewMode === 'chips' ? `${value.toLocaleString()} chips` : `${value.toFixed(1)} BB`, 
-                        chartViewMode === 'chips' ? 'Stack' : 'Big Blinds'
-                      ]} 
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px'
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={3}
-                      dot={{
-                        fill: 'hsl(var(--primary))',
-                        strokeWidth: 2,
-                        r: 6
-                      }}
-                      activeDot={{
-                        r: 5,
-                        stroke: 'hsl(var(--primary))',
-                        strokeWidth: 2,
-                        fill: 'hsl(var(--background))'
-                      }}
-                    />
-                  </LineChart>
+                  {chartViewMode === 'chips' ? (
+                    <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis 
+                        dataKey="level" 
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={value => `${(value / 1000).toFixed(0)}k`}
+                      />
+                      <Tooltip 
+                        labelFormatter={value => `Level ${value}`} 
+                        formatter={(value: number) => [`${value.toLocaleString()} chips`, 'Stack']} 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="chips" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={3}
+                        fill="url(#chipGradient)"
+                        dot={{
+                          fill: 'hsl(var(--primary))',
+                          strokeWidth: 2,
+                          r: 6
+                        }}
+                        activeDot={{
+                          r: 8,
+                          stroke: 'hsl(var(--primary))',
+                          strokeWidth: 2,
+                          fill: 'hsl(var(--background))'
+                        }}
+                      />
+                    </AreaChart>
+                  ) : (
+                    <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis 
+                        dataKey="level" 
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={value => `${value.toFixed(0)}`}
+                      />
+                      <Tooltip 
+                        labelFormatter={value => `Level ${value}`} 
+                        formatter={(value: number) => [`${value.toFixed(1)} BB`, 'Big Blinds']} 
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="bb" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={3}
+                        dot={{
+                          fill: 'hsl(var(--primary))',
+                          strokeWidth: 2,
+                          r: 6
+                        }}
+                        activeDot={{
+                          r: 8,
+                          stroke: 'hsl(var(--primary))',
+                          strokeWidth: 2,
+                          fill: 'hsl(var(--background))'
+                        }}
+                      />
+                    </LineChart>
+                  )}
                 </ResponsiveContainer>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
