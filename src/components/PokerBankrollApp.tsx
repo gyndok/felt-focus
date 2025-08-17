@@ -27,6 +27,7 @@ import { FeedbackDialog } from './FeedbackDialog';
 import { ShareDialog } from './ShareDialog';
 import { FeedbackReview } from './FeedbackReview';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
+
 const PokerBankrollApp = () => {
   const {
     user,
@@ -389,62 +390,53 @@ const PokerBankrollApp = () => {
       {/* Header */}
       <div className="gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-md mx-auto">
-          {/* Logo Row */}
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/lovable-uploads/897efa0f-8be4-4504-b043-89381907306b.png" 
-              alt="Felt Focus Logo" 
-              className="h-12 w-auto"
-            />
-          </div>
-          
-          {/* Icons Row */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <ThemeToggle />
-            <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30">
-              <Filter size={18} />
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Import CSV">
-              📊
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Settings">
-              <Settings size={18} />
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Send Feedback">
-              <Bug size={18} />
-            </Button>
-            {isAdmin && (
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                onClick={() => setFeedbackReviewOpen(true)} 
-                className="bg-white/20 hover:bg-white/30 border-white/30 relative" 
-                title="Review Feedback"
-              >
-                <MessageSquare size={18} />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {unreadCount}
-                  </span>
-                )}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold">Felt Focus</h1>
+            <div className="flex gap-2">
+              <ThemeToggle />
+              <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30">
+                <Filter size={18} />
               </Button>
-            )}
-            <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Share App">
-              <Share size={18} />
-            </Button>
-            <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30">
-              <LogOut size={18} />
-            </Button>
-            
-            <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="bg-profit hover:bg-profit/90">
-                  <Plus size={18} />
+              <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Import CSV">
+                📊
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Settings">
+                <Settings size={18} />
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Send Feedback">
+                <Bug size={18} />
+              </Button>
+              {isAdmin && (
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={() => setFeedbackReviewOpen(true)} 
+                  className="bg-white/20 hover:bg-white/30 border-white/30 relative" 
+                  title="Review Feedback"
+                >
+                  <MessageSquare size={18} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Button>
-              </DialogTrigger>
-            </Dialog>
+              )}
+              <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Share App">
+                <Share size={18} />
+              </Button>
+              <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30">
+                <LogOut size={18} />
+              </Button>
+              <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-profit hover:bg-profit/90">
+                    <Plus size={18} />
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
+            </div>
           </div>
-        </div>
 
           {/* Tab Navigation */}
           <div className="flex bg-white/10 rounded-lg p-1 mb-6">
@@ -1250,7 +1242,5 @@ const PokerBankrollApp = () => {
         </div>
       )}
     </div>
-  );
 };
-
 export default PokerBankrollApp;
