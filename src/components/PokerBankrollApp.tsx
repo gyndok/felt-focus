@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { ThemeToggle } from './ThemeToggle';
 import { CSVImport } from './CSVImport';
 import { PhotoCapture } from './PhotoCapture';
 import LiveTournament from './LiveTournament';
@@ -382,6 +383,7 @@ const PokerBankrollApp = () => {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold">Poker Bankroll</h1>
             <div className="flex gap-2">
+              <ThemeToggle />
               <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30">
                 <Filter size={18} />
               </Button>
