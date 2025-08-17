@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      feedback: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          type: string
+          updated_at: string
+          user_display_name: string | null
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          type: string
+          updated_at?: string
+          user_display_name?: string | null
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          type?: string
+          updated_at?: string
+          user_display_name?: string | null
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       poker_sessions: {
         Row: {
           buy_in: number

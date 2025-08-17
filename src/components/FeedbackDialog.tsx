@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Bug, Lightbulb, Send } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FeedbackDialogProps {
   open: boolean;
@@ -17,6 +19,7 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async () => {
     if (!type || !message.trim()) {
@@ -28,20 +31,47 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to submit feedback.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate sending feedback (in a real app, this would call an API)
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Feedback Sent!",
-      description: "Thank you for your feedback. We'll review it soon.",
-    });
-    
-    setType('');
-    setMessage('');
-    setIsSubmitting(false);
-    onOpenChange(false);
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .insert({
+          user_id: user.id,
+          type: type,
+          message: message.trim(),
+          user_email: user.email,
+          user_display_name: user.user_metadata?.display_name || user.email
+        });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Feedback Sent!",
+        description: "Thank you for your feedback. We'll review it soon.",
+      });
+      
+      setType('');
+      setMessage('');
+      onOpenChange(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to send feedback. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
