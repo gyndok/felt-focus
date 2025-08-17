@@ -35,11 +35,44 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   };
 
   const shareViaEmail = () => {
+    if (!email.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter an email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const subject = encodeURIComponent("Check out Felt Focus!");
     const body = encodeURIComponent(`${shareText}\n\n${appUrl}`);
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`);
-    setEmail('');
-    onOpenChange(false);
+    
+    try {
+      window.open(`mailto:${email.trim()}?subject=${subject}&body=${body}`);
+      toast({
+        title: "Email Client Opened",
+        description: "Your email client should open with the message ready to send.",
+      });
+      setEmail('');
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Email Failed",
+        description: "Could not open email client. Please copy the link manually.",
+        variant: "destructive",
+      });
+    }
   };
 
   const shareViaSMS = () => {
