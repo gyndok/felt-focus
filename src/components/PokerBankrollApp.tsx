@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2 } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
 import { useTournaments } from '@/hooks/useTournaments';
@@ -42,6 +42,12 @@ const PokerBankrollApp = () => {
   const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
   const [editSession, setEditSession] = useState<PokerSession | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>(activeTournament ? 'tournament' : 'dashboard');
+  const [showSettings, setShowSettings] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   // Auto-switch to tournament tab when there's an active tournament
   useEffect(() => {
@@ -283,6 +289,53 @@ const PokerBankrollApp = () => {
   const handleLogout = async () => {
     await signOut();
   };
+
+  const handlePasswordChange = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New passwords don't match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Error", 
+        description: "Password must be at least 6 characters long",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Password updated successfully!"
+      });
+
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setShowSettings(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update password",
+        variant: "destructive"
+      });
+    }
+  };
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
         <div className="text-center">
@@ -303,6 +356,9 @@ const PokerBankrollApp = () => {
               </Button>
               <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Import CSV">
                 📊
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Settings">
+                <Settings size={18} />
               </Button>
               <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30">
                 <LogOut size={18} />
@@ -914,6 +970,66 @@ const PokerBankrollApp = () => {
         </Dialog>
 
         <CSVImport isOpen={showCSVImport} onOpenChange={setShowCSVImport} />
+
+        {/* Settings Dialog */}
+        <Dialog open={showSettings} onOpenChange={setShowSettings}>
+          <DialogContent className="max-w-md mx-auto">
+            <DialogHeader>
+              <DialogTitle>Settings</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Current Password</Label>
+                  <Input 
+                    type="password" 
+                    placeholder="Enter current password"
+                    value={passwordData.currentPassword}
+                    onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>New Password</Label>
+                  <Input 
+                    type="password" 
+                    placeholder="Enter new password"
+                    value={passwordData.newPassword}
+                    onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Confirm New Password</Label>
+                  <Input 
+                    type="password" 
+                    placeholder="Confirm new password"
+                    value={passwordData.confirmPassword}
+                    onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowSettings(false)} 
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handlePasswordChange} 
+                  className="flex-1"
+                  disabled={!passwordData.newPassword || !passwordData.confirmPassword}
+                >
+                  Update Password
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
         </div>
       )}
     </div>;
