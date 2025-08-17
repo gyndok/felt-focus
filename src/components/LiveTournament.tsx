@@ -738,11 +738,20 @@ const LiveTournament = () => {
           </Card>}
 
         {/* Current Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
               <div className="text-2xl font-bold">Level {activeTournament.level}</div>
               <div className="text-sm text-muted-foreground">Current Level</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold">
+                {Math.floor(activeTournament.total_players * activeTournament.starting_chips).toLocaleString()}
+              </div>
+              <div className="text-sm text-muted-foreground">Total Chips in Play</div>
             </CardContent>
           </Card>
 
