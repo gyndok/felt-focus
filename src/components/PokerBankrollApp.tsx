@@ -659,7 +659,7 @@ const PokerBankrollApp = () => {
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock size={12} />
-                      {session.duration}h
+                      {session.duration.toFixed(1)}h
                     </span>
                   </div>
                   
