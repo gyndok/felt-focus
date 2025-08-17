@@ -149,6 +149,7 @@ const LiveTournament = () => {
         starting_chips: startingChips,
         guarantee: newTournament.guarantee ? parseFloat(newTournament.guarantee) : null,
         total_players: newTournament.total_players ? parseInt(newTournament.total_players) : null,
+        level: parseInt(newTournament.level) || 1,
         small_blind: parseFloat(newTournament.small_blind),
         big_blind: bigBlind,
         players_left: newTournament.total_players ? parseInt(newTournament.total_players) : null,
