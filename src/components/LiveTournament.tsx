@@ -642,11 +642,50 @@ const LiveTournament = () => {
         <div className="max-w-md mx-auto text-center">
           <div className="mb-4">
             <h1 className="text-xl font-bold mb-1">{activeTournament.name}</h1>
-            <div className="text-2xl font-bold">
-              {activeTournament.current_chips.toLocaleString()} chips
-            </div>
-            <div className="text-sm opacity-90">
-              {activeTournament.bb_stack?.toFixed(1)} Big Blinds
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 w-8 p-0"
+                onClick={() => {
+                  const currentChips = activeTournament.current_chips;
+                  const increment = currentChips >= 100000 ? 25000 : currentChips >= 10000 ? 5000 : 1000;
+                  const newChips = Math.max(0, currentChips - increment);
+                  const newBBStack = newChips / activeTournament.big_blind;
+                  updateTournament(activeTournament.id, { 
+                    current_chips: newChips,
+                    bb_stack: newBBStack
+                  });
+                }}
+                disabled={activeTournament.current_chips <= 0}
+              >
+                -
+              </Button>
+              <div className="text-center">
+                <div className="text-2xl font-bold min-w-[120px]">
+                  {activeTournament.current_chips.toLocaleString()} chips
+                </div>
+                <div className="text-sm opacity-90">
+                  {activeTournament.bb_stack?.toFixed(1)} Big Blinds
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 w-8 p-0"
+                onClick={() => {
+                  const currentChips = activeTournament.current_chips;
+                  const increment = currentChips >= 100000 ? 25000 : currentChips >= 10000 ? 5000 : 1000;
+                  const newChips = currentChips + increment;
+                  const newBBStack = newChips / activeTournament.big_blind;
+                  updateTournament(activeTournament.id, { 
+                    current_chips: newChips,
+                    bb_stack: newBBStack
+                  });
+                }}
+              >
+                +
+              </Button>
             </div>
             {activeTournament.is_paused && (
               <Badge className="mt-2 bg-orange-500">
