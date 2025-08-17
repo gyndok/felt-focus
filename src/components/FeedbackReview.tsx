@@ -42,7 +42,7 @@ export function FeedbackReview({ open, onOpenChange }: FeedbackReviewProps) {
           ) : (
             <div className="space-y-4">
               {allFeedback.map((feedback) => (
-                <Card key={feedback.id} className={`${!feedback.reviewed_at ? 'border-orange-200 bg-orange-50/50' : ''}`}>
+                <Card key={feedback.id} className={`${!feedback.reviewed_at ? 'border-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-700' : 'bg-card border-border'}`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
@@ -51,11 +51,11 @@ export function FeedbackReview({ open, onOpenChange }: FeedbackReviewProps) {
                         ) : (
                           <Lightbulb className="h-4 w-4 text-yellow-500" />
                         )}
-                        <Badge variant={feedback.type === 'bug' ? 'destructive' : 'secondary'}>
+                        <Badge variant={feedback.type === 'bug' ? 'destructive' : 'secondary'} className="text-xs">
                           {feedback.type === 'bug' ? 'Bug Report' : 'Feature Request'}
                         </Badge>
                         {!feedback.reviewed_at && (
-                          <Badge variant="outline" className="bg-orange-100 text-orange-700">
+                          <Badge variant="outline" className="bg-orange-500 text-white border-orange-500 text-xs">
                             New
                           </Badge>
                         )}
@@ -63,41 +63,44 @@ export function FeedbackReview({ open, onOpenChange }: FeedbackReviewProps) {
                       
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
-                        {format(new Date(feedback.created_at), 'MMM d, yyyy h:mm a')}
+                        <span className="text-foreground">
+                          {format(new Date(feedback.created_at), 'MMM d, yyyy h:mm a')}
+                        </span>
                       </div>
                     </div>
                   </CardHeader>
                   
                   <CardContent className="space-y-4">
-                    <div className="text-sm leading-relaxed">
+                    <div className="text-sm leading-relaxed text-foreground bg-background/50 p-3 rounded-md border">
                       {feedback.message}
                     </div>
                     
                     <Separator />
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1 text-muted-foreground">
                           <User className="h-3 w-3" />
-                          {feedback.user_display_name}
+                          <span className="text-foreground font-medium">{feedback.user_display_name}</span>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 text-muted-foreground">
                           <Mail className="h-3 w-3" />
-                          {feedback.user_email}
+                          <span className="text-foreground">{feedback.user_email}</span>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-2">
                         {feedback.reviewed_at ? (
-                          <div className="flex items-center gap-1 text-xs text-green-600">
+                          <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                             <CheckCircle2 className="h-3 w-3" />
-                            Reviewed {format(new Date(feedback.reviewed_at), 'MMM d')}
+                            <span>Reviewed {format(new Date(feedback.reviewed_at), 'MMM d')}</span>
                           </div>
                         ) : (
                           <Button
                             size="sm"
-                            variant="outline"
+                            variant="default"
                             onClick={() => handleMarkAsReviewed(feedback.id)}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground"
                           >
                             Mark as Reviewed
                           </Button>
