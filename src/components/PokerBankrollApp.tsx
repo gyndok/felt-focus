@@ -25,6 +25,8 @@ import { PhotoCapture } from './PhotoCapture';
 import LiveTournament from './LiveTournament';
 import { FeedbackDialog } from './FeedbackDialog';
 import { ShareDialog } from './ShareDialog';
+import { FeedbackReview } from './FeedbackReview';
+import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
 
 const PokerBankrollApp = () => {
   const {
@@ -45,6 +47,7 @@ const PokerBankrollApp = () => {
   const {
     toast
   } = useToast();
+  const { unreadCount, isAdmin } = useFeedbackNotifications();
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(false);
@@ -55,6 +58,7 @@ const PokerBankrollApp = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [feedbackReviewOpen, setFeedbackReviewOpen] = useState(false);
   const [startingBankroll, setStartingBankroll] = useState(0);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -402,6 +406,22 @@ const PokerBankrollApp = () => {
               <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Send Feedback">
                 <Bug size={18} />
               </Button>
+              {isAdmin && (
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={() => setFeedbackReviewOpen(true)} 
+                  className="bg-white/20 hover:bg-white/30 border-white/30 relative" 
+                  title="Review Feedback"
+                >
+                  <Bug size={18} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+              )}
               <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Share App">
                 <Share size={18} />
               </Button>
@@ -1119,6 +1139,11 @@ const PokerBankrollApp = () => {
         <ShareDialog
           open={shareOpen}
           onOpenChange={setShareOpen}
+        />
+
+        <FeedbackReview
+          open={feedbackReviewOpen}
+          onOpenChange={setFeedbackReviewOpen}
         />
 
         {/* Settings Dialog */}
