@@ -827,42 +827,6 @@ const LiveTournament = () => {
           </Card>
         </div>
 
-        {/* Stack Health Guide */}
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="text-lg">Stack Health Guide</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <div>
-                <div className="font-medium">20+ BB - Healthy</div>
-                <div className="text-sm text-muted-foreground">Play your normal ranges</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div>
-                <div className="font-medium">10-20 BB - Caution</div>
-                <div className="text-sm text-muted-foreground">Tighten up, look for spots</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-              <div>
-                <div className="font-medium">5-10 BB - Danger</div>
-                <div className="text-sm text-muted-foreground">Push/fold territory</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div>
-                <div className="font-medium">&lt;5 BB - Critical</div>
-                <div className="text-sm text-muted-foreground">Shove or fold only</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Stack Progression Chart */}
         {chartData.length > 0 && <Card className="glass-card">
