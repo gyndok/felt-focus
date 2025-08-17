@@ -803,17 +803,19 @@ const LiveTournament = () => {
                       </CardContent>
                     </Card>
 
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-lg lg:text-xl font-bold text-purple-600">
-                          {Math.floor(economics.avgStackAtBubble).toLocaleString()}
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">
-                          Avg Stack at Bubble
-                        </div>
-                        <div className="text-xs text-muted-foreground">chips</div>
-                      </CardContent>
-                    </Card>
+                    {!isInMoney && (
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-lg lg:text-xl font-bold text-purple-600">
+                            {Math.floor(economics.avgStackAtBubble).toLocaleString()}
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">
+                            Avg Stack at Bubble
+                          </div>
+                          <div className="text-xs text-muted-foreground">chips</div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </>
                 );
               })()}
