@@ -803,7 +803,7 @@ const LiveTournament = () => {
                       </CardContent>
                     </Card>
 
-                    {!isInMoney && (
+                    {!isInMoney ? (
                       <Card className="glass-card">
                         <CardContent className="p-4 text-center">
                           <div className="text-lg lg:text-xl font-bold text-purple-600">
@@ -813,6 +813,18 @@ const LiveTournament = () => {
                             Avg Stack at Bubble
                           </div>
                           <div className="text-xs text-muted-foreground">chips</div>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-lg lg:text-xl font-bold text-blue-600">
+                            {((activeTournament.current_chips / (activeTournament.starting_chips * activeTournament.total_players)) * 100).toFixed(1)}%
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">
+                            Chip Share
+                          </div>
+                          <div className="text-xs text-muted-foreground">of total chips in play</div>
                         </CardContent>
                       </Card>
                     )}
