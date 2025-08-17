@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
 import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
-
 const LiveTournament = () => {
   const {
     toast
@@ -31,11 +30,8 @@ const LiveTournament = () => {
     updateTournament,
     addTournamentUpdate,
     endTournament,
-    getTournamentUpdates,
-    pauseTournament,
-    resumeTournament
+    getTournamentUpdates
   } = useTournaments();
-  
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showQuickUpdateDialog, setShowQuickUpdateDialog] = useState(false);
@@ -83,13 +79,12 @@ const LiveTournament = () => {
     const rakePercentage = activeTournament.house_rake / activeTournament.buy_in * 100;
     const prizePoolPerPlayer = activeTournament.buy_in - activeTournament.house_rake;
     const playersNeededForGuarantee = activeTournament.guarantee ? Math.ceil(activeTournament.guarantee / prizePoolPerPlayer) : 0;
-    
+
     // Money bubble calculations
     const percentPaid = activeTournament.percent_paid || 15; // Use stored value or default to 15%
-    const playersInMoney = activeTournament.total_players ? Math.floor((activeTournament.total_players * percentPaid) / 100) : 0;
+    const playersInMoney = activeTournament.total_players ? Math.floor(activeTournament.total_players * percentPaid / 100) : 0;
     const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : 0;
     const avgStackAtBubble = playersInMoney > 0 && totalChipsInPlay > 0 ? totalChipsInPlay / (playersInMoney + 1) : 0;
-    
     return {
       totalCollected,
       prizePool,
@@ -195,14 +190,17 @@ const LiveTournament = () => {
 
       // Update tournament with new total entries if provided
       if (updateData.total_entries && totalEntries !== activeTournament.total_players) {
-        await updateTournament(activeTournament.id, { total_players: totalEntries });
+        await updateTournament(activeTournament.id, {
+          total_players: totalEntries
+        });
       }
 
       // Update tournament with new percent paid if provided
       if (updateData.percent_paid) {
-        await updateTournament(activeTournament.id, { percent_paid: parseFloat(updateData.percent_paid) });
+        await updateTournament(activeTournament.id, {
+          percent_paid: parseFloat(updateData.percent_paid)
+        });
       }
-
       await addTournamentUpdate(activeTournament.id, {
         level: updateData.level || activeTournament.level,
         small_blind: parseFloat(updateData.small_blind) || activeTournament.small_blind,
@@ -236,14 +234,12 @@ const LiveTournament = () => {
       });
     }
   };
-
   const handleQuickUpdate = async () => {
     if (!activeTournament) return;
-    
     try {
       const totalEntries = quickUpdateData.total_entries ? parseInt(quickUpdateData.total_entries) : activeTournament.total_players;
       const playersLeft = quickUpdateData.players_left ? parseInt(quickUpdateData.players_left) : activeTournament.players_left;
-      
+
       // Update tournament with new values if provided
       const updates: any = {};
       if (quickUpdateData.total_entries && totalEntries !== activeTournament.total_players) {
@@ -255,11 +251,9 @@ const LiveTournament = () => {
       if (quickUpdateData.percent_paid) {
         updates.percent_paid = parseFloat(quickUpdateData.percent_paid);
       }
-      
       if (Object.keys(updates).length > 0) {
         await updateTournament(activeTournament.id, updates);
       }
-
       setQuickUpdateData({
         total_entries: '',
         players_left: '',
@@ -317,40 +311,6 @@ const LiveTournament = () => {
     }
   };
 
-  const handlePauseTournament = async () => {
-    if (!activeTournament) return;
-    try {
-      await pauseTournament(activeTournament.id);
-      toast({
-        title: "Tournament Paused",
-        description: "Tournament has been paused for multi-day tracking"
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to pause tournament",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleResumeTournament = async () => {
-    if (!activeTournament) return;
-    try {
-      await resumeTournament(activeTournament.id);
-      toast({
-        title: "Tournament Resumed",
-        description: "Tournament has been resumed"
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to resume tournament",
-        variant: "destructive"
-      });
-    }
-  };
-
   // Load tournament updates for chart
   useEffect(() => {
     if (activeTournament) {
@@ -363,62 +323,22 @@ const LiveTournament = () => {
   // Prepare chart data
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
-    
-    // Calculate starting big blind properly
-    // If we have tournament updates, use the earliest/lowest level big blind
-    // Otherwise, use small blind * 2 as default
-    let startingBigBlind = activeTournament.small_blind * 2;
-    
-    // If we have tournament updates, try to get the level 1 big blind specifically
-    if (tournamentUpdates && tournamentUpdates.length > 0) {
-      const level1Update = tournamentUpdates.find(update => update.level === 1);
-      if (level1Update) {
-        startingBigBlind = Number(level1Update.big_blind);
-      } else {
-        // If no level 1 update, use the smallest big blind value from updates
-        const sortedUpdates = [...tournamentUpdates].sort((a, b) => Number(a.big_blind) - Number(b.big_blind));
-        if (sortedUpdates.length > 0 && Number(sortedUpdates[0].big_blind) < startingBigBlind) {
-          startingBigBlind = Number(sortedUpdates[0].big_blind);
-        }
-      }
-    }
-    
-    console.log('Starting blind calculation debug:', {
-      tournamentSmallBlind: activeTournament.small_blind,
-      tournamentBigBlind: activeTournament.big_blind,
-      calculatedStartingBB: startingBigBlind,
-      updatesCount: tournamentUpdates?.length || 0
-    });
-    
-    // Create starting data point with proper BB calculation
     const data = [{
       level: 1,
       chips: Number(activeTournament.starting_chips),
-      bb: Number(activeTournament.starting_chips) / startingBigBlind
+      bb: Number(activeTournament.starting_chips) / Number(activeTournament.big_blind)
     }];
-    
-    console.log('Starting BB calculation:', {
-      startingChips: activeTournament.starting_chips,
-      startingBigBlind,
-      calculatedBB: Number(activeTournament.starting_chips) / startingBigBlind
-    });
-    
     if (tournamentUpdates && tournamentUpdates.length > 0) {
       // Sort updates by level to ensure proper line drawing
       const sortedUpdates = [...tournamentUpdates].sort((a, b) => a.level - b.level);
-      
-      sortedUpdates.forEach((update) => {
+      sortedUpdates.forEach(update => {
         const chips = Number(update.current_chips);
         const bigBlind = Number(update.big_blind);
+        // Always calculate BB stack using the big blind from that specific level
         const bbStack = chips / bigBlind;
-        
-        // Add all valid data points (including level 1 updates if they exist)
+
+        // Only add valid data points
         if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack)) {
-          // Remove existing level 1 entry if we have a level 1 update
-          if (update.level === 1) {
-            data.splice(0, 1); // Remove the default level 1 entry
-          }
-          
           data.push({
             level: Number(update.level),
             chips: chips,
@@ -427,8 +347,7 @@ const LiveTournament = () => {
         }
       });
     }
-    
-    return data.sort((a, b) => a.level - b.level);
+    return data;
   }, [activeTournament, tournamentUpdates]);
 
   // Debug chart data
@@ -461,47 +380,6 @@ const LiveTournament = () => {
                   ...newTournament,
                   name: e.target.value
                 })} placeholder="Main Event" />
-                </div>
-
-                <div>
-                  <Label htmlFor="game_type">Game Type</Label>
-                  <div className="space-y-2">
-                    <Select value={newTournament.game_type} onValueChange={value => {
-                      if (value === 'custom') {
-                        setNewTournament({
-                          ...newTournament,
-                          game_type: ''
-                        });
-                      } else {
-                        setNewTournament({
-                          ...newTournament,
-                          game_type: value
-                        });
-                      }
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select or enter custom..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="NLH">No Limit Hold'em</SelectItem>
-                        <SelectItem value="PLO">Pot Limit Omaha</SelectItem>
-                        <SelectItem value="PLO5">PLO5 (5-card)</SelectItem>
-                        <SelectItem value="STUD">7-Card Stud</SelectItem>
-                        <SelectItem value="RAZZ">Razz</SelectItem>
-                        <SelectItem value="8OB">Omaha Hi-Lo</SelectItem>
-                        <SelectItem value="MIXED">Mixed Games</SelectItem>
-                        <SelectItem value="custom">Enter Custom Game Type...</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input 
-                      placeholder="Enter custom game type (e.g., PLO8, 2-7 Triple Draw, etc.)"
-                      value={newTournament.game_type}
-                      onChange={e => setNewTournament({
-                        ...newTournament,
-                        game_type: e.target.value
-                      })}
-                    />
-                  </div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3">
@@ -562,19 +440,27 @@ const LiveTournament = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="game_type">Game Type</Label>
+                    <select id="game_type" value={newTournament.game_type} onChange={e => setNewTournament({
+                    ...newTournament,
+                    game_type: e.target.value
+                  })} className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring">
+                      <option value="NLH">No Limit Hold'em</option>
+                      <option value="PLO">Pot Limit Omaha</option>
+                      <option value="PLO5">Pot Limit Omaha Hi-Lo</option>
+                      <option value="Stud">Seven Card Stud</option>
+                      <option value="Mixed">Mixed Games</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                   <div>
                     <Label htmlFor="percent_paid">% Field Paid</Label>
-                    <Input 
-                      id="percent_paid" 
-                      type="number" 
-                      value={newTournament.percent_paid} 
-                      onChange={e => setNewTournament({
-                        ...newTournament,
-                        percent_paid: e.target.value
-                      })} 
-                      placeholder="15" 
-                    />
+                    <Input id="percent_paid" type="number" value={newTournament.percent_paid} onChange={e => setNewTournament({
+                    ...newTournament,
+                    percent_paid: e.target.value
+                  })} placeholder="15" />
                   </div>
                 </div>
                 
@@ -599,16 +485,9 @@ const LiveTournament = () => {
             <div className="text-sm opacity-90">
               {activeTournament.bb_stack?.toFixed(1)} Big Blinds
             </div>
-            {activeTournament.is_paused && (
-              <Badge className="mt-2 bg-orange-500">
-                Tournament Paused
-              </Badge>
-            )}
-            {!activeTournament.is_paused && (
-              <Badge className={`mt-2 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
-                {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
-              </Badge>
-            )}
+            <Badge className={`mt-2 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
+              {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
+            </Badge>
           </div>
         </div>
       </div>
@@ -686,54 +565,29 @@ const LiveTournament = () => {
                    </div>
                  </>}
 
-              {economics.playersInMoney > 0 && (() => {
-                const playersLeft = activeTournament.players_left || activeTournament.total_players;
-                const totalPlayers = activeTournament.total_players;
-                const percentPaid = activeTournament.percent_paid || 15;
-                const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
-                const isInMoney = playersLeft <= playersPaid;
-                
-                return (
-                  <>
-                    <Separator />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          {isInMoney ? "Players Paid" : "In the Money"}
-                        </div>
-                        <div className="font-bold text-green-600">
-                          {economics.playersInMoney} players
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {activeTournament.percent_paid || 15}% of field cashes
-                        </div>
+              {economics.playersInMoney > 0 && <>
+                  <Separator />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground">In the Money</div>
+                      <div className="font-bold text-green-600">
+                        {economics.playersInMoney} players
                       </div>
-                      
-                      {!isInMoney ? (
-                        <div>
-                          <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
-                          <div className="font-bold text-purple-600">
-                            {Math.floor(economics.avgStackAtBubble).toLocaleString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            chips
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="text-sm text-muted-foreground">Min Cash Est.</div>
-                          <div className="font-bold text-green-600">
-                            ~${Math.round(economics.prizePool * 0.4 / economics.playersInMoney)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            approximate
-                          </div>
-                        </div>
-                      )}
+                       <div className="text-xs text-muted-foreground">
+                         {activeTournament.percent_paid || 15}% of field cashes
+                       </div>
                     </div>
-                  </>
-                );
-              })()}
+                    <div>
+                      <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
+                      <div className="font-bold text-purple-600">
+                        {Math.floor(economics.avgStackAtBubble).toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        chips
+                      </div>
+                    </div>
+                  </div>
+                </>}
             </CardContent>
           </Card>}
 
@@ -752,56 +606,6 @@ const LiveTournament = () => {
                 {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
               </div>
               <div className="text-sm text-muted-foreground">Players Left/Entered</div>
-              
-              {/* Enhanced In the Money Indicator */}
-              {(() => {
-                const playersLeft = activeTournament.players_left || activeTournament.total_players;
-                const totalPlayers = activeTournament.total_players;
-                const percentPaid = activeTournament.percent_paid || 15;
-                const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
-                const isInMoney = playersLeft <= playersPaid;
-                const eliminationsToMoney = playersPaid - playersLeft;
-                const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
-                
-                return (
-                  <div className="mt-3 space-y-2">
-                    {isInMoney ? (
-                      <div className="animate-fade-in">
-                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
-                          🏆 IN THE MONEY! 🏆
-                        </Badge>
-                        <div className="text-xs text-green-600 font-medium mt-1">
-                          Congratulations! Minimum payout secured 🎉
-                        </div>
-                      </div>
-                    ) : bubbleZone ? (
-                      <div className="animate-fade-in">
-                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse border-2 border-orange-300">
-                          🫧 BUBBLE TIME! 🫧
-                        </Badge>
-                        <div className="text-xs text-orange-600 font-medium">
-                          Just {eliminationsToMoney} elimination{eliminationsToMoney > 1 ? 's' : ''} to the money!
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
-                            style={{ width: `${Math.max(10, ((totalPlayers - playersLeft) / (totalPlayers - playersPaid)) * 100)}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-muted-foreground text-center">
-                          {eliminationsToMoney} eliminations to money
-                        </div>
-                      </div>
-                    )}
-                    <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
-                      💰 Top {playersPaid} players paid ({percentPaid}%) • Min cash: ~${Math.round(economics?.prizePool * 0.4 / playersPaid || 0)}
-                    </div>
-                  </div>
-                );
-              })()}
             </CardContent>
           </Card>
 
@@ -881,96 +685,36 @@ const LiveTournament = () => {
             <CardContent>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  {chartViewMode === 'chips' ? (
-                    <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <defs>
-                        <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <XAxis 
-                        dataKey="level" 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickFormatter={value => `${(value / 1000).toFixed(0)}k`}
-                      />
-                      <Tooltip 
-                        labelFormatter={value => `Level ${value}`} 
-                        formatter={(value: number) => [`${value.toLocaleString()} chips`, 'Stack']} 
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="chips" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={3}
-                        fill="url(#chipGradient)"
-                        dot={{
-                          fill: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          r: 6
-                        }}
-                        activeDot={{
-                          r: 8,
-                          stroke: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          fill: 'hsl(var(--background))'
-                        }}
-                      />
-                    </AreaChart>
-                  ) : (
-                    <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <XAxis 
-                        dataKey="level" 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickFormatter={value => `${value.toFixed(0)}`}
-                      />
-                      <Tooltip 
-                        labelFormatter={value => `Level ${value}`} 
-                        formatter={(value: number) => [`${value.toFixed(1)} BB`, 'Big Blinds']} 
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="bb" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={3}
-                        dot={{
-                          fill: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          r: 6
-                        }}
-                        activeDot={{
-                          r: 8,
-                          stroke: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          fill: 'hsl(var(--background))'
-                        }}
-                      />
-                    </LineChart>
-                  )}
+                  <LineChart data={chartData} margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5
+              }}>
+                    <XAxis dataKey="level" tick={{
+                  fontSize: 12,
+                  fill: "hsl(var(--muted-foreground))"
+                }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{
+                  fontSize: 12,
+                  fill: "hsl(var(--muted-foreground))"
+                }} axisLine={false} tickLine={false} tickFormatter={value => chartViewMode === 'chips' ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)}`} />
+                    <Tooltip labelFormatter={value => `Level ${value}`} formatter={(value: number) => [chartViewMode === 'chips' ? `${value.toLocaleString()} chips` : `${value.toFixed(1)} BB`, chartViewMode === 'chips' ? 'Stack' : 'Big Blinds']} contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }} />
+                    <Line type="monotone" dataKey={chartViewMode === 'chips' ? 'chips' : 'bb'} stroke="hsl(var(--primary))" strokeWidth={3} dot={{
+                  fill: 'hsl(var(--primary))',
+                  strokeWidth: 2,
+                  r: 6
+                }} activeDot={{
+                  r: 5,
+                  stroke: 'hsl(var(--primary))',
+                  strokeWidth: 2,
+                  fill: 'hsl(var(--background))'
+                }} />
+                  </LineChart>
                 </ResponsiveContainer>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
@@ -994,22 +738,9 @@ const LiveTournament = () => {
                 Full Update
               </Button>
             </div>
-            <div className="flex gap-2">
-              {activeTournament.is_paused ? (
-                <Button onClick={handleResumeTournament} size="sm" variant="outline" className="flex-1">
-                  <Play className="w-4 h-4 mr-2" />
-                  Resume
-                </Button>
-              ) : (
-                <Button onClick={handlePauseTournament} size="sm" variant="outline" className="flex-1">
-                  <Pause className="w-4 h-4 mr-2" />
-                  Pause
-                </Button>
-              )}
-              <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="flex-1">
-                End Tournament
-              </Button>
-            </div>
+            <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="w-full">
+              End Tournament
+            </Button>
           </CardContent>
         </Card>
 
@@ -1072,16 +803,7 @@ const LiveTournament = () => {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="update_percent_paid">% Field Paid</Label>
-                <Input id="update_percent_paid" type="number" value={updateData.percent_paid} onChange={e => setUpdateData({
-                ...updateData,
-                percent_paid: e.target.value
-              })} placeholder="15" />
-                <div className="text-xs text-muted-foreground mt-1">
-                  Percentage of field that cashes
-                </div>
-              </div>
+              
 
               <div>
                 <Label htmlFor="update_notes">Notes (Optional)</Label>
@@ -1107,45 +829,26 @@ const LiveTournament = () => {
           <div className="space-y-4">
             <div>
               <Label htmlFor="quick_total_entries">Total Entries</Label>
-              <Input
-                id="quick_total_entries"
-                type="number"
-                value={quickUpdateData.total_entries}
-                onChange={e => setQuickUpdateData({
-                  ...quickUpdateData,
-                  total_entries: e.target.value
-                })}
-                placeholder={activeTournament?.total_players?.toString() || ""}
-              />
+              <Input id="quick_total_entries" type="number" value={quickUpdateData.total_entries} onChange={e => setQuickUpdateData({
+                ...quickUpdateData,
+                total_entries: e.target.value
+              })} placeholder={activeTournament?.total_players?.toString() || ""} />
             </div>
 
             <div>
               <Label htmlFor="quick_players_left">Players Left</Label>
-              <Input
-                id="quick_players_left"
-                type="number"
-                value={quickUpdateData.players_left}
-                onChange={e => setQuickUpdateData({
-                  ...quickUpdateData,
-                  players_left: e.target.value
-                })}
-                placeholder={activeTournament?.players_left?.toString() || ""}
-              />
+              <Input id="quick_players_left" type="number" value={quickUpdateData.players_left} onChange={e => setQuickUpdateData({
+                ...quickUpdateData,
+                players_left: e.target.value
+              })} placeholder={activeTournament?.players_left?.toString() || ""} />
             </div>
 
             <div>
               <Label htmlFor="quick_percent_paid">% Field Paid</Label>
-              <Input
-                id="quick_percent_paid"
-                type="number"
-                step="0.1"
-                value={quickUpdateData.percent_paid}
-                onChange={e => setQuickUpdateData({
-                  ...quickUpdateData,
-                  percent_paid: e.target.value
-                })}
-                placeholder={activeTournament?.percent_paid?.toString() || "15"}
-              />
+              <Input id="quick_percent_paid" type="number" step="0.1" value={quickUpdateData.percent_paid} onChange={e => setQuickUpdateData({
+                ...quickUpdateData,
+                percent_paid: e.target.value
+              })} placeholder={activeTournament?.percent_paid?.toString() || "15"} />
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-6">
