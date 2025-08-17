@@ -425,6 +425,27 @@ const LiveTournament = () => {
                   name: e.target.value
                 })} placeholder="Main Event" />
                 </div>
+
+                <div>
+                  <Label htmlFor="game_type">Game Type</Label>
+                  <Select value={newTournament.game_type} onValueChange={value => setNewTournament({
+                    ...newTournament,
+                    game_type: value
+                  })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select game type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NLH">No Limit Hold'em</SelectItem>
+                      <SelectItem value="PLO">Pot Limit Omaha</SelectItem>
+                      <SelectItem value="PLO5">PLO5 (5-card)</SelectItem>
+                      <SelectItem value="STUD">7-Card Stud</SelectItem>
+                      <SelectItem value="RAZZ">Razz</SelectItem>
+                      <SelectItem value="8OB">Omaha Hi-Lo</SelectItem>
+                      <SelectItem value="MIXED">Mixed Games</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
@@ -484,23 +505,7 @@ const LiveTournament = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="game_type">Game Type</Label>
-                    <select
-                      id="game_type"
-                      value={newTournament.game_type}
-                      onChange={(e) => setNewTournament({...newTournament, game_type: e.target.value})}
-                      className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="NLH">No Limit Hold'em</option>
-                      <option value="PLO">Pot Limit Omaha</option>
-                      <option value="PLO5">Pot Limit Omaha Hi-Lo</option>
-                      <option value="Stud">Seven Card Stud</option>
-                      <option value="Mixed">Mixed Games</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
+                <div className="grid grid-cols-1 gap-3">
                   <div>
                     <Label htmlFor="percent_paid">% Field Paid</Label>
                     <Input 
