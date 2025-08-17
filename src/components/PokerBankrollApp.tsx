@@ -452,9 +452,9 @@ const PokerBankrollApp = () => {
       {/* Header */}
       <div className="gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-md mx-auto">
-          <div className="flex flex-col gap-6 mb-6">
-            {/* App Icon */}
-            <div className="flex justify-center">
+          <div className="flex items-center gap-4 mb-6">
+            {/* App Icon - Left 1/3 */}
+            <div className="w-1/3 flex justify-center">
               <div className="relative">
                 <img 
                   src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
@@ -465,10 +465,10 @@ const PokerBankrollApp = () => {
               </div>
             </div>
             
-            {/* Control Buttons */}
-            <div className="flex flex-col gap-3">
+            {/* Control Buttons - Right 2/3 */}
+            <div className="w-2/3 flex flex-col gap-2">
               {/* First row */}
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2">
                 <ThemeToggle />
                 <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
                   <Filter size={18} />
@@ -485,7 +485,7 @@ const PokerBankrollApp = () => {
               </div>
               
               {/* Second row */}
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2">
                 {isAdmin && (
                   <Button 
                     variant="secondary" 
