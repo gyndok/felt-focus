@@ -812,7 +812,7 @@ const LiveTournament = () => {
                           <div className="text-xs lg:text-sm text-muted-foreground">
                             Avg Stack at Bubble
                           </div>
-                          <div className="text-xs text-muted-foreground">chips</div>
+                          <div className="text-xs text-muted-foreground"></div>
                         </CardContent>
                       </Card>
                     ) : (
