@@ -19,6 +19,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeToggle } from './ThemeToggle';
+import { useTheme } from 'next-themes';
 import { CSVImport } from './CSVImport';
 import { PhotoCapture } from './PhotoCapture';
 import LiveTournament from './LiveTournament';
@@ -28,6 +29,7 @@ const PokerBankrollApp = () => {
     user,
     signOut
   } = useAuth();
+  const { theme, setTheme } = useTheme();
   const {
     sessions,
     loading,
@@ -1118,6 +1120,24 @@ const PokerBankrollApp = () => {
                 />
                 <p className="text-xs text-muted-foreground">
                   Set your initial bankroll amount before any sessions
+                </p>
+              </div>
+
+              {/* Theme Preference Setting */}
+              <div className="space-y-2">
+                <Label>Theme Preference</Label>
+                <Select value={theme} onValueChange={setTheme}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Choose your preferred theme or follow system settings
                 </p>
               </div>
 
