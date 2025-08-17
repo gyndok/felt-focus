@@ -364,22 +364,44 @@ const LiveTournament = () => {
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
     
-    // Get the starting big blind from the first tournament update, or use a default
-    let startingBigBlind = activeTournament.small_blind * 2; // Default calculation
+    // Calculate starting big blind properly
+    // If we have tournament updates, use the earliest/lowest level big blind
+    // Otherwise, use small blind * 2 as default
+    let startingBigBlind = activeTournament.small_blind * 2;
     
-    // If we have tournament updates, find the level 1 big blind
+    // If we have tournament updates, try to get the level 1 big blind specifically
     if (tournamentUpdates && tournamentUpdates.length > 0) {
       const level1Update = tournamentUpdates.find(update => update.level === 1);
       if (level1Update) {
         startingBigBlind = Number(level1Update.big_blind);
+      } else {
+        // If no level 1 update, use the smallest big blind value from updates
+        const sortedUpdates = [...tournamentUpdates].sort((a, b) => Number(a.big_blind) - Number(b.big_blind));
+        if (sortedUpdates.length > 0 && Number(sortedUpdates[0].big_blind) < startingBigBlind) {
+          startingBigBlind = Number(sortedUpdates[0].big_blind);
+        }
       }
     }
     
+    console.log('Starting blind calculation debug:', {
+      tournamentSmallBlind: activeTournament.small_blind,
+      tournamentBigBlind: activeTournament.big_blind,
+      calculatedStartingBB: startingBigBlind,
+      updatesCount: tournamentUpdates?.length || 0
+    });
+    
+    // Create starting data point with proper BB calculation
     const data = [{
       level: 1,
       chips: Number(activeTournament.starting_chips),
       bb: Number(activeTournament.starting_chips) / startingBigBlind
     }];
+    
+    console.log('Starting BB calculation:', {
+      startingChips: activeTournament.starting_chips,
+      startingBigBlind,
+      calculatedBB: Number(activeTournament.starting_chips) / startingBigBlind
+    });
     
     if (tournamentUpdates && tournamentUpdates.length > 0) {
       // Sort updates by level to ensure proper line drawing
@@ -388,11 +410,15 @@ const LiveTournament = () => {
       sortedUpdates.forEach((update) => {
         const chips = Number(update.current_chips);
         const bigBlind = Number(update.big_blind);
-        // Calculate BB stack using the big blind from that specific level
         const bbStack = chips / bigBlind;
         
-        // Only add valid data points and skip level 1 if it's already in the data
-        if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack) && update.level > 1) {
+        // Add all valid data points (including level 1 updates if they exist)
+        if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack)) {
+          // Remove existing level 1 entry if we have a level 1 update
+          if (update.level === 1) {
+            data.splice(0, 1); // Remove the default level 1 entry
+          }
+          
           data.push({
             level: Number(update.level),
             chips: chips,
@@ -402,7 +428,7 @@ const LiveTournament = () => {
       });
     }
     
-    return data;
+    return data.sort((a, b) => a.level - b.level);
   }, [activeTournament, tournamentUpdates]);
 
   // Debug chart data
