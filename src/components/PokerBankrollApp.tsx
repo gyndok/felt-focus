@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { CSVImport } from './CSVImport';
 import { PhotoCapture } from './PhotoCapture';
@@ -67,7 +70,9 @@ const PokerBankrollApp = () => {
     type: 'all',
     game_type: 'all',
     location: 'all',
-    dateRange: 30
+    dateRange: 30,
+    startDate: undefined as Date | undefined,
+    endDate: undefined as Date | undefined
   });
   const [newSession, setNewSession] = useState({
     type: 'cash' as 'cash' | 'mtt',
@@ -138,8 +143,27 @@ const PokerBankrollApp = () => {
   // Filter sessions based on current filters
   const filteredSessions = useMemo(() => {
     return sessions.filter(session => {
-      const daysDiff = (new Date().getTime() - new Date(session.date).getTime()) / (1000 * 60 * 60 * 24);
-      return (filters.type === 'all' || session.type === filters.type) && (filters.game_type === 'all' || session.game_type === filters.game_type) && (filters.location === 'all' || session.location === filters.location) && daysDiff <= filters.dateRange;
+      const sessionDate = new Date(session.date);
+      const now = new Date();
+      const daysDiff = (now.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24);
+      
+      // Check basic filters
+      const typeMatch = filters.type === 'all' || session.type === filters.type;
+      const gameMatch = filters.game_type === 'all' || session.game_type === filters.game_type;
+      const locationMatch = filters.location === 'all' || session.location === filters.location;
+      
+      // Check date range - custom date range takes precedence over dateRange filter
+      let dateMatch = true;
+      if (filters.startDate && filters.endDate) {
+        const startDate = new Date(filters.startDate);
+        const endDate = new Date(filters.endDate);
+        endDate.setHours(23, 59, 59, 999); // Include the entire end date
+        dateMatch = sessionDate >= startDate && sessionDate <= endDate;
+      } else {
+        dateMatch = daysDiff <= filters.dateRange;
+      }
+      
+      return typeMatch && gameMatch && locationMatch && dateMatch;
     });
   }, [sessions, filters]);
 
@@ -598,7 +622,61 @@ const PokerBankrollApp = () => {
         {/* Session History */}
         <div className="space-y-4">
           <div className="flex items-center justify-between sticky top-0 bg-background/95 backdrop-blur-sm py-2 z-10">
+          <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Recent Sessions</h3>
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[280px] justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filters.startDate && filters.endDate ? (
+                      <>
+                        {format(filters.startDate, "LLL dd, y")} - {format(filters.endDate, "LLL dd, y")}
+                      </>
+                    ) : (
+                      <span>Pick a date range</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <div className="flex">
+                    <div className="p-3">
+                      <div className="text-sm font-medium mb-2">From</div>
+                       <Calendar
+                         mode="single"
+                         selected={filters.startDate}
+                         onSelect={(date) => setFilters(prev => ({ ...prev, startDate: date }))}
+                         className="pointer-events-auto"
+                       />
+                     </div>
+                     <div className="p-3 border-l">
+                       <div className="text-sm font-medium mb-2">To</div>
+                       <Calendar
+                         mode="single"
+                         selected={filters.endDate}
+                         onSelect={(date) => setFilters(prev => ({ ...prev, endDate: date }))}
+                         disabled={(date) => filters.startDate ? date < filters.startDate : false}
+                         className="pointer-events-auto"
+                       />
+                     </div>
+                   </div>
+                   <div className="p-3 border-t">
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       onClick={() => setFilters(prev => ({ ...prev, startDate: undefined, endDate: undefined }))}
+                       className="w-full"
+                     >
+                      Clear dates
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
             <Badge variant="secondary">{filteredSessions.length}</Badge>
           </div>
           
@@ -675,10 +753,10 @@ const PokerBankrollApp = () => {
                   <Separator className="my-3" />
                   
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar size={12} />
-                      {session.date}
-                    </span>
+                     <span className="flex items-center gap-1">
+                       <CalendarIcon size={12} />
+                       {session.date}
+                     </span>
                     <span className="flex items-center gap-1">
                       <Clock size={12} />
                       {session.duration.toFixed(1)}h
