@@ -62,8 +62,8 @@ export const useTournaments = () => {
         .insert([{
           ...tournamentData,
           user_id: user.id,
-          current_chips: tournamentData.starting_chips,
-          bb_stack: tournamentData.starting_chips / tournamentData.big_blind
+          current_chips: tournamentData.current_chips || tournamentData.starting_chips,
+          bb_stack: (tournamentData.current_chips || tournamentData.starting_chips) / tournamentData.big_blind
         }])
         .select()
         .single();
