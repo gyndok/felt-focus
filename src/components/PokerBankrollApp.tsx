@@ -458,7 +458,7 @@ const PokerBankrollApp = () => {
               <img 
                 src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
                 alt="Felt Focus" 
-                className="h-16 w-16 rounded-2xl shadow-lg hover-scale"
+                className="h-20 w-20 rounded-2xl shadow-lg hover-scale"
               />
             </div>
             
