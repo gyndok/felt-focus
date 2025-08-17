@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
-import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -387,44 +387,11 @@ const LiveTournament = () => {
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
     
-    // Calculate starting big blind properly
-    // If we have tournament updates, use the earliest/lowest level big blind
-    // Otherwise, use small blind * 2 as default
-    let startingBigBlind = activeTournament.small_blind * 2;
-    
-    // If we have tournament updates, try to get the level 1 big blind specifically
-    if (tournamentUpdates && tournamentUpdates.length > 0) {
-      const level1Update = tournamentUpdates.find(update => update.level === 1);
-      if (level1Update) {
-        startingBigBlind = Number(level1Update.big_blind);
-      } else {
-        // If no level 1 update, use the smallest big blind value from updates
-        const sortedUpdates = [...tournamentUpdates].sort((a, b) => Number(a.big_blind) - Number(b.big_blind));
-        if (sortedUpdates.length > 0 && Number(sortedUpdates[0].big_blind) < startingBigBlind) {
-          startingBigBlind = Number(sortedUpdates[0].big_blind);
-        }
-      }
-    }
-    
-    console.log('Starting blind calculation debug:', {
-      tournamentSmallBlind: activeTournament.small_blind,
-      tournamentBigBlind: activeTournament.big_blind,
-      calculatedStartingBB: startingBigBlind,
-      updatesCount: tournamentUpdates?.length || 0
-    });
-    
-    // Create starting data point with proper BB calculation
+    // Create starting data point
     const data = [{
       level: 1,
-      chips: Number(activeTournament.starting_chips),
-      bb: Number(activeTournament.starting_chips) / startingBigBlind
+      chips: Number(activeTournament.starting_chips)
     }];
-    
-    console.log('Starting BB calculation:', {
-      startingChips: activeTournament.starting_chips,
-      startingBigBlind,
-      calculatedBB: Number(activeTournament.starting_chips) / startingBigBlind
-    });
     
     if (tournamentUpdates && tournamentUpdates.length > 0) {
       // Sort updates by level to ensure proper line drawing
@@ -432,11 +399,9 @@ const LiveTournament = () => {
       
       sortedUpdates.forEach((update) => {
         const chips = Number(update.current_chips);
-        const bigBlind = Number(update.big_blind);
-        const bbStack = chips / bigBlind;
         
         // Add all valid data points (including level 1 updates if they exist)
-        if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack)) {
+        if (!isNaN(chips)) {
           // Remove existing level 1 entry if we have a level 1 update
           if (update.level === 1) {
             data.splice(0, 1); // Remove the default level 1 entry
@@ -444,8 +409,7 @@ const LiveTournament = () => {
           
           data.push({
             level: Number(update.level),
-            chips: chips,
-            bb: bbStack
+            chips: chips
           });
         }
       });
@@ -454,8 +418,6 @@ const LiveTournament = () => {
     return data.sort((a, b) => a.level - b.level);
   }, [activeTournament, tournamentUpdates]);
 
-  // Debug chart data
-  console.log('Chart data:', chartData);
   if (!activeTournament) {
     return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-6">
