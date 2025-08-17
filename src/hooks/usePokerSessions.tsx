@@ -24,6 +24,16 @@ export const usePokerSessions = () => {
     try {
       setLoading(true);
       console.log('Fetching sessions for user:', user.id);
+      console.log('User email:', user.email);
+      
+      // First check if user has any sessions at all
+      const { data: userSessionsCheck, error: checkError } = await supabase
+        .from('poker_sessions')
+        .select('count', { count: 'exact' })
+        .eq('user_id', user.id);
+        
+      console.log('User sessions count check:', userSessionsCheck, checkError);
+      
       const { data, error } = await supabase
         .from('poker_sessions')
         .select('*')
