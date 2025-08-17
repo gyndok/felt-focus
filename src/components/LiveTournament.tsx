@@ -690,6 +690,32 @@ const LiveTournament = () => {
                 {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
               </div>
               <div className="text-sm text-muted-foreground">Players Left/Entered</div>
+              
+              {/* In the Money Indicator */}
+              {(() => {
+                const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                const totalPlayers = activeTournament.total_players;
+                const percentPaid = activeTournament.percent_paid || 15;
+                const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                const isInMoney = playersLeft <= playersPaid;
+                
+                return (
+                  <div className="mt-3 space-y-1">
+                    {isInMoney ? (
+                      <Badge className="bg-green-500 text-white animate-pulse">
+                        🏆 IN THE MONEY! 🏆
+                      </Badge>
+                    ) : (
+                      <div className="text-xs text-muted-foreground">
+                        {playersPaid - playersLeft} eliminations to the money
+                      </div>
+                    )}
+                    <div className="text-xs text-muted-foreground">
+                      Top {playersPaid} players paid ({percentPaid}%)
+                    </div>
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
 
