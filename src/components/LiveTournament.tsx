@@ -376,12 +376,12 @@ const LiveTournament = () => {
 
   // Load tournament updates for chart
   useEffect(() => {
-    if (activeTournament) {
+    if (activeTournament?.id) {
       getTournamentUpdates(activeTournament.id).then(updates => {
         setTournamentUpdates(updates || []);
       }).catch(console.error);
     }
-  }, [activeTournament, getTournamentUpdates]);
+  }, [activeTournament?.id, getTournamentUpdates]);
 
   // Prepare chart data
   const chartData = useMemo(() => {
