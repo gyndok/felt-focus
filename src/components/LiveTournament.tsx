@@ -703,76 +703,82 @@ const LiveTournament = () => {
 
       <div className="max-w-md mx-auto px-4 pb-20 space-y-6">
         {/* Tournament Economics */}
-        {economics && <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="text-lg">Tournament Economics</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-muted-foreground">Buy-in</div>
-                  <div className="font-bold">
-                    ${activeTournament.buy_in.toLocaleString()} ({economics.rakePercentage.toFixed(1)}% rake)
+        {economics && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-center">Tournament Economics</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="glass-card">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl font-bold">
+                    ${activeTournament.buy_in.toLocaleString()}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    ${activeTournament.house_rake} rake, ${(activeTournament.buy_in - activeTournament.house_rake).toLocaleString()} to prizes
+                  <div className="text-xs lg:text-sm text-muted-foreground">
+                    Buy-in ({economics.rakePercentage.toFixed(1)}% rake)
                   </div>
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Prize Pool</div>
-                  <div className="font-bold text-green-600">
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl font-bold text-green-600">
                     ${economics.prizePool.toLocaleString()}
                   </div>
-                  {economics.overlay > 0 && <div className="text-xs text-orange-500">
-                      +${economics.overlay.toLocaleString()} overlay
-                    </div>}
-                  <div className="text-xs text-muted-foreground">
-                    ${(economics.prizePool / (activeTournament.total_players || 1)).toLocaleString()}/entry
+                  <div className="text-xs lg:text-sm text-muted-foreground">Prize Pool</div>
+                  {economics.overlay > 0 && (
+                    <div className="text-xs text-orange-500">+${economics.overlay.toLocaleString()} overlay</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl font-bold">
+                    ${economics.totalCollected.toLocaleString()}
                   </div>
-                </div>
-              </div>
+                  <div className="text-xs lg:text-sm text-muted-foreground">Total Collected</div>
+                </CardContent>
+              </Card>
 
-              <Separator />
+              <Card className="glass-card">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl font-bold text-red-600">
+                    ${((activeTournament.total_players || 0) * activeTournament.house_rake).toLocaleString()}
+                  </div>
+                  <div className="text-xs lg:text-sm text-muted-foreground">
+                    House Rake
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    ${activeTournament.house_rake}/entry
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-muted-foreground">Total Collected</div>
-                  <div className="font-bold">${economics.totalCollected.toLocaleString()}</div>
-                </div>
-                 <div>
-                   <div className="text-sm text-muted-foreground">House Rake</div>
-                   <div className="font-bold text-red-600">
-                     ${((activeTournament.total_players || 0) * activeTournament.house_rake).toLocaleString()}
-                   </div>
-                   <div className="text-xs text-muted-foreground">
-                     ${activeTournament.house_rake}/entry
-                   </div>
-                 </div>
-              </div>
-
-              {activeTournament.guarantee && <>
-                  <Separator />
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-muted-foreground">Guarantee</div>
-                      <div className="font-bold text-orange-600">
-                        ${activeTournament.guarantee.toLocaleString()} {economics.overlay > 0 ? '(overlay)' : ''}
+              {activeTournament.guarantee && (
+                <>
+                  <Card className="glass-card">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-lg lg:text-xl font-bold text-orange-600">
+                        ${activeTournament.guarantee.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {economics.overlay > 0 ? `Overlay: +$${economics.overlay.toLocaleString()} added to prize pool` : ''}
+                      <div className="text-xs lg:text-sm text-muted-foreground">
+                        Guarantee {economics.overlay > 0 ? '(overlay)' : ''}
                       </div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Players Needed</div>
-                      <div className="font-bold text-blue-600">
+                    </CardContent>
+                  </Card>
+
+                  <Card className="glass-card">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-lg lg:text-xl font-bold text-blue-600">
                         {economics.playersNeededForGuarantee}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        To reach guarantee
+                      <div className="text-xs lg:text-sm text-muted-foreground">
+                        Players Needed
                       </div>
-                     </div>
-                   </div>
-                 </>}
+                    </CardContent>
+                  </Card>
+                </>
+              )}
 
               {economics.playersInMoney > 0 && (() => {
                 const playersLeft = activeTournament.players_left || activeTournament.total_players;
@@ -783,47 +789,51 @@ const LiveTournament = () => {
                 
                 return (
                   <>
-                    <Separator />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground">
-                          {isInMoney ? "Players Paid" : "In the Money"}
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-lg lg:text-xl font-bold text-green-600">
+                          {economics.playersInMoney}
                         </div>
-                        <div className="font-bold text-green-600">
-                          {economics.playersInMoney} players
+                        <div className="text-xs lg:text-sm text-muted-foreground">
+                          {isInMoney ? "Players Paid" : "In the Money"}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {activeTournament.percent_paid || 15}% of field cashes
                         </div>
-                      </div>
-                      
-                      {!isInMoney ? (
-                        <div>
-                          <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
-                          <div className="font-bold text-purple-600">
-                            {Math.floor(economics.avgStackAtBubble).toLocaleString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            chips
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="text-sm text-muted-foreground">Min Cash Est.</div>
-                          <div className="font-bold text-green-600">
-                            ~${Math.round(economics.prizePool * 0.4 / economics.playersInMoney)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            approximate
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        {!isInMoney ? (
+                          <>
+                            <div className="text-lg lg:text-xl font-bold text-purple-600">
+                              {Math.floor(economics.avgStackAtBubble).toLocaleString()}
+                            </div>
+                            <div className="text-xs lg:text-sm text-muted-foreground">
+                              Avg Stack at Bubble
+                            </div>
+                            <div className="text-xs text-muted-foreground">chips</div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-lg lg:text-xl font-bold text-green-600">
+                              ~${Math.round(economics.prizePool * 0.4 / economics.playersInMoney)}
+                            </div>
+                            <div className="text-xs lg:text-sm text-muted-foreground">
+                              Min Cash Est.
+                            </div>
+                            <div className="text-xs text-muted-foreground">approximate</div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
                   </>
                 );
               })()}
-            </CardContent>
-          </Card>}
+            </div>
+          </div>
+        )}
 
         {/* Current Status */}
         <div className="grid grid-cols-2 gap-4">
