@@ -15,6 +15,7 @@ export const usePokerSessions = () => {
 
   const fetchSessions = async () => {
     if (!user) {
+      console.log('No user found, skipping session fetch');
       setSessions([]);
       setLoading(false);
       return;
@@ -22,14 +23,20 @@ export const usePokerSessions = () => {
 
     try {
       setLoading(true);
+      console.log('Fetching sessions for user:', user.id);
       const { data, error } = await supabase
         .from('poker_sessions')
         .select('*')
         .order('date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      console.log('Fetched sessions:', data);
       setSessions((data as PokerSession[]) || []);
     } catch (err) {
+      console.error('Error fetching sessions:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
