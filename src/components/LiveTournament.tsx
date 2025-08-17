@@ -816,8 +816,42 @@ const LiveTournament = () => {
 
           <Card className="glass-card">
             <CardContent className="p-4 text-center">
-              <div className="text-xl lg:text-2xl font-bold">
-                {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-6 w-6 p-0"
+                  onClick={() => {
+                    const currentPlayersLeft = activeTournament.players_left || activeTournament.total_players;
+                    if (currentPlayersLeft > 0) {
+                      updateTournament(activeTournament.id, { 
+                        players_left: currentPlayersLeft - 1 
+                      });
+                    }
+                  }}
+                  disabled={!activeTournament.players_left || activeTournament.players_left <= 0}
+                >
+                  -
+                </Button>
+                <div className="text-xl lg:text-2xl font-bold min-w-[60px]">
+                  {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-6 w-6 p-0"
+                  onClick={() => {
+                    const currentPlayersLeft = activeTournament.players_left || activeTournament.total_players;
+                    if (currentPlayersLeft < activeTournament.total_players) {
+                      updateTournament(activeTournament.id, { 
+                        players_left: currentPlayersLeft + 1 
+                      });
+                    }
+                  }}
+                  disabled={!activeTournament.total_players || (activeTournament.players_left || 0) >= activeTournament.total_players}
+                >
+                  +
+                </Button>
               </div>
               <div className="text-xs lg:text-sm text-muted-foreground">Players Left/Entered</div>
             </CardContent>
