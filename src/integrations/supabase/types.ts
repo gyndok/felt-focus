@@ -147,15 +147,19 @@ export type Database = {
           guarantee: number | null
           house_rake: number
           id: string
+          is_paused: boolean
           level: number
           name: string
+          paused_at: string | null
           percent_paid: number | null
           players_left: number | null
           prize_won: number | null
+          resumed_at: string | null
           small_blind: number
           started_at: string
           starting_chips: number
           status: string
+          total_paused_duration: number | null
           total_players: number | null
           updated_at: string
           user_id: string
@@ -173,15 +177,19 @@ export type Database = {
           guarantee?: number | null
           house_rake?: number
           id?: string
+          is_paused?: boolean
           level?: number
           name: string
+          paused_at?: string | null
           percent_paid?: number | null
           players_left?: number | null
           prize_won?: number | null
+          resumed_at?: string | null
           small_blind: number
           started_at?: string
           starting_chips: number
           status?: string
+          total_paused_duration?: number | null
           total_players?: number | null
           updated_at?: string
           user_id: string
@@ -199,15 +207,19 @@ export type Database = {
           guarantee?: number | null
           house_rake?: number
           id?: string
+          is_paused?: boolean
           level?: number
           name?: string
+          paused_at?: string | null
           percent_paid?: number | null
           players_left?: number | null
           prize_won?: number | null
+          resumed_at?: string | null
           small_blind?: number
           started_at?: string
           starting_chips?: number
           status?: string
+          total_paused_duration?: number | null
           total_players?: number | null
           updated_at?: string
           user_id?: string
