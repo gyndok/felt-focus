@@ -824,7 +824,9 @@ const LiveTournament = () => {
                           <div className="text-xs lg:text-sm text-muted-foreground">
                             Chip Share
                           </div>
-                          <div className="text-xs text-muted-foreground">of total chips in play</div>
+                          <div className="text-xs text-muted-foreground">
+                            ICM: ~${Math.round((activeTournament.current_chips / (activeTournament.starting_chips * activeTournament.total_players)) * economics.prizePool)}
+                          </div>
                         </CardContent>
                       </Card>
                     )}
