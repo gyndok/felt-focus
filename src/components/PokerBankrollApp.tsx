@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip, Bug, Share } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -23,6 +23,8 @@ import { useTheme } from 'next-themes';
 import { CSVImport } from './CSVImport';
 import { PhotoCapture } from './PhotoCapture';
 import LiveTournament from './LiveTournament';
+import { FeedbackDialog } from './FeedbackDialog';
+import { ShareDialog } from './ShareDialog';
 
 const PokerBankrollApp = () => {
   const {
@@ -51,6 +53,8 @@ const PokerBankrollApp = () => {
   const [editSession, setEditSession] = useState<PokerSession | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'tournament'>(activeTournament ? 'tournament' : 'dashboard');
   const [showSettings, setShowSettings] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [startingBankroll, setStartingBankroll] = useState(0);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -394,6 +398,12 @@ const PokerBankrollApp = () => {
               </Button>
               <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Settings">
                 <Settings size={18} />
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Send Feedback">
+                <Bug size={18} />
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Share App">
+                <Share size={18} />
               </Button>
               <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30">
                 <LogOut size={18} />
@@ -1100,6 +1110,16 @@ const PokerBankrollApp = () => {
         </Dialog>
 
         <CSVImport isOpen={showCSVImport} onOpenChange={setShowCSVImport} />
+
+        <FeedbackDialog
+          open={feedbackOpen}
+          onOpenChange={setFeedbackOpen}
+        />
+
+        <ShareDialog
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+        />
 
         {/* Settings Dialog */}
         <Dialog open={showSettings} onOpenChange={setShowSettings}>
