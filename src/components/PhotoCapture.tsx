@@ -20,29 +20,45 @@ export const PhotoCapture: React.FC<PhotoCaptureProps> = ({ onPhotoCapture, curr
   const { user } = useAuth();
 
   const uploadImageToSupabase = async (imageBase64: string, fileName: string) => {
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('User not authenticated for photo upload');
+      throw new Error('User not authenticated');
+    }
 
-    // Convert base64 to blob
-    const response = await fetch(imageBase64);
-    const blob = await response.blob();
+    try {
+      // Convert base64 to blob
+      const response = await fetch(imageBase64);
+      const blob = await response.blob();
+      console.log('Image blob created:', blob.size, 'bytes');
 
-    const filePath = `${user.id}/${fileName}`;
-    
-    const { data, error } = await supabase.storage
-      .from('receipts')
-      .upload(filePath, blob, {
-        cacheControl: '3600',
-        upsert: false
-      });
+      const filePath = `${user.id}/${fileName}`;
+      console.log('Uploading to path:', filePath);
+      
+      const { data, error } = await supabase.storage
+        .from('receipts')
+        .upload(filePath, blob, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-    if (error) throw error;
+      if (error) {
+        console.error('Supabase storage error:', error);
+        throw error;
+      }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('receipts')
-      .getPublicUrl(filePath);
+      console.log('Upload successful:', data);
 
-    return urlData.publicUrl;
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('receipts')
+        .getPublicUrl(filePath);
+
+      console.log('Public URL generated:', urlData.publicUrl);
+      return urlData.publicUrl;
+    } catch (uploadError) {
+      console.error('Upload process failed:', uploadError);
+      throw uploadError;
+    }
   };
 
   const captureFromCamera = async () => {
