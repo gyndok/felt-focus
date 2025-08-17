@@ -120,11 +120,11 @@ All colors MUST be HSL.
 
   /* Custom Poker Theme Utilities */
   .profit {
-    @apply text-green-400;
+    color: hsl(var(--profit));
   }
 
   .loss {
-    @apply text-red-400;
+    color: hsl(var(--loss));
   }
 
   .gradient-casino {
