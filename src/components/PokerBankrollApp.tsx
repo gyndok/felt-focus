@@ -724,31 +724,35 @@ const PokerBankrollApp = () => {
 
         {/* Session History */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between sticky top-0 bg-background/95 backdrop-blur-sm py-2 z-10">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Recent Sessions</h3>
-            <div className="flex items-center gap-2">
+          <div className="sticky top-0 bg-background/95 backdrop-blur-sm py-2 z-10 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Recent Sessions</h3>
+              <Badge variant="secondary">{filteredSessions.length}</Badge>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => exportSessionsToCSV(filteredSessions)}
-                className="h-8"
+                className="h-8 flex-shrink-0"
               >
                 Export CSV
               </Button>
+              
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-[280px] justify-start text-left font-normal"
+                    className="justify-start text-left font-normal text-sm h-8"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {filters.startDate && filters.endDate ? (
                       <>
-                        {format(filters.startDate, "LLL dd, y")} - {format(filters.endDate, "LLL dd, y")}
+                        {format(filters.startDate, "MMM dd")} - {format(filters.endDate, "MMM dd, y")}
                       </>
                     ) : (
-                      <span>Pick a date range</span>
+                      <span>Pick date range</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -787,8 +791,6 @@ const PokerBankrollApp = () => {
                 </PopoverContent>
               </Popover>
             </div>
-          </div>
-            <Badge variant="secondary">{filteredSessions.length}</Badge>
           </div>
           
           <div className="max-h-96 overflow-y-auto space-y-4">
