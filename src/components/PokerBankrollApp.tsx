@@ -70,7 +70,7 @@ const PokerBankrollApp = () => {
     type: 'all',
     game_type: 'all',
     location: 'all',
-    dateRange: 30,
+    dateRange: 999999, // Show all sessions by default
     startDate: undefined as Date | undefined,
     endDate: undefined as Date | undefined
   });
