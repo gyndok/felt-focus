@@ -428,23 +428,43 @@ const LiveTournament = () => {
 
                 <div>
                   <Label htmlFor="game_type">Game Type</Label>
-                  <Select value={newTournament.game_type} onValueChange={value => setNewTournament({
-                    ...newTournament,
-                    game_type: value
-                  })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select game type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="NLH">No Limit Hold'em</SelectItem>
-                      <SelectItem value="PLO">Pot Limit Omaha</SelectItem>
-                      <SelectItem value="PLO5">PLO5 (5-card)</SelectItem>
-                      <SelectItem value="STUD">7-Card Stud</SelectItem>
-                      <SelectItem value="RAZZ">Razz</SelectItem>
-                      <SelectItem value="8OB">Omaha Hi-Lo</SelectItem>
-                      <SelectItem value="MIXED">Mixed Games</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2">
+                    <Select value={newTournament.game_type} onValueChange={value => {
+                      if (value === 'custom') {
+                        setNewTournament({
+                          ...newTournament,
+                          game_type: ''
+                        });
+                      } else {
+                        setNewTournament({
+                          ...newTournament,
+                          game_type: value
+                        });
+                      }
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select or enter custom..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NLH">No Limit Hold'em</SelectItem>
+                        <SelectItem value="PLO">Pot Limit Omaha</SelectItem>
+                        <SelectItem value="PLO5">PLO5 (5-card)</SelectItem>
+                        <SelectItem value="STUD">7-Card Stud</SelectItem>
+                        <SelectItem value="RAZZ">Razz</SelectItem>
+                        <SelectItem value="8OB">Omaha Hi-Lo</SelectItem>
+                        <SelectItem value="MIXED">Mixed Games</SelectItem>
+                        <SelectItem value="custom">Enter Custom Game Type...</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      placeholder="Enter custom game type (e.g., PLO8, 2-7 Triple Draw, etc.)"
+                      value={newTournament.game_type}
+                      onChange={e => setNewTournament({
+                        ...newTournament,
+                        game_type: e.target.value
+                      })}
+                    />
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3">
