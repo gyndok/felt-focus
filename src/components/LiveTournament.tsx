@@ -23,7 +23,8 @@ const LiveTournament = () => {
     user
   } = useAuth();
   const {
-    addSession
+    addSession,
+    refetch: refetchSessions
   } = usePokerSessions();
   const {
     activeTournament,
@@ -299,6 +300,10 @@ const LiveTournament = () => {
         duration: duration,
         notes: finalPosition ? `Finished ${finalPosition}` : 'Eliminated'
       });
+      
+      // Refetch sessions to immediately update the recent sessions list
+      await refetchSessions();
+      
       setEndData({
         final_position: '',
         prize_won: '0'
