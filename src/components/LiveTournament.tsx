@@ -49,6 +49,7 @@ const LiveTournament = () => {
     house_rake: '',
     starting_chips: '30000',
     day_2_stack: '',
+    day_2_players_left: '',
     is_day_2: false,
     level: '1',
     guarantee: '',
@@ -142,6 +143,11 @@ const LiveTournament = () => {
         ? parseFloat(newTournament.day_2_stack) 
         : startingChips;
 
+      // Use day 2 players left if entering day 2, otherwise use total players
+      const playersLeft = newTournament.is_day_2 && newTournament.day_2_players_left
+        ? parseInt(newTournament.day_2_players_left)
+        : (newTournament.total_players ? parseInt(newTournament.total_players) : null);
+
       await createTournament({
         name: newTournament.name,
         buy_in: parseFloat(newTournament.buy_in),
@@ -152,7 +158,7 @@ const LiveTournament = () => {
         level: parseInt(newTournament.level) || 1,
         small_blind: parseFloat(newTournament.small_blind),
         big_blind: bigBlind,
-        players_left: newTournament.total_players ? parseInt(newTournament.total_players) : null,
+        players_left: playersLeft,
         current_chips: currentChips,
         bb_stack: currentChips / bigBlind,
         game_type: newTournament.game_type,
@@ -164,6 +170,7 @@ const LiveTournament = () => {
         house_rake: '',
         starting_chips: '30000',
         day_2_stack: '',
+        day_2_players_left: '',
         is_day_2: false,
         level: '1',
         guarantee: '',
@@ -565,20 +572,38 @@ const LiveTournament = () => {
                   </div>
                   
                   {newTournament.is_day_2 && (
-                    <div>
-                      <Label htmlFor="day_2_stack">Day 2 Starting Stack</Label>
-                      <Input 
-                        id="day_2_stack" 
-                        type="number" 
-                        value={newTournament.day_2_stack} 
-                        onChange={e => setNewTournament({
-                          ...newTournament,
-                          day_2_stack: e.target.value
-                        })} 
-                        placeholder="45000" 
-                      />
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Your actual stack size for day 2. Starting chips ({newTournament.starting_chips}) will still be used for calculations.
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="day_2_stack">Day 2 Starting Stack</Label>
+                        <Input 
+                          id="day_2_stack" 
+                          type="number" 
+                          value={newTournament.day_2_stack} 
+                          onChange={e => setNewTournament({
+                            ...newTournament,
+                            day_2_stack: e.target.value
+                          })} 
+                          placeholder="45000" 
+                        />
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Your actual stack size for day 2. Starting chips ({newTournament.starting_chips}) will still be used for calculations.
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="day_2_players_left">Players Left (Day 2)</Label>
+                        <Input 
+                          id="day_2_players_left" 
+                          type="number" 
+                          value={newTournament.day_2_players_left || ''} 
+                          onChange={e => setNewTournament({
+                            ...newTournament,
+                            day_2_players_left: e.target.value
+                          })} 
+                          placeholder="147" 
+                        />
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Number of players remaining at start of day 2
+                        </div>
                       </div>
                     </div>
                   )}
