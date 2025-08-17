@@ -455,14 +455,11 @@ const PokerBankrollApp = () => {
           <div className="flex items-center gap-4 mb-6">
             {/* App Icon - Left 1/3 */}
             <div className="w-1/3 flex justify-center">
-              <div className="relative">
-                <img 
-                  src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
-                  alt="Felt Focus" 
-                  className="h-16 w-16 rounded-2xl shadow-lg hover-scale"
-                />
-                <div className="absolute inset-0 rounded-2xl bg-white/10 backdrop-blur-sm"></div>
-              </div>
+              <img 
+                src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
+                alt="Felt Focus" 
+                className="h-16 w-16 rounded-2xl shadow-lg hover-scale"
+              />
             </div>
             
             {/* Control Buttons - Right 2/3 */}
