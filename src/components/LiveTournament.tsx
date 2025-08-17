@@ -50,6 +50,7 @@ const LiveTournament = () => {
     starting_chips: '30000',
     day_2_stack: '',
     is_day_2: false,
+    level: '1',
     guarantee: '',
     total_players: '',
     small_blind: '100',
@@ -158,6 +159,7 @@ const LiveTournament = () => {
         starting_chips: '30000',
         day_2_stack: '',
         is_day_2: false,
+        level: '1',
         guarantee: '',
         total_players: '',
         small_blind: '100',
@@ -593,7 +595,7 @@ const LiveTournament = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <div>
                     <Label htmlFor="small_blind">Small Blind</Label>
                     <Input id="small_blind" type="number" value={newTournament.small_blind} onChange={e => setNewTournament({
@@ -607,6 +609,13 @@ const LiveTournament = () => {
                     ...newTournament,
                     big_blind: e.target.value
                   })} placeholder="200" />
+                  </div>
+                  <div>
+                    <Label htmlFor="level">Starting Level</Label>
+                    <Input id="level" type="number" value={newTournament.level} onChange={e => setNewTournament({
+                    ...newTournament,
+                    level: e.target.value
+                  })} placeholder="1" />
                   </div>
                 </div>
 
