@@ -614,17 +614,30 @@ const PokerBankrollApp = () => {
                         {session.location}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEditDialog(session);
-                      }}
-                      className="h-8 w-8 p-0 hover:bg-muted"
-                    >
-                      <Edit size={14} />
-                    </Button>
+                    <div className="flex flex-col gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditDialog(session);
+                        }}
+                        className="h-8 w-8 p-0 hover:bg-muted"
+                      >
+                        <Edit size={14} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSession(session.id);
+                        }}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="flex items-center gap-2">
