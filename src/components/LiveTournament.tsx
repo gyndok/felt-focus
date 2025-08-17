@@ -357,6 +357,9 @@ const LiveTournament = () => {
     
     return data;
   }, [activeTournament, tournamentUpdates]);
+
+  // Debug chart data
+  console.log('Chart data:', chartData, 'View mode:', chartViewMode);
   if (!activeTournament) {
     return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-6">
@@ -731,8 +734,8 @@ const LiveTournament = () => {
                       dot={{
                         fill: 'hsl(var(--primary))',
                         strokeWidth: 2,
-                        r: 4
-                      }} 
+                        r: 6
+                      }}
                       activeDot={{
                         r: 5,
                         stroke: 'hsl(var(--primary))',
