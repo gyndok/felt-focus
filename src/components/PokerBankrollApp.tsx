@@ -452,59 +452,65 @@ const PokerBankrollApp = () => {
       {/* Header */}
       <div className="gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-md mx-auto">
-          <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col gap-6 mb-6">
+            {/* App Icon */}
             <div className="flex justify-center">
-              <img 
-                src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
-                alt="Felt Focus" 
-                className="h-12 w-12 rounded-xl"
-              />
+              <div className="relative">
+                <img 
+                  src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
+                  alt="Felt Focus" 
+                  className="h-16 w-16 rounded-2xl shadow-lg hover-scale"
+                />
+                <div className="absolute inset-0 rounded-2xl bg-white/10 backdrop-blur-sm"></div>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
+            
+            {/* Control Buttons */}
+            <div className="flex flex-col gap-3">
               {/* First row */}
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-3">
                 <ThemeToggle />
-                <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30">
+                <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
                   <Filter size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Import CSV">
+                <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Import CSV">
                   📊
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Settings">
+                <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Settings">
                   <Settings size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Send Feedback">
+                <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Send Feedback">
                   <Bug size={18} />
                 </Button>
               </div>
               
               {/* Second row */}
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-3">
                 {isAdmin && (
                   <Button 
                     variant="secondary" 
                     size="sm" 
                     onClick={() => setFeedbackReviewOpen(true)} 
-                    className="bg-white/20 hover:bg-white/30 border-white/30 relative" 
+                    className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm relative" 
                     title="Review Feedback"
                   >
                     <MessageSquare size={18} />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                         {unreadCount}
                       </span>
                     )}
                   </Button>
                 )}
-                <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30" title="Share App">
+                <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Share App">
                   <Share size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30">
+                <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
                   <LogOut size={18} />
                 </Button>
                 <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
                   <DialogTrigger asChild>
-                    <Button size="sm" className="bg-profit hover:bg-profit/90">
+                    <Button size="sm" className="bg-profit hover:bg-profit/90 shadow-lg hover-scale">
                       <Plus size={18} />
                     </Button>
                   </DialogTrigger>
