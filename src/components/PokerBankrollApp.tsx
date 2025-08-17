@@ -894,7 +894,7 @@ const PokerBankrollApp = () => {
 
         {/* Edit Session Dialog */}
         <Dialog open={!!editSession} onOpenChange={() => setEditSession(null)}>
-          <DialogContent className="max-w-md mx-auto">
+          <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Session</DialogTitle>
             </DialogHeader>
