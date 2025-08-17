@@ -626,10 +626,36 @@ const PokerBankrollApp = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
-                            console.log('Attachment clicked:', session.receipt_image_url);
-                            window.open(session.receipt_image_url, '_blank');
+                            try {
+                              // Extract filename from the URL for private bucket access
+                              const fileName = session.receipt_image_url.split('/').pop();
+                              const { data, error } = await supabase.storage
+                                .from('receipts')
+                                .createSignedUrl(`${user?.id}/${fileName}`, 3600);
+                              
+                              if (error) {
+                                console.error('Error creating signed URL:', error);
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to open receipt. Please try again.",
+                                  variant: "destructive"
+                                });
+                                return;
+                              }
+                              
+                              if (data?.signedUrl) {
+                                window.open(data.signedUrl, '_blank');
+                              }
+                            } catch (error) {
+                              console.error('Error accessing receipt:', error);
+                              toast({
+                                title: "Error", 
+                                description: "Failed to open receipt. Please try again.",
+                                variant: "destructive"
+                              });
+                            }
                           }}
                           className="h-8 w-8 p-0 hover:bg-muted"
                           title="View receipt"
