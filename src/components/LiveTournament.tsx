@@ -42,7 +42,6 @@ const LiveTournament = () => {
   const [showQuickUpdateDialog, setShowQuickUpdateDialog] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
-  const [chartViewMode, setChartViewMode] = useState<'chips' | 'bb'>('chips');
   const [newTournament, setNewTournament] = useState({
     name: '',
     buy_in: '',
@@ -456,7 +455,7 @@ const LiveTournament = () => {
   }, [activeTournament, tournamentUpdates]);
 
   // Debug chart data
-  console.log('Chart data:', chartData, 'View mode:', chartViewMode);
+  console.log('Chart data:', chartData);
   if (!activeTournament) {
     return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-6">
@@ -950,117 +949,63 @@ const LiveTournament = () => {
                   <TrendingUp className="w-5 h-5" />
                   Stack Progression
                 </CardTitle>
-                <Button variant="outline" size="sm" onClick={() => setChartViewMode(chartViewMode === 'chips' ? 'bb' : 'chips')} className="flex items-center gap-2">
-                  {chartViewMode === 'chips' ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
-                  {chartViewMode === 'chips' ? 'Chips' : 'Big Blinds'}
-                </Button>
               </div>
             </CardHeader>
             <CardContent>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  {chartViewMode === 'chips' ? (
-                    <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <defs>
-                        <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <XAxis 
-                        dataKey="level" 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickFormatter={value => `${(value / 1000).toFixed(0)}k`}
-                      />
-                      <Tooltip 
-                        labelFormatter={value => `Level ${value}`} 
-                        formatter={(value: number) => [`${value.toLocaleString()} chips`, 'Stack']} 
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="chips" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={3}
-                        fill="url(#chipGradient)"
-                        dot={{
-                          fill: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          r: 6
-                        }}
-                        activeDot={{
-                          r: 8,
-                          stroke: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          fill: 'hsl(var(--background))'
-                        }}
-                      />
-                    </AreaChart>
-                  ) : (
-                    <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <defs>
-                        <linearGradient id="bbGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <XAxis 
-                        dataKey="level" 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickFormatter={value => `${value.toFixed(0)}`}
-                      />
-                      <Tooltip 
-                        labelFormatter={value => `Level ${value}`} 
-                        formatter={(value: number) => [`${value.toFixed(1)} BB`, 'Big Blinds']} 
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="bb" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={3}
-                        fill="url(#bbGradient)"
-                        dot={{
-                          fill: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          r: 6
-                        }}
-                        activeDot={{
-                          r: 8,
-                          stroke: 'hsl(var(--primary))',
-                          strokeWidth: 2,
-                          fill: 'hsl(var(--background))'
-                        }}
-                      />
-                    </AreaChart>
-                  )}
+                  <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="level" 
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={value => `${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip 
+                      labelFormatter={value => `Level ${value}`} 
+                      formatter={(value: number) => [`${value.toLocaleString()} chips`, 'Stack']} 
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="chips" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      fill="url(#chipGradient)"
+                      dot={{
+                        fill: 'hsl(var(--primary))',
+                        strokeWidth: 2,
+                        r: 6
+                      }}
+                      activeDot={{
+                        r: 8,
+                        stroke: 'hsl(var(--primary))',
+                        strokeWidth: 2,
+                        fill: 'hsl(var(--background))'
+                      }}
+                    />
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                 <span>Tournament Level</span>
-                <span>{chartViewMode === 'chips' ? 'Stack in Chips' : 'Stack in Big Blinds'}</span>
+                <span>Stack in Chips</span>
               </div>
             </CardContent>
           </Card>}
