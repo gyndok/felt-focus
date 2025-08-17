@@ -660,29 +660,54 @@ const LiveTournament = () => {
                    </div>
                  </>}
 
-              {economics.playersInMoney > 0 && <>
-                  <Separator />
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-muted-foreground">In the Money</div>
-                      <div className="font-bold text-green-600">
-                        {economics.playersInMoney} players
+              {economics.playersInMoney > 0 && (() => {
+                const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                const totalPlayers = activeTournament.total_players;
+                const percentPaid = activeTournament.percent_paid || 15;
+                const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                const isInMoney = playersLeft <= playersPaid;
+                
+                return (
+                  <>
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm text-muted-foreground">
+                          {isInMoney ? "Players Paid" : "In the Money"}
+                        </div>
+                        <div className="font-bold text-green-600">
+                          {economics.playersInMoney} players
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {activeTournament.percent_paid || 15}% of field cashes
+                        </div>
                       </div>
-                       <div className="text-xs text-muted-foreground">
-                         {activeTournament.percent_paid || 15}% of field cashes
-                       </div>
+                      
+                      {!isInMoney ? (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
+                          <div className="font-bold text-purple-600">
+                            {Math.floor(economics.avgStackAtBubble).toLocaleString()}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            chips
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Min Cash Est.</div>
+                          <div className="font-bold text-green-600">
+                            ~${Math.round(economics.prizePool * 0.4 / economics.playersInMoney)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            approximate
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Avg Stack at Bubble</div>
-                      <div className="font-bold text-purple-600">
-                        {Math.floor(economics.avgStackAtBubble).toLocaleString()}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        chips
-                      </div>
-                    </div>
-                  </div>
-                </>}
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>}
 
