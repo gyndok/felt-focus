@@ -7,6 +7,7 @@ import { useAuth, AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import UserGuide from "./components/UserGuide";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,10 @@ const AppContent = () => {
       <Route 
         path="/auth" 
         element={!user ? <Auth /> : <Navigate to="/" replace />} 
+      />
+      <Route 
+        path="/guide" 
+        element={user ? <UserGuide /> : <Navigate to="/auth" replace />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
