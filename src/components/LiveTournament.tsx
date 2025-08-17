@@ -919,7 +919,7 @@ const LiveTournament = () => {
                       </div>
                     )}
                     <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
-                      💰 Top {playersPaid} players paid ({percentPaid}%) • Min cash: ~${Math.round(economics?.prizePool * 0.4 / playersPaid || 0)}
+                      💰 Top {playersPaid} players paid ({percentPaid}%)
                     </div>
                   </div>
                 );
