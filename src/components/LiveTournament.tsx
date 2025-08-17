@@ -364,10 +364,21 @@ const LiveTournament = () => {
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
     
+    // Get the starting big blind from the first tournament update, or use a default
+    let startingBigBlind = activeTournament.small_blind * 2; // Default calculation
+    
+    // If we have tournament updates, find the level 1 big blind
+    if (tournamentUpdates && tournamentUpdates.length > 0) {
+      const level1Update = tournamentUpdates.find(update => update.level === 1);
+      if (level1Update) {
+        startingBigBlind = Number(level1Update.big_blind);
+      }
+    }
+    
     const data = [{
       level: 1,
       chips: Number(activeTournament.starting_chips),
-      bb: Number(activeTournament.starting_chips) / Number(activeTournament.big_blind)
+      bb: Number(activeTournament.starting_chips) / startingBigBlind
     }];
     
     if (tournamentUpdates && tournamentUpdates.length > 0) {
@@ -377,11 +388,11 @@ const LiveTournament = () => {
       sortedUpdates.forEach((update) => {
         const chips = Number(update.current_chips);
         const bigBlind = Number(update.big_blind);
-        // Always calculate BB stack using the big blind from that specific level
+        // Calculate BB stack using the big blind from that specific level
         const bbStack = chips / bigBlind;
         
-        // Only add valid data points
-        if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack)) {
+        // Only add valid data points and skip level 1 if it's already in the data
+        if (!isNaN(chips) && !isNaN(bigBlind) && !isNaN(bbStack) && update.level > 1) {
           data.push({
             level: Number(update.level),
             chips: chips,
