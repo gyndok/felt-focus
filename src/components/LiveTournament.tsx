@@ -77,6 +77,8 @@ const LiveTournament = () => {
     final_position: '',
     prize_won: '0'
   });
+  const [chipDialogOpen, setChipDialogOpen] = useState(false);
+  const [chipUpdateValue, setChipUpdateValue] = useState('');
 
   // Calculate tournament economics
   const economics = useMemo(() => {
@@ -642,51 +644,70 @@ const LiveTournament = () => {
         <div className="max-w-md mx-auto text-center">
           <div className="mb-4">
             <h1 className="text-xl font-bold mb-1">{activeTournament.name}</h1>
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-8 w-8 p-0"
-                onClick={() => {
-                  const currentChips = activeTournament.current_chips;
-                  const increment = currentChips >= 100000 ? 25000 : currentChips >= 10000 ? 5000 : 1000;
-                  const newChips = Math.max(0, currentChips - increment);
-                  const newBBStack = newChips / activeTournament.big_blind;
-                  updateTournament(activeTournament.id, { 
-                    current_chips: newChips,
-                    bb_stack: newBBStack
-                  });
-                }}
-                disabled={activeTournament.current_chips <= 0}
-              >
-                -
-              </Button>
-              <div className="text-center">
-                <div className="text-2xl font-bold min-w-[120px]">
-                  {activeTournament.current_chips.toLocaleString()} chips
+            <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="p-4 h-auto hover:bg-white/10">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">
+                      {activeTournament.current_chips.toLocaleString()} chips
+                    </div>
+                    <div className="text-sm opacity-90">
+                      {activeTournament.bb_stack?.toFixed(1)} Big Blinds
+                    </div>
+                    <div className="text-xs opacity-70 mt-1">
+                      Click to update
+                    </div>
+                  </div>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-background/95 backdrop-blur-md border border-white/20">
+                <DialogHeader>
+                  <DialogTitle>Update Chip Stack</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="chip-amount">New Chip Amount</Label>
+                    <Input
+                      id="chip-amount"
+                      type="number"
+                      value={chipUpdateValue}
+                      onChange={(e) => setChipUpdateValue(e.target.value)}
+                      placeholder={activeTournament.current_chips.toString()}
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => {
+                        const newChips = parseFloat(chipUpdateValue);
+                        if (newChips && newChips > 0) {
+                          const newBBStack = newChips / activeTournament.big_blind;
+                          updateTournament(activeTournament.id, { 
+                            current_chips: newChips,
+                            bb_stack: newBBStack
+                          });
+                          setChipDialogOpen(false);
+                          setChipUpdateValue('');
+                          toast({
+                            title: "Chip stack updated",
+                            description: `Updated to ${newChips.toLocaleString()} chips`
+                          });
+                        }
+                      }}
+                      disabled={!chipUpdateValue || parseFloat(chipUpdateValue) <= 0}
+                    >
+                      Update
+                    </Button>
+                    <Button variant="outline" onClick={() => {
+                      setChipDialogOpen(false);
+                      setChipUpdateValue('');
+                    }}>
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
-                <div className="text-sm opacity-90">
-                  {activeTournament.bb_stack?.toFixed(1)} Big Blinds
-                </div>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-8 w-8 p-0"
-                onClick={() => {
-                  const currentChips = activeTournament.current_chips;
-                  const increment = currentChips >= 100000 ? 25000 : currentChips >= 10000 ? 5000 : 1000;
-                  const newChips = currentChips + increment;
-                  const newBBStack = newChips / activeTournament.big_blind;
-                  updateTournament(activeTournament.id, { 
-                    current_chips: newChips,
-                    bb_stack: newBBStack
-                  });
-                }}
-              >
-                +
-              </Button>
-            </div>
+              </DialogContent>
+            </Dialog>
             {activeTournament.is_paused && (
               <Badge className="mt-2 bg-orange-500">
                 Tournament Paused
