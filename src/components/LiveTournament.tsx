@@ -738,9 +738,25 @@ const LiveTournament = () => {
                 Full Update
               </Button>
             </div>
-            <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="w-full">
-              End Tournament
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="flex-1 flex items-center gap-2"
+                onClick={() => {
+                  toast({
+                    title: "Tournament Paused",
+                    description: "Tournament tracking paused"
+                  });
+                }}
+              >
+                <Pause className="w-4 h-4" />
+                Pause
+              </Button>
+              <Button onClick={() => setShowEndDialog(true)} variant="destructive" size="sm" className="flex-1">
+                End Tournament
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
