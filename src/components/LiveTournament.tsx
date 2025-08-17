@@ -699,7 +699,6 @@ const LiveTournament = () => {
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
-                    <CartesianGrid strokeDasharray="2 2" stroke="hsl(var(--muted-foreground))" opacity={0.2} />
                     {chartViewMode === 'bb' && (
                       <>
                         <ReferenceLine y={20} stroke="#10b981" strokeDasharray="4 4" strokeOpacity={0.7} />
