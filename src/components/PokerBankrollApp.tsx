@@ -381,7 +381,7 @@ const PokerBankrollApp = () => {
       <div className="gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">Poker Bankroll</h1>
+            <h1 className="text-2xl font-bold">Felt Focus</h1>
             <div className="flex gap-2">
               <ThemeToggle />
               <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30">
