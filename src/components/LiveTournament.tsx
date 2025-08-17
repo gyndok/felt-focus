@@ -824,7 +824,7 @@ const LiveTournament = () => {
                           <div className="text-xs lg:text-sm text-muted-foreground">
                             Chip Share
                           </div>
-                          <div className="text-xs text-muted-foreground">of total chips in play</div>
+                          <div className="text-xs text-muted-foreground">of total in play</div>
                         </CardContent>
                       </Card>
                     )}
