@@ -567,26 +567,26 @@ const PokerBankrollApp = () => {
               {/* First row */}
               <div className="flex justify-center gap-2">
                 <ThemeToggle />
-                <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
+                <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white">
                   <Filter size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Import CSV">
+                <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Import CSV">
                   📊
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Settings">
+                <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Settings">
                   <Settings size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Send Feedback">
+                <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Send Feedback">
                   <Bug size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="User Guide">
+                <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="User Guide">
                   <BookOpen size={18} />
                 </Button>
                 <Button 
                   variant="secondary" 
                   size="sm" 
                   onClick={() => window.open('https://twitter.com/feltfocus', '_blank')} 
-                  className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" 
+                  className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" 
                   title="Follow @feltfocus on Twitter"
                 >
                   <Twitter size={18} />
@@ -600,7 +600,7 @@ const PokerBankrollApp = () => {
                     variant="secondary" 
                     size="sm"
                     onClick={() => setFeedbackReviewOpen(true)} 
-                    className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm relative" 
+                    className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm relative text-white" 
                     title="Review Feedback"
                   >
                     <MessageSquare size={18} />
@@ -611,10 +611,10 @@ const PokerBankrollApp = () => {
                     )}
                   </Button>
                 )}
-                <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Share App">
+                <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Share App">
                   <Share size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
+                <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white">
                   <LogOut size={18} />
                 </Button>
                 <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
