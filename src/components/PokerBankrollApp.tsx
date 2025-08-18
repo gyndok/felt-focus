@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -26,6 +26,7 @@ import LiveTournament from './LiveTournament';
 import { FeedbackDialog } from './FeedbackDialog';
 import { ShareDialog } from './ShareDialog';
 import { FeedbackReview } from './FeedbackReview';
+import TwoFactorSetup from './TwoFactorSetup';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
 
 const PokerBankrollApp = () => {
@@ -60,6 +61,7 @@ const PokerBankrollApp = () => {
   const [shareOpen, setShareOpen] = useState(false);
   const [feedbackReviewOpen, setFeedbackReviewOpen] = useState(false);
   const [startingBankroll, setStartingBankroll] = useState(0);
+  const [show2FASetup, setShow2FASetup] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -1360,6 +1362,13 @@ const PokerBankrollApp = () => {
                 </Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Two-Factor Authentication Setup */}
+        <Dialog open={show2FASetup} onOpenChange={setShow2FASetup}>
+          <DialogContent className="max-w-md mx-auto p-0">
+            <TwoFactorSetup onClose={() => setShow2FASetup(false)} />
           </DialogContent>
         </Dialog>
         </div>

@@ -9,11 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, Loader2, ArrowLeft, Shield, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import TwoFactorVerify from '@/components/TwoFactorVerify';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [needs2FA, setNeeds2FA] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,12 +65,20 @@ const Auth = () => {
     const password = formData.get('password') as string;
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
       if (error) {
+        // Check if error is due to MFA being required
+        if (error.message.includes('MFA') || error.message.includes('factor')) {
+          setUserEmail(email);
+          setNeeds2FA(true);
+          setError(null);
+          return;
+        }
+        
         if (error.message.includes('Invalid login credentials')) {
           setError('Invalid email or password');
         } else {
@@ -82,6 +93,29 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const handle2FASuccess = () => {
+    navigate('/');
+  };
+
+  const handle2FABack = () => {
+    setNeeds2FA(false);
+    setUserEmail('');
+    setError(null);
+  };
+
+  // Show 2FA verification if needed
+  if (needs2FA) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-green-900 flex items-center justify-center p-4">
+        <TwoFactorVerify 
+          onSuccess={handle2FASuccess}
+          onBack={handle2FABack}
+          email={userEmail}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-green-900 flex items-center justify-center p-4">
