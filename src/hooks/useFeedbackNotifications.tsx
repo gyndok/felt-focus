@@ -7,7 +7,6 @@ interface FeedbackItem {
   user_id: string;
   type: string;
   message: string;
-  user_email: string;
   user_display_name: string;
   created_at: string;
   reviewed_at: string | null;

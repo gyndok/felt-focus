@@ -84,8 +84,7 @@ export function FeedbackReview({ open, onOpenChange }: FeedbackReviewProps) {
                           <span className="text-foreground font-medium">{feedback.user_display_name}</span>
                         </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
-                          <Mail className="h-3 w-3" />
-                          <span className="text-foreground">{feedback.user_email}</span>
+                          <span className="text-foreground text-xs">ID: {feedback.user_id.slice(0, 8)}...</span>
                         </div>
                       </div>
                       

@@ -49,7 +49,6 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
           user_id: user.id,
           type: type,
           message: message.trim(),
-          user_email: user.email,
           user_display_name: user.user_metadata?.display_name || user.email
         });
 
