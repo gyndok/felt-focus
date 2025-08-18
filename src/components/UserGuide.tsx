@@ -225,11 +225,7 @@ const UserGuide = () => {
 
                 <AccordionItem value="csv-import">
                   <AccordionTrigger>How do I import my existing data?</AccordionTrigger>
-                  <AccordionContent className="text-xs md:text-sm">
-                    Use the CSV import feature in the main dashboard. Your CSV should include columns for:
-                    date, game_type, stakes, buy_in, cash_out, duration, and notes. Download our 
-                    template for the exact format.
-                  </AccordionContent>
+                  
                 </AccordionItem>
 
                 <AccordionItem value="timezone">
