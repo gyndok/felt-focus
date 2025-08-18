@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -505,6 +505,15 @@ const PokerBankrollApp = () => {
             </Button>
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="User Guide">
               <BookOpen size={18} />
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={() => window.open('https://twitter.com/feltfocus', '_blank')} 
+              className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" 
+              title="Follow @feltfocus on Twitter"
+            >
+              <Twitter size={18} />
             </Button>
             {isAdmin && (
               <Button 
