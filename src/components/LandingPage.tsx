@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Clock, DollarSign, BarChart3, Shield, Mail, Smartphone, Calendar, MapPin, Camera, FileSpreadsheet, Timer, PieChart } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, BarChart3, Shield, Mail, Smartphone, Calendar, MapPin, Camera, FileSpreadsheet, Timer, PieChart, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
@@ -58,6 +58,11 @@ const LandingPage = () => {
       icon: <Smartphone className="h-6 w-6 text-blue-400" />,
       title: "Mobile Optimized",
       description: "Fully responsive design works perfectly on desktop and mobile devices"
+    },
+    {
+      icon: <KeyRound className="h-6 w-6 text-green-400" />,
+      title: "Two-Factor Authentication",
+      description: "Secure your account with 2FA using authenticator apps for enhanced protection"
     }
   ];
 
