@@ -202,6 +202,60 @@ const UserGuide = () => {
                 </AccordionItem>
 
                 
+                <AccordionItem value="bankroll-management">
+                  <AccordionTrigger>Bankroll Management Rules</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-1 text-xs md:text-sm">
+                      <li>• Never play above your bankroll limits (20-40 buy-ins for cash games)</li>
+                      <li>• Set stop-loss limits before each session</li>
+                      <li>• Don't chase losses by moving up in stakes</li>
+                      <li>• Regularly withdraw profits to avoid lifestyle inflation</li>
+                      <li>• Keep separate bankrolls for different game types</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="accuracy">
+                  <AccordionTrigger>Maintain Data Accuracy</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-1 text-xs md:text-sm">
+                      <li>• Double-check buy-in and cash-out amounts</li>
+                      <li>• Include all session costs (gas, food, parking)</li>
+                      <li>• Record exact session start and end times</li>
+                      <li>• Use receipt photos for verification when possible</li>
+                      <li>• Reconcile your tracking with bank statements monthly</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="mental-game">
+                  <AccordionTrigger>Mental Game & Discipline</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-1 text-xs md:text-sm">
+                      <li>• Track your mental state before and after sessions</li>
+                      <li>• Note factors that affect your play (sleep, stress, mood)</li>
+                      <li>• Set session time limits and stick to them</li>
+                      <li>• Review losing sessions objectively, not emotionally</li>
+                      <li>• Celebrate small wins and learn from all outcomes</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="long-term">
+                  <AccordionTrigger>Long-term Success Strategies</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-1 text-xs md:text-sm">
+                      <li>• Focus on hourly rate over session results</li>
+                      <li>• Set monthly and yearly profit/improvement goals</li>
+                      <li>• Invest in poker education and skill development</li>
+                      <li>• Network with other serious players</li>
+                      <li>• Consider game selection as your most profitable skill</li>
+                      <li>• Regular backup of your session data</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+
+                
               </Accordion>
             </CardContent>
           </Card>
