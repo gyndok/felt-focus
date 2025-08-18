@@ -201,17 +201,7 @@ const UserGuide = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="bankroll">
-                  <AccordionTrigger>Bankroll Management</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="space-y-1 text-xs md:text-sm">
-                      <li>• Follow proper bankroll requirements for your stakes</li>
-                      <li>• Update your starting bankroll when making deposits/withdrawals</li>
-                      <li>• Consider moving down in stakes during downswings</li>
-                      <li>• Keep poker money separate from living expenses</li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
+                
               </Accordion>
             </CardContent>
           </Card>
