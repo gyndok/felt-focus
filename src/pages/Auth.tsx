@@ -17,6 +17,8 @@ const Auth = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [needs2FA, setNeeds2FA] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -94,6 +96,29 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`
+      });
+
+      if (error) throw error;
+
+      setMessage('Password reset email sent! Check your inbox for instructions.');
+      setShowForgotPassword(false);
+      setResetEmail('');
+    } catch (error: any) {
+      setError(error.message || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handle2FASuccess = () => {
     navigate('/');
   };
@@ -113,6 +138,87 @@ const Auth = () => {
           onBack={handle2FABack}
           email={userEmail}
         />
+      </div>
+    );
+  }
+
+  // Show forgot password form
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-green-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Back to Landing Button */}
+          <div className="flex justify-start mb-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => setShowForgotPassword(false)} 
+              className="text-blue-200 hover:text-white hover:bg-white/10 flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Sign In
+            </Button>
+          </div>
+
+          {/* Logo Section */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-xl">
+                <div className="text-white text-2xl font-bold">♠</div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">Reset Password</h1>
+            <p className="text-blue-200">Enter your email to receive reset instructions</p>
+          </div>
+
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-white text-xl">Forgot Password</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <Alert variant="destructive" className="mb-4 bg-red-500/20 border-red-400 text-red-200">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {message && (
+                <Alert className="mb-4 bg-green-500/20 border-green-400 text-green-200">
+                  <Mail className="h-4 w-4" />
+                  <AlertDescription>{message}</AlertDescription>
+                </Alert>
+              )}
+
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email" className="text-white">Email Address</Label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-blue-300 focus:border-green-400 focus:ring-green-400"
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3" 
+                  disabled={loading || !resetEmail}
+                >
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Send Reset Email
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -223,6 +329,17 @@ const Auth = () => {
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Sign In
+                  </Button>
+                  
+                  {/* Forgot Password Link */}
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    className="w-full text-blue-300 hover:text-white hover:bg-white/10" 
+                    onClick={() => setShowForgotPassword(true)}
+                    disabled={loading}
+                  >
+                    Forgot your password?
                   </Button>
                 </form>
               </TabsContent>
