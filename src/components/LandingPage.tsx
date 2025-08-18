@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Clock, DollarSign, BarChart3, Shield, Mail, Smartphone, Calendar, MapPin, Camera, FileSpreadsheet, Timer, PieChart, KeyRound } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, BarChart3, Shield, Mail, Smartphone, Calendar, MapPin, Camera, FileSpreadsheet, Timer, PieChart, KeyRound, Twitter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
@@ -214,6 +214,20 @@ const LandingPage = () => {
           >
             Get Started - It's Free
           </Button>
+          
+          {/* Social Links */}
+          <div className="mt-8 pt-8 border-t border-white/20">
+            <p className="text-blue-200 mb-4">Follow for updates</p>
+            <a 
+              href="https://twitter.com/feltfocus" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              <Twitter className="h-5 w-5" />
+              @feltfocus
+            </a>
+          </div>
         </div>
       </div>
     </div>
