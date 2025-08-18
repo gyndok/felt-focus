@@ -5,16 +5,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { AlertCircle, DollarSign, BarChart3, Trophy, Camera, FileSpreadsheet, TrendingUp, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-
 const UserGuide = () => {
-  return (
-    <div className="container mx-auto p-4 max-w-4xl">
+  return <div className="container mx-auto p-4 max-w-4xl">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => window.location.href = '/'} 
-          className="mb-4 p-2 h-auto"
-        >
+        <Button variant="ghost" onClick={() => window.location.href = '/'} className="mb-4 p-2 h-auto">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
@@ -117,8 +111,8 @@ const UserGuide = () => {
                   <li>• Real-time tournament tracking</li>
                   <li>• Chip stack management</li>
                   <li>• Blind level tracking</li>
-                  <li>• Break timers</li>
-                  <li>• Prize pool information</li>
+                  
+                  
                 </ul>
               </CardContent>
             </Card>
@@ -286,8 +280,6 @@ const UserGuide = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default UserGuide;
