@@ -207,9 +207,6 @@ const LandingPage = () => {
           <h3 className="text-3xl font-bold text-white mb-6">
             Ready to improve your poker game?
           </h3>
-          <p className="text-xl text-blue-200 mb-8">
-            Join thousands of players tracking their bankroll with Felt Focus
-          </p>
           <Button 
             size="lg" 
             className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-12 py-4 text-xl font-semibold shadow-xl"
