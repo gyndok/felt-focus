@@ -1713,7 +1713,7 @@ const PokerBankrollApp = () => {
 
         {/* Settings Dialog */}
         <Dialog open={showSettings} onOpenChange={setShowSettings}>
-          <DialogContent className="max-w-md mx-auto">
+          <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto sm:max-h-none">
             <DialogHeader>
               <DialogTitle>Settings</DialogTitle>
             </DialogHeader>
