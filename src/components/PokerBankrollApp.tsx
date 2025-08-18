@@ -452,8 +452,96 @@ const PokerBankrollApp = () => {
       </div>;
   }
   return <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
+      {/* Desktop Header */}
+      <div className="hidden lg:block gradient-casino text-white p-4 sticky top-0 z-10 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left: App Icon and Title */}
+          <div className="flex items-center gap-4">
+            <img 
+              src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
+              alt="Felt Focus" 
+              className="h-12 w-12 rounded-xl shadow-lg"
+            />
+            <div>
+              <h1 className="text-xl font-bold">Felt Focus</h1>
+              <p className="text-sm opacity-75">Poker Bankroll Tracker</p>
+            </div>
+          </div>
+
+          {/* Center: Tab Navigation */}
+          <div className="flex bg-white/10 rounded-lg p-1">
+            <Button
+              variant={activeTab === 'dashboard' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-6 ${activeTab === 'dashboard' ? 'bg-white text-primary' : 'text-white hover:bg-white/20'}`}
+            >
+              Dashboard
+            </Button>
+            <Button
+              variant={activeTab === 'tournament' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('tournament')}
+              className={`px-6 ${activeTab === 'tournament' ? 'bg-white text-primary' : 'text-white hover:bg-white/20'}`}
+            >
+              Live Tournament
+            </Button>
+          </div>
+
+          {/* Right: Action Buttons */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
+              <Filter size={18} />
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Import CSV">
+              📊
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Settings">
+              <Settings size={18} />
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Send Feedback">
+              <Bug size={18} />
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="User Guide">
+              <BookOpen size={18} />
+            </Button>
+            {isAdmin && (
+              <Button 
+                variant="secondary" 
+                size="sm"
+                onClick={() => setFeedbackReviewOpen(true)} 
+                className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm relative" 
+                title="Review Feedback"
+              >
+                <MessageSquare size={18} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+            )}
+            <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="Share App">
+              <Share size={18} />
+            </Button>
+            <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
+              <LogOut size={18} />
+            </Button>
+            <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="bg-profit hover:bg-profit/90 shadow-lg hover-scale">
+                  <Plus size={18} className="mr-1" />
+                  Add Session
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden gradient-casino text-white p-6 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-md mx-auto">
           <div className="flex items-center gap-4 mb-6">
             {/* App Icon - Left 1/3 */}
@@ -492,7 +580,7 @@ const PokerBankrollApp = () => {
                 {isAdmin && (
                   <Button 
                     variant="secondary" 
-                    size="sm" 
+                    size="sm"
                     onClick={() => setFeedbackReviewOpen(true)} 
                     className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm relative" 
                     title="Review Feedback"
@@ -522,7 +610,7 @@ const PokerBankrollApp = () => {
             </div>
           </div>
 
-          {/* Tab Navigation */}
+          {/* Mobile Tab Navigation */}
           <div className="flex bg-white/10 rounded-lg p-1 mb-6">
             <Button
               variant={activeTab === 'dashboard' ? 'secondary' : 'ghost'}
@@ -594,36 +682,367 @@ const PokerBankrollApp = () => {
       {activeTab === 'tournament' ? (
         <LiveTournament />
       ) : (
-        <div className="max-w-md mx-auto px-4 pb-20">
-          {/* Timer Section */}
-          <Card className="mb-6 glass-card">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="text-xl font-mono font-bold">
-                    {formatTime(currentSessionTime)}
+        <div className="lg:max-w-7xl lg:mx-auto lg:px-8 lg:pb-8 max-w-md mx-auto px-4 pb-20">
+          {/* Desktop: Bankroll Header */}
+          {activeTab === 'dashboard' && (
+            <div className="hidden lg:block text-center py-6 border-b bg-gradient-to-r from-background to-muted/20">
+              {/* Time Frame Display */}
+              {filteredSessions.length > 0 && (() => {
+                const dates = filteredSessions.map(s => new Date(s.date)).sort((a, b) => a.getTime() - b.getTime());
+                const startDate = dates[0];
+                const endDate = dates[dates.length - 1];
+                const diffMs = endDate.getTime() - startDate.getTime();
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                let timeFrame = '';
+                if (diffDays >= 365) {
+                  const years = Math.floor(diffDays / 365);
+                  const remainingDays = diffDays % 365;
+                  const months = Math.floor(remainingDays / 30);
+                  timeFrame = years === 1 ? '1 year' : `${years} years`;
+                  if (months > 0) timeFrame += months === 1 ? ', 1 month' : `, ${months} months`;
+                } else if (diffDays >= 30) {
+                  const months = Math.floor(diffDays / 30);
+                  const remainingDays = diffDays % 30;
+                  timeFrame = months === 1 ? '1 month' : `${months} months`;
+                  if (remainingDays > 0) timeFrame += remainingDays === 1 ? ', 1 day' : `, ${remainingDays} days`;
+                } else {
+                  timeFrame = diffDays === 0 ? 'Same day' : diffDays === 1 ? '1 day' : `${diffDays} days`;
+                }
+                
+                return (
+                  <div className="text-sm text-muted-foreground mb-4">
+                    Session range: {timeFrame}
                   </div>
-                  {isTimerRunning && <Badge variant="default" className="animate-pulse">
-                      Session Active
-                    </Badge>}
+                );
+              })()}
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <span className="text-lg font-medium">Total Bankroll</span>
+                <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-2">
+                  {showBankroll ? <Eye size={20} /> : <EyeOff size={20} />}
+                </Button>
+              </div>
+              
+              <div className={`text-3xl font-bold ${stats.totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••••••••'}
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Layout */}
+          <div className="hidden lg:grid lg:grid-cols-12 lg:gap-8 lg:pt-8">
+            {/* Left Column: Timer & Filters */}
+            <div className="lg:col-span-3 space-y-6">
+              {/* Timer Section */}
+              <Card className="glass-card">
+                <CardContent className="p-4">
+                  <div className="text-center space-y-3">
+                    <div className="text-2xl font-mono font-bold">
+                      {formatTime(currentSessionTime)}
+                    </div>
+                    {isTimerRunning && <Badge variant="default" className="animate-pulse">
+                        Session Active
+                      </Badge>}
+                    <div className="flex gap-2 justify-center">
+                      {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
+                          <Play className="h-4 w-4 mr-1" />
+                          Start
+                        </Button> : <>
+                          <Button onClick={resetTimer} variant="outline" size="sm">
+                            <Square className="h-4 w-4" />
+                          </Button>
+                          <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
+                            <Pause className="h-4 w-4 mr-1" />
+                            End Session
+                          </Button>
+                        </>}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Filters */}
+              {showFilters && <Card className="glass-card">
+                  <CardContent className="p-4 space-y-4">
+                    <div className="grid grid-cols-1 gap-3">
+                      <Select value={filters.type} onValueChange={value => setFilters({
+                    ...filters,
+                    type: value
+                  })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Game Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="cash">Cash Games</SelectItem>
+                          <SelectItem value="mtt">Tournaments</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select value={filters.game_type} onValueChange={value => setFilters({
+                    ...filters,
+                    game_type: value
+                  })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Variant" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Games</SelectItem>
+                          {getUniqueValues('game_type').map(game => <SelectItem key={game} value={game}>{game}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+
+                      <Select value={filters.location} onValueChange={value => setFilters({
+                  ...filters,
+                  location: value
+                })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Location" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Locations</SelectItem>
+                          {getUniqueValues('location').map(location => <SelectItem key={location} value={location}>{location}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+
+                      <Select value={filters.dateRange.toString()} onValueChange={value => setFilters({
+                  ...filters,
+                  dateRange: parseInt(value)
+                })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Time Period" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="7">Last 7 days</SelectItem>
+                          <SelectItem value="30">Last 30 days</SelectItem>
+                          <SelectItem value="90">Last 90 days</SelectItem>
+                          <SelectItem value="365">Last year</SelectItem>
+                          <SelectItem value="999999">All time</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>}
+            </div>
+
+            {/* Middle Column: Stats & Chart */}
+            <div className="lg:col-span-6 space-y-6">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-2 gap-4">
+                <Card className="glass-card">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center text-primary mb-2">
+                      <TrendingUp size={20} />
+                    </div>
+                    <div className="text-2xl font-bold">${stats.hourlyRate.toFixed(0)}</div>
+                    <div className="text-sm text-muted-foreground">Hourly Rate</div>
+                    <div className="text-xs text-muted-foreground mt-1">{stats.totalHours.toFixed(1)}h total</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-card">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center text-profit mb-2">
+                      <DollarSign size={20} />
+                    </div>
+                    <div className="text-2xl font-bold">{stats.winRate.toFixed(0)}%</div>
+                    <div className="text-sm text-muted-foreground">Win Rate</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-card">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center text-blue-500 mb-2">
+                      <DollarSign size={20} />
+                    </div>
+                    <div className="text-2xl font-bold">${stats.totalBuyIn.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">Total Buy-In</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-card">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center text-green-500 mb-2">
+                      <DollarSign size={20} />
+                    </div>
+                    <div className="text-2xl font-bold">${stats.totalCashOut.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">Total Cash-Out</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Chart */}
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="text-lg">Bankroll Over Time</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData}>
+                        <XAxis dataKey="date" tick={{
+                        fontSize: 12,
+                        fill: 'hsl(var(--muted-foreground))'
+                      }} tickFormatter={date => new Date(date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })} />
+                        <YAxis tick={{
+                        fontSize: 12,
+                        fill: 'hsl(var(--muted-foreground))'
+                      }} />
+                        <Tooltip formatter={value => [`$${value?.toLocaleString()}`, 'Bankroll']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }} />
+                        <Line type="monotone" dataKey="bankroll" stroke="hsl(var(--primary))" strokeWidth={3} dot={{
+                        fill: 'hsl(var(--primary))',
+                        strokeWidth: 2,
+                        r: 4
+                      }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column: Session History */}
+            <div className="lg:col-span-3">
+              <div className="space-y-4">
+                <div className="sticky top-24 bg-background/95 backdrop-blur-sm py-2 z-10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Recent Sessions</h3>
+                    <Badge variant="secondary">{filteredSessions.length}</Badge>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => exportSessionsToCSV(filteredSessions)}
+                      className="h-8"
+                    >
+                      Export CSV
+                    </Button>
+                    
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="justify-start text-left font-normal text-sm h-8"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.startDate && filters.endDate ? (
+                            <>
+                              {format(filters.startDate, "MMM dd")} - {format(filters.endDate, "MMM dd, y")}
+                            </>
+                          ) : (
+                            <span>Pick date range</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <div className="flex">
+                          <div className="p-3">
+                            <div className="text-sm font-medium mb-2">From</div>
+                             <Calendar
+                               mode="single"
+                               selected={filters.startDate}
+                               onSelect={(date) => setFilters(prev => ({ ...prev, startDate: date }))}
+                               className="pointer-events-auto"
+                             />
+                           </div>
+                           <div className="p-3 border-l">
+                             <div className="text-sm font-medium mb-2">To</div>
+                             <Calendar
+                               mode="single"
+                               selected={filters.endDate}
+                               onSelect={(date) => setFilters(prev => ({ ...prev, endDate: date }))}
+                               disabled={(date) => filters.startDate ? date < filters.startDate : false}
+                               className="pointer-events-auto"
+                             />
+                           </div>
+                         </div>
+                         <div className="p-3 border-t">
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => setFilters(prev => ({ ...prev, startDate: undefined, endDate: undefined }))}
+                             className="w-full"
+                           >
+                            Clear dates
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
-                      <Play className="h-4 w-4 mr-1" />
-                      Start
-                    </Button> : <>
-                      <Button onClick={resetTimer} variant="outline" size="sm">
-                        <Square className="h-4 w-4" />
-                      </Button>
-                      <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
-                        <Pause className="h-4 w-4 mr-1" />
-                        End Session
-                      </Button>
-                    </>}
+                
+                <div className="max-h-[600px] overflow-y-auto space-y-3">
+                {filteredSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(session => {
+                  const profit = session.cash_out - session.buy_in;
+                  const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
+                  return <Card key={session.id} className={`glass-card border-l-4 hover:shadow-lg transition-shadow cursor-pointer ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`} onClick={() => setSelectedSession(session)}>
+                      <CardContent className="p-3">
+                        <div className="space-y-2">
+                          <div className="font-semibold flex items-center gap-2 text-sm">
+                            {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
+                            <Badge variant="outline" className="text-xs">
+                              {session.type.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-muted-foreground flex items-center gap-1">
+                            <MapPin size={10} />
+                            {session.location}
+                          </div>
+                          <div className={`text-sm font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                            {profit >= 0 ? '+' : ''}${profit.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {session.duration.toFixed(1)}h • ${hourlyRate.toFixed(0)}/hr
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  })}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Mobile Layout */}
+          <div className="lg:hidden">
+            {/* Timer Section */}
+            <Card className="mb-6 glass-card">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-xl font-mono font-bold">
+                      {formatTime(currentSessionTime)}
+                    </div>
+                    {isTimerRunning && <Badge variant="default" className="animate-pulse">
+                        Session Active
+                      </Badge>}
+                  </div>
+                  <div className="flex gap-2">
+                    {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
+                        <Play className="h-4 w-4 mr-1" />
+                        Start
+                      </Button> : <>
+                        <Button onClick={resetTimer} variant="outline" size="sm">
+                          <Square className="h-4 w-4" />
+                        </Button>
+                        <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
+                          <Pause className="h-4 w-4 mr-1" />
+                          End Session
+                        </Button>
+                      </>}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
         {/* Filters */}
         {showFilters && <Card className="mb-6 glass-card">
@@ -1389,6 +1808,7 @@ const PokerBankrollApp = () => {
             <TwoFactorSetup onClose={() => setShow2FASetup(false)} />
           </DialogContent>
         </Dialog>
+          </div>
         </div>
       )}
     </div>
