@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Bug, Lightbulb, Clock, CheckCircle2, User, Mail } from 'lucide-react';
+import { Bug, Lightbulb, Clock, CheckCircle2, User, Mail, Trash2 } from 'lucide-react';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
 import { format } from 'date-fns';
 
@@ -14,10 +14,16 @@ interface FeedbackReviewProps {
 }
 
 export function FeedbackReview({ open, onOpenChange }: FeedbackReviewProps) {
-  const { allFeedback, loading, markAsReviewed } = useFeedbackNotifications();
+  const { allFeedback, loading, markAsReviewed, deleteFeedback } = useFeedbackNotifications();
 
   const handleMarkAsReviewed = (feedbackId: string) => {
     markAsReviewed(feedbackId);
+  };
+
+  const handleDeleteFeedback = (feedbackId: string) => {
+    if (confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+      deleteFeedback(feedbackId);
+    }
   };
 
   return (
@@ -88,23 +94,33 @@ export function FeedbackReview({ open, onOpenChange }: FeedbackReviewProps) {
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2">
-                        {feedback.reviewed_at ? (
-                          <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                            <CheckCircle2 className="h-3 w-3" />
-                            <span>Reviewed {format(new Date(feedback.reviewed_at), 'MMM d')}</span>
-                          </div>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={() => handleMarkAsReviewed(feedback.id)}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                          >
-                            Mark as Reviewed
-                          </Button>
-                        )}
-                      </div>
+                       <div className="flex items-center gap-2">
+                         {feedback.reviewed_at ? (
+                           <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                             <CheckCircle2 className="h-3 w-3" />
+                             <span>Reviewed {format(new Date(feedback.reviewed_at), 'MMM d')}</span>
+                           </div>
+                         ) : (
+                           <Button
+                             size="sm"
+                             variant="default"
+                             onClick={() => handleMarkAsReviewed(feedback.id)}
+                             className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                           >
+                             Mark as Reviewed
+                           </Button>
+                         )}
+                         
+                         <Button
+                           size="sm"
+                           variant="destructive"
+                           onClick={() => handleDeleteFeedback(feedback.id)}
+                           className="ml-2"
+                         >
+                           <Trash2 className="h-3 w-3 mr-1" />
+                           Delete
+                         </Button>
+                       </div>
                     </div>
                   </CardContent>
                 </Card>

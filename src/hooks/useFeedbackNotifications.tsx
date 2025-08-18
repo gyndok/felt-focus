@@ -72,6 +72,28 @@ export function useFeedbackNotifications() {
     }
   };
 
+  const deleteFeedback = async (feedbackId: string) => {
+    if (!isAdmin) return;
+
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .delete()
+        .eq('id', feedbackId);
+
+      if (error) throw error;
+
+      // Update local state
+      setAllFeedback(prev => prev.filter(item => item.id !== feedbackId));
+      setUnreadCount(prev => {
+        const deletedFeedback = allFeedback.find(item => item.id === feedbackId);
+        return deletedFeedback && !deletedFeedback.reviewed_at ? Math.max(0, prev - 1) : prev;
+      });
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+    }
+  };
+
   useEffect(() => {
     fetchFeedback();
   }, [isAdmin]);
@@ -124,6 +146,7 @@ export function useFeedbackNotifications() {
     loading,
     isAdmin,
     markAsReviewed,
+    deleteFeedback,
     refreshFeedback: fetchFeedback
   };
 }
