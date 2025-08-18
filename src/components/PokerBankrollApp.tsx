@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter, FileSpreadsheet } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -563,64 +563,28 @@ const PokerBankrollApp = () => {
             </div>
             
             {/* Control Buttons - Right 2/3 */}
-            <div className="w-2/3 flex flex-col gap-2">
-              {/* First row */}
-              <div className="flex justify-center gap-2">
+            <div className="w-2/3 flex flex-col gap-3">
+              {/* Essential actions only */}
+              <div className="flex justify-center gap-3">
                 <ThemeToggle />
                 <Button variant="secondary" size="sm" onClick={() => setShowFilters(!showFilters)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white">
                   <Filter size={18} />
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setShowCSVImport(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Import CSV">
-                  📊
-                </Button>
                 <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Settings">
                   <Settings size={18} />
-                </Button>
-                <Button variant="secondary" size="sm" onClick={() => setFeedbackOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Send Feedback">
-                  <Bug size={18} />
-                </Button>
-                <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="User Guide">
-                  <BookOpen size={18} />
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  onClick={() => window.open('https://twitter.com/feltfocus', '_blank')} 
-                  className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" 
-                  title="Follow @feltfocus on Twitter"
-                >
-                  <Twitter size={18} />
-                </Button>
-              </div>
-              
-              {/* Second row */}
-              <div className="flex justify-center gap-2">
-                {isAdmin && (
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    onClick={() => setFeedbackReviewOpen(true)} 
-                    className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm relative text-white" 
-                    title="Review Feedback"
-                  >
-                    <MessageSquare size={18} />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </Button>
-                )}
-                <Button variant="secondary" size="sm" onClick={() => setShareOpen(true)} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white" title="Share App">
-                  <Share size={18} />
                 </Button>
                 <Button variant="secondary" size="sm" onClick={handleLogout} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm text-white">
                   <LogOut size={18} />
                 </Button>
+              </div>
+              
+              {/* Add Session Button */}
+              <div className="flex justify-center">
                 <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
                   <DialogTrigger asChild>
-                    <Button size="sm" className="bg-profit hover:bg-profit/90 shadow-lg hover-scale">
-                      <Plus size={18} />
+                    <Button size="sm" className="bg-profit hover:bg-profit/90 shadow-lg hover-scale px-6">
+                      <Plus size={18} className="mr-1" />
+                      Add Session
                     </Button>
                   </DialogTrigger>
                 </Dialog>
@@ -1785,6 +1749,70 @@ const PokerBankrollApp = () => {
                 <p className="text-xs text-muted-foreground">
                   Choose your preferred theme or follow system settings
                 </p>
+              </div>
+
+              <Separator />
+
+              {/* App Actions */}
+              <div className="space-y-2">
+                <Label>App Actions</Label>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button 
+                    onClick={() => setShowCSVImport(true)} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <FileSpreadsheet size={16} className="mr-2" />
+                    Import CSV Data
+                  </Button>
+                  <Button 
+                    onClick={() => setFeedbackOpen(true)} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <Bug size={16} className="mr-2" />
+                    Send Feedback
+                  </Button>
+                  <Button 
+                    onClick={() => window.location.href = '/guide'} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <BookOpen size={16} className="mr-2" />
+                    User Guide
+                  </Button>
+                  <Button 
+                    onClick={() => setShareOpen(true)} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <Share size={16} className="mr-2" />
+                    Share App
+                  </Button>
+                  <Button 
+                    onClick={() => window.open('https://twitter.com/feltfocus', '_blank')} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <Twitter size={16} className="mr-2" />
+                    Follow @feltfocus
+                  </Button>
+                  {isAdmin && (
+                    <Button 
+                      onClick={() => setFeedbackReviewOpen(true)} 
+                      variant="outline" 
+                      className="w-full justify-start relative"
+                    >
+                      <MessageSquare size={16} className="mr-2" />
+                      Review Feedback
+                      {unreadCount > 0 && (
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <Separator />
