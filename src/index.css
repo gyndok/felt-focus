@@ -71,23 +71,23 @@ All colors MUST be HSL.
   }
 
   .light {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
+    --background: 20 20% 98%;
+    --foreground: 240 10% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
+    --card: 20 15% 97%;
+    --card-foreground: 240 10% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
+    --popover: 20 15% 97%;
+    --popover-foreground: 240 10% 8%;
 
     --primary: 210 100% 50%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 4%;
+    --secondary: 220 10% 92%;
+    --secondary-foreground: 240 10% 8%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
+    --muted: 220 8% 94%;
+    --muted-foreground: 240 4% 42%;
 
     --accent: 120 100% 25%;
     --accent-foreground: 0 0% 98%;
@@ -95,8 +95,8 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
+    --border: 220 12% 88%;
+    --input: 220 12% 88%;
     --ring: 210 100% 50%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
