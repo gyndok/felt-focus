@@ -81,8 +81,12 @@ const LandingPage = () => {
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-3xl flex items-center justify-center shadow-2xl">
-                <div className="text-white text-3xl font-bold">♠</div>
+              <div className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden">
+                <img 
+                  src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
+                  alt="Felt Focus" 
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
