@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import UserGuide from "./components/UserGuide";
+import LandingPage from "./components/LandingPage";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -27,15 +28,19 @@ const AppContent = () => {
     <Routes>
       <Route 
         path="/" 
+        element={user ? <Index /> : <LandingPage />} 
+      />
+      <Route 
+        path="/app" 
         element={user ? <Index /> : <Navigate to="/auth" replace />} 
       />
       <Route 
         path="/auth" 
-        element={!user ? <Auth /> : <Navigate to="/" replace />} 
+        element={!user ? <Auth /> : <Navigate to="/app" replace />} 
       />
       <Route 
         path="/guide" 
-        element={user ? <UserGuide /> : <Navigate to="/auth" replace />} 
+        element={<UserGuide />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
