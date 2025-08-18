@@ -1313,6 +1313,24 @@ const PokerBankrollApp = () => {
 
               <Separator />
 
+              {/* Two-Factor Authentication */}
+              <div className="space-y-2">
+                <Label>Security</Label>
+                <Button 
+                  onClick={() => setShow2FASetup(true)} 
+                  variant="outline" 
+                  className="w-full justify-start"
+                >
+                  <Shield size={16} className="mr-2" />
+                  Manage Two-Factor Authentication
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Add an extra layer of security to your account
+                </p>
+              </div>
+
+              <Separator />
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Current Password</Label>
