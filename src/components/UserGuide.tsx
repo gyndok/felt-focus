@@ -279,7 +279,39 @@ const UserGuide = () => {
 
                 <AccordionItem value="csv-import">
                   <AccordionTrigger>How do I import my existing data?</AccordionTrigger>
-                  
+                  <AccordionContent className="text-xs md:text-sm">
+                    You can import existing poker session data using CSV files. Click the "Import CSV" 
+                    button on the main dashboard. Your CSV should include columns for date, buy-in, 
+                    cash-out, duration, location, stakes, and game type. Download our template for 
+                    the correct format.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="hourly-rate">
+                  <AccordionTrigger>How is hourly rate calculated?</AccordionTrigger>
+                  <AccordionContent className="text-xs md:text-sm">
+                    Hourly rate is calculated by dividing your total profit/loss by total hours played. 
+                    The calculation includes all sessions within your selected date range. Negative 
+                    hourly rates indicate overall losses during that period.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="tournament-vs-cash">
+                  <AccordionTrigger>What's the difference between cash games and tournaments?</AccordionTrigger>
+                  <AccordionContent className="text-xs md:text-sm">
+                    Cash games have fixed buy-ins and cash-outs, while tournaments have entry fees 
+                    and prize winnings. The app tracks them separately to provide accurate statistics 
+                    for each format. Use the live tournament mode for real-time tournament tracking.
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="mobile-app">
+                  <AccordionTrigger>Is there a mobile app?</AccordionTrigger>
+                  <AccordionContent className="text-xs md:text-sm">
+                    Felt Focus is a progressive web app (PWA) that works great on mobile browsers. 
+                    You can add it to your phone's home screen for a native app experience. 
+                    All features work seamlessly on mobile devices.
+                  </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="timezone">
