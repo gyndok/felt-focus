@@ -582,6 +582,15 @@ const PokerBankrollApp = () => {
                 <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="User Guide">
                   <BookOpen size={18} />
                 </Button>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={() => window.open('https://twitter.com/feltfocus', '_blank')} 
+                  className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" 
+                  title="Follow @feltfocus on Twitter"
+                >
+                  <Twitter size={18} />
+                </Button>
               </div>
               
               {/* Second row */}
