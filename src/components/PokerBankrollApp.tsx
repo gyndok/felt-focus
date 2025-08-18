@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -980,28 +980,67 @@ const PokerBankrollApp = () => {
                   </div>
                 </div>
                 
-                <div className="max-h-[600px] overflow-y-auto space-y-3">
+                 <div className="max-h-[600px] overflow-y-auto space-y-3">
                 {filteredSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(session => {
                   const profit = session.cash_out - session.buy_in;
                   const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
-                  return <Card key={session.id} className={`glass-card border-l-4 hover:shadow-lg transition-shadow cursor-pointer ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`} onClick={() => setSelectedSession(session)}>
+                  return <Card key={session.id} className={`glass-card border-l-4 hover:shadow-lg transition-shadow ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`}>
                       <CardContent className="p-3">
-                        <div className="space-y-2">
-                          <div className="font-semibold flex items-center gap-2 text-sm">
-                            {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
-                            <Badge variant="outline" className="text-xs">
-                              {session.type.toUpperCase()}
-                            </Badge>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="space-y-2 flex-1 cursor-pointer" onClick={() => setSelectedSession(session)}>
+                            <div className="font-semibold flex items-center gap-2 text-sm">
+                              {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
+                              <Badge variant="outline" className="text-xs">
+                                {session.type.toUpperCase()}
+                              </Badge>
+                            </div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <MapPin size={10} />
+                              {session.location}
+                            </div>
+                            <div className={`text-sm font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                              {profit >= 0 ? '+' : ''}${profit.toLocaleString()}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {session.duration.toFixed(1)}h • ${hourlyRate.toFixed(0)}/hr
+                            </div>
                           </div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <MapPin size={10} />
-                            {session.location}
-                          </div>
-                          <div className={`text-sm font-bold ${profit >= 0 ? 'text-profit' : 'text-loss'}`}>
-                            {profit >= 0 ? '+' : ''}${profit.toLocaleString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {session.duration.toFixed(1)}h • ${hourlyRate.toFixed(0)}/hr
+                          <div className="flex flex-col gap-1">
+                            {session.receipt_image_url && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(session.receipt_image_url, '_blank');
+                                }}
+                              >
+                                <Camera className="h-3 w-3" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditDialog(session);
+                              }}
+                            >
+                              <Edit2 className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteSession(session.id);
+                              }}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
                           </div>
                         </div>
                       </CardContent>
