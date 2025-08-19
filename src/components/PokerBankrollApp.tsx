@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter, FileSpreadsheet, AlertTriangle } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter, FileSpreadsheet } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -59,8 +59,6 @@ const PokerBankrollApp = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [feedbackReviewOpen, setFeedbackReviewOpen] = useState(false);
   const [startingBankroll, setStartingBankroll] = useState(0);
   const [show2FASetup, setShow2FASetup] = useState(false);
@@ -444,44 +442,6 @@ const PokerBankrollApp = () => {
         variant: "destructive"
       });
     }
-  };
-
-  const handleDeleteAccount = async () => {
-    if (!user) return;
-    
-    try {
-      // First delete all user data using our database function
-      const { error: dbError } = await supabase.rpc('delete_user_account', {
-        user_id_to_delete: user.id
-      });
-
-      if (dbError) throw dbError;
-
-      // Then delete the auth user account
-      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
-      
-      if (authError) {
-        // If auth deletion fails, try client-side sign out
-        console.warn('Admin deletion failed, signing out user:', authError);
-        await supabase.auth.signOut();
-      }
-
-      toast({
-        title: "Account deleted",
-        description: "Your account and all data have been permanently deleted.",
-      });
-
-      // Redirect to auth page
-      window.location.href = '/auth';
-    } catch (error: any) {
-      console.error('Error deleting account:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete account. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
   };
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
@@ -1924,90 +1884,6 @@ const PokerBankrollApp = () => {
                 </Button>
               </div>
             </div>
-
-            {/* Account Deletion Section */}
-            <div className="space-y-4 pt-6 border-t border-destructive/20">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-destructive flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Danger Zone
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Permanently delete your account and all associated data. This action cannot be undone.
-                </p>
-              </div>
-              
-              <Button 
-                variant="destructive" 
-                onClick={() => setDeleteAccountOpen(true)}
-                className="w-full"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Account
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Account Deletion Confirmation Dialog */}
-        <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
-          <DialogContent className="max-w-md mx-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-5 w-5" />
-                Delete Account
-              </DialogTitle>
-              <DialogDescription>
-                This will permanently delete your account and all associated data including:
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                <li>• All poker session records</li>
-                <li>• Tournament history and data</li>
-                <li>• User profile and settings</li>
-                <li>• Feedback and support requests</li>
-                <li>• All uploaded images and receipts</li>
-              </ul>
-              
-              <div className="bg-destructive/10 p-4 rounded-lg border border-destructive/20">
-                <p className="text-sm font-medium text-destructive">
-                  ⚠️ This action is permanent and cannot be undone!
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Type "DELETE MY ACCOUNT" to confirm:</Label>
-                <Input 
-                  placeholder="DELETE MY ACCOUNT"
-                  value={deleteConfirmText}
-                  onChange={e => setDeleteConfirmText(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setDeleteAccountOpen(false);
-                    setDeleteConfirmText('');
-                  }} 
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  variant="destructive"
-                  onClick={handleDeleteAccount}
-                  className="flex-1"
-                  disabled={deleteConfirmText !== 'DELETE MY ACCOUNT'}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Forever
-                </Button>
-              </div>
-            </div>
           </DialogContent>
         </Dialog>
 
@@ -2017,9 +1893,9 @@ const PokerBankrollApp = () => {
             <TwoFactorSetup onClose={() => setShow2FASetup(false)} />
           </DialogContent>
         </Dialog>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
 };
-
 export default PokerBankrollApp;
