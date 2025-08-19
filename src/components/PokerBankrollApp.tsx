@@ -668,7 +668,7 @@ const PokerBankrollApp = () => {
         <div className="lg:max-w-7xl lg:mx-auto lg:px-8 lg:pb-8 max-w-md mx-auto px-4 pb-20">
           {/* Desktop: Bankroll Header */}
           {activeTab === 'dashboard' && (
-            <div className="invisible lg:block text-center py-6 border-b bg-gradient-to-r from-background to-muted/20">
+            <div className="hidden lg:block text-center py-6 border-b bg-gradient-to-r from-background to-muted/20">
               {/* Time Frame Display */}
               {filteredSessions.length > 0 && (() => {
                 const dates = filteredSessions.map(s => new Date(s.date)).sort((a, b) => a.getTime() - b.getTime());
