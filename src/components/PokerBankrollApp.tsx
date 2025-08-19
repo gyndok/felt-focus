@@ -1281,7 +1281,78 @@ const PokerBankrollApp = () => {
           </div>
           
           <div className="max-h-96 overflow-y-auto space-y-4">
-          {filteredSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(session => {
+          {filteredSessions.length === 0 ? (
+            // Welcome Message for New Users
+            <Card className="glass-card border-dashed border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/10">
+              <CardContent className="p-8 text-center">
+                <div className="space-y-6">
+                  {/* Welcome Icon */}
+                  <div className="flex justify-center">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
+                      <TrendingUp size={32} className="text-white" />
+                    </div>
+                  </div>
+                  
+                  {/* Welcome Message */}
+                  <div className="space-y-3">
+                    <h2 className="text-2xl font-bold text-foreground">
+                      Welcome to Felt Focus! 🎯
+                    </h2>
+                    <p className="text-lg text-muted-foreground leading-relaxed max-w-md mx-auto">
+                      Your poker bankroll tracking journey starts here. Let's add your first session and begin building your poker legacy.
+                    </p>
+                  </div>
+                  
+                  {/* Feature Highlights */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-8">
+                    <div className="flex flex-col items-center space-y-2 p-4 rounded-lg bg-background/50">
+                      <div className="w-10 h-10 rounded-full bg-profit/20 flex items-center justify-center">
+                        <DollarSign size={20} className="text-profit" />
+                      </div>
+                      <span className="text-sm font-medium">Track P&L</span>
+                    </div>
+                    <div className="flex flex-col items-center space-y-2 p-4 rounded-lg bg-background/50">
+                      <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <Clock size={20} className="text-blue-500" />
+                      </div>
+                      <span className="text-sm font-medium">Session Timer</span>
+                    </div>
+                    <div className="flex flex-col items-center space-y-2 p-4 rounded-lg bg-background/50">
+                      <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                        <TrendingUp size={20} className="text-purple-500" />
+                      </div>
+                      <span className="text-sm font-medium">Analytics</span>
+                    </div>
+                  </div>
+                  
+                  {/* Call to Action */}
+                  <div className="space-y-4">
+                    <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
+                      <DialogTrigger asChild>
+                        <Button size="lg" className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-6 text-lg">
+                          <Plus size={24} className="mr-3" />
+                          Add Your First Session
+                        </Button>
+                      </DialogTrigger>
+                    </Dialog>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      Or explore the{" "}
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-primary font-medium"
+                        onClick={() => window.location.href = '/guide'}
+                      >
+                        User Guide
+                      </Button>
+                      {" "}to learn more about features
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(session => {
             const profit = session.cash_out - session.buy_in;
             const hourlyRate = session.duration > 0 ? profit / session.duration : 0;
             return <Card key={session.id} className={`glass-card border-l-4 hover:shadow-lg transition-shadow ${profit >= 0 ? 'border-l-profit glow-profit' : 'border-l-loss glow-loss'}`}>
@@ -1368,7 +1439,8 @@ const PokerBankrollApp = () => {
                     </div>}
                 </CardContent>
               </Card>;
-          })}
+            })
+          )}
           </div>
         </div>
 
