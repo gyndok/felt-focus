@@ -640,22 +640,33 @@ const PokerBankrollApp = () => {
                   timeFrame = diffDays === 0 ? 'Same day' : diffDays === 1 ? '1 day' : `${diffDays} days`;
                 }
                 
-                return (
-                  <div className="text-xs opacity-75 mb-2">
-                    Session range: {timeFrame}
-                  </div>
-                );
-              })()}
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-sm opacity-90">Total Bankroll</span>
-                <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-1 h-auto">
-                  {showBankroll ? <Eye size={16} /> : <EyeOff size={16} />}
-                </Button>
-              </div>
-              
-              <div className={`text-sm ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••'}
-              </div>
+                 return (
+                   <div className="text-xs opacity-75 mb-3">
+                     Found {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} spanning: {timeFrame}
+                   </div>
+                 );
+               })()}
+               
+               {/* Mobile P/L and Bankroll Display */}
+               <div className="flex items-center justify-center gap-4 mb-3">
+                 <div className="text-center">
+                   <div className="text-xs opacity-75 mb-1">P/L Selected</div>
+                   <div className={`text-sm font-medium ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                     {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '•••••'}
+                   </div>
+                 </div>
+                 
+                 <div className="text-center">
+                   <div className="text-xs opacity-75 mb-1">Total Bankroll</div>
+                   <div className={`text-sm font-medium ${stats.totalBankroll >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                     {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '•••••'}
+                   </div>
+                 </div>
+                 
+                 <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-1 h-auto">
+                   {showBankroll ? <Eye size={16} /> : <EyeOff size={16} />}
+                 </Button>
+               </div>
             </div>
           )}
         </div>
