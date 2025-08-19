@@ -325,9 +325,10 @@ const UserGuide = () => {
                 <AccordionItem value="delete-account">
                   <AccordionTrigger>Can I delete my account and data?</AccordionTrigger>
                   <AccordionContent className="text-xs md:text-sm">
-                    Currently, account deletion is not available through the app interface. 
-                    If you need to delete your account and all associated data, please contact 
-                    support directly. This action would be permanent and cannot be undone.
+                    Yes, you can delete your account and all associated data directly from the app. 
+                    Go to Settings and look for the "Danger Zone" section where you'll find the 
+                    account deletion option. This action is permanent and cannot be undone - all 
+                    your poker sessions, tournament data, and profile information will be permanently removed.
                   </AccordionContent>
                 </AccordionItem>
 
