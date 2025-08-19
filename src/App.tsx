@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import UserGuide from "./components/UserGuide";
 import LandingPage from "./components/LandingPage";
+import EmailPreview from "./components/EmailPreview";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,10 @@ const AppContent = () => {
       <Route 
         path="/guide" 
         element={<UserGuide />} 
+      />
+      <Route 
+        path="/email-preview" 
+        element={<EmailPreview />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
