@@ -27,6 +27,7 @@ import { FeedbackDialog } from './FeedbackDialog';
 import { ShareDialog } from './ShareDialog';
 import { FeedbackReview } from './FeedbackReview';
 import TwoFactorSetup from './TwoFactorSetup';
+import { AccountDeletion } from './AccountDeletion';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
 
 const PokerBankrollApp = () => {
@@ -1835,6 +1836,12 @@ const PokerBankrollApp = () => {
 
               <Separator />
 
+              {/* Account Deletion */}
+              <AccountDeletion />
+
+              <Separator />
+
+              {/* Password Change Section */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Current Password</Label>
