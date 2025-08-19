@@ -668,7 +668,7 @@ const PokerBankrollApp = () => {
         <div className="lg:max-w-7xl lg:mx-auto lg:px-8 lg:pb-8 max-w-md mx-auto px-4 pb-20">
           {/* Desktop: Bankroll Header */}
           {activeTab === 'dashboard' && (
-            <div className="hidden lg:block text-center py-6 border-b bg-gradient-to-r from-background to-muted/20">
+            <div className="invisible lg:block text-center py-6 border-b bg-gradient-to-r from-background to-muted/20">
               {/* Time Frame Display */}
               {filteredSessions.length > 0 && (() => {
                 const dates = filteredSessions.map(s => new Date(s.date)).sort((a, b) => a.getTime() - b.getTime());
@@ -695,19 +695,30 @@ const PokerBankrollApp = () => {
                 
                 return (
                   <div className="text-sm text-muted-foreground mb-4">
-                    Session range: {timeFrame}
+                    Found {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} spanning: {timeFrame}
                   </div>
                 );
               })()}
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="text-lg font-medium">Total Bankroll</span>
+              
+              {/* Filtered Records P/L */}
+              <div className="flex items-center justify-center gap-6 mb-4">
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Period P/L</div>
+                  <div className={`text-2xl font-bold ${stats.totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                    {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '•••••••'}
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Total Bankroll</div>
+                  <div className={`text-2xl font-bold ${stats.totalBankroll >= 0 ? 'text-profit' : 'text-loss'}`}>
+                    {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '•••••••'}
+                  </div>
+                </div>
+                
                 <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-2">
                   {showBankroll ? <Eye size={20} /> : <EyeOff size={20} />}
                 </Button>
-              </div>
-              
-              <div className={`text-3xl font-bold ${stats.totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
-                {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••••••••'}
               </div>
             </div>
           )}
