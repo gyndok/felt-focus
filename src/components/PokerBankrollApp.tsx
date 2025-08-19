@@ -703,7 +703,7 @@ const PokerBankrollApp = () => {
               {/* Filtered Records P/L */}
               <div className="flex items-center justify-center gap-6 mb-4">
                 <div className="text-center">
-                  <div className="text-sm text-muted-foreground">Period P/L</div>
+                  <div className="text-sm text-muted-foreground">P/L Selected</div>
                   <div className={`text-2xl font-bold ${stats.totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
                     {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '•••••••'}
                   </div>
