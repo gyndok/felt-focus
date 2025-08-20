@@ -62,10 +62,7 @@ const PokerBankrollApp = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [feedbackReviewOpen, setFeedbackReviewOpen] = useState(false);
-  const [startingBankroll, setStartingBankroll] = useState(() => {
-    const saved = localStorage.getItem('starting-bankroll');
-    return saved ? Number(saved) : 0;
-  });
+  const [startingBankroll, setStartingBankroll] = useState(0);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -80,10 +77,70 @@ const PokerBankrollApp = () => {
     }
   }, [activeTournament]);
 
-  // Save starting bankroll to localStorage
+  // Load user profile data including starting bankroll
   useEffect(() => {
-    localStorage.setItem('starting-bankroll', startingBankroll.toString());
-  }, [startingBankroll]);
+    const loadUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('starting_bankroll')
+          .eq('id', user.id)
+          .single();
+          
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
+          console.error('Error loading profile:', error);
+          return;
+        }
+        
+        if (data?.starting_bankroll !== undefined) {
+          setStartingBankroll(Number(data.starting_bankroll));
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    };
+
+    loadUserProfile();
+  }, [user]);
+
+  // Save starting bankroll to database
+  const updateStartingBankroll = async (amount: number) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          starting_bankroll: amount
+        });
+        
+      if (error) {
+        console.error('Error updating starting bankroll:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save starting bankroll",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      setStartingBankroll(amount);
+      toast({
+        title: "Success",
+        description: "Starting bankroll saved!"
+      });
+    } catch (error) {
+      console.error('Error updating starting bankroll:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to save starting bankroll",
+        variant: "destructive"
+      });
+    }
+  };
 
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -1823,7 +1880,7 @@ const PokerBankrollApp = () => {
                   type="number" 
                   placeholder="0"
                   value={startingBankroll}
-                  onChange={e => setStartingBankroll(Number(e.target.value) || 0)}
+                  onChange={e => updateStartingBankroll(Number(e.target.value) || 0)}
                 />
                 <p className="text-xs text-muted-foreground">
                   Set your initial bankroll amount before any sessions
