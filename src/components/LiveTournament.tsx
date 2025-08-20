@@ -421,7 +421,7 @@ const LiveTournament = () => {
   }, [activeTournament, tournamentUpdates]);
 
   if (!activeTournament) {
-    return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+    return <div className="flex flex-col items-center justify-center p-6 pt-20">
         <div className="max-w-md w-full text-center space-y-6">
           <div className="space-y-4">
             <Trophy className="w-16 h-16 mx-auto text-muted-foreground" />
