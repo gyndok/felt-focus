@@ -463,7 +463,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                 <div>
                   <Label htmlFor="location">Location</Label>
                   <div className="space-y-2">
-                    <Select value={newTournament.location} onValueChange={value => {
+                    <Select value={newTournament.location === '' ? 'custom' : newTournament.location} onValueChange={value => {
                       if (value === 'custom') {
                         setNewTournament({
                           ...newTournament,
@@ -495,14 +495,16 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                         <SelectItem value="custom">Enter Custom Location...</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Input 
-                      placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
-                      value={newTournament.location}
-                      onChange={e => setNewTournament({
-                        ...newTournament,
-                        location: e.target.value
-                      })}
-                    />
+                    {(newTournament.location === '' || !['Aria', 'Bellagio', 'WSOP', 'Venetian', 'Orleans', 'Borgata', 'Commerce', 'HPT', 'WPT', 'Local Casino', 'Home Game', 'Online'].includes(newTournament.location)) && (
+                      <Input 
+                        placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
+                        value={newTournament.location}
+                        onChange={e => setNewTournament({
+                          ...newTournament,
+                          location: e.target.value
+                        })}
+                      />
+                    )}
                   </div>
                 </div>
 
