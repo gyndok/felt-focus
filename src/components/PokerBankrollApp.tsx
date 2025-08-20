@@ -1269,7 +1269,7 @@ const PokerBankrollApp = () => {
         {/* Chart */}
         <Card className="mb-6 glass-card">
           <CardHeader>
-            <CardTitle className="text-lg">Bankroll Over Time</CardTitle>
+            <CardTitle className="text-lg">P/L Over Time</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-48">
@@ -1286,12 +1286,12 @@ const PokerBankrollApp = () => {
                   fontSize: 12,
                   fill: 'hsl(var(--muted-foreground))'
                 }} />
-                  <Tooltip formatter={value => [`$${value?.toLocaleString()}`, 'Bankroll']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
+                  <Tooltip formatter={value => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'Running P/L']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px'
                 }} />
-                  <Line type="monotone" dataKey="bankroll" stroke="hsl(var(--primary))" strokeWidth={3} dot={{
+                  <Line type="monotone" dataKey="runningPL" stroke="hsl(var(--primary))" strokeWidth={3} dot={{
                   fill: 'hsl(var(--primary))',
                   strokeWidth: 2,
                   r: 4
