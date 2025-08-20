@@ -1780,11 +1780,41 @@ const PokerBankrollApp = () => {
 
               <div className="space-y-2">
                 <Label>Location</Label>
-                <Input 
-                  placeholder="Casino name" 
-                  value={editSessionData.location} 
-                  onChange={e => setEditSessionData({...editSessionData, location: e.target.value})} 
-                />
+                <div className="space-y-2">
+                  <Select value={editSessionData.location === '' ? 'custom' : editSessionData.location} onValueChange={value => {
+                    if (value === 'custom') {
+                      setEditSessionData({...editSessionData, location: ''});
+                    } else {
+                      setEditSessionData({...editSessionData, location: value});
+                    }
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select or enter custom..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Aria">Aria (Las Vegas)</SelectItem>
+                      <SelectItem value="Bellagio">Bellagio (Las Vegas)</SelectItem>
+                      <SelectItem value="WSOP">WSOP (Las Vegas)</SelectItem>
+                      <SelectItem value="Venetian">Venetian (Las Vegas)</SelectItem>
+                      <SelectItem value="Orleans">Orleans (Las Vegas)</SelectItem>
+                      <SelectItem value="Borgata">Borgata (Atlantic City)</SelectItem>
+                      <SelectItem value="Commerce">Commerce Casino (LA)</SelectItem>
+                      <SelectItem value="HPT">Hollywood Poker Open</SelectItem>
+                      <SelectItem value="WPT">World Poker Tour</SelectItem>
+                      <SelectItem value="Local Casino">Local Casino</SelectItem>
+                      <SelectItem value="Home Game">Home Game</SelectItem>
+                      <SelectItem value="Online">Online</SelectItem>
+                      <SelectItem value="custom">Enter Custom Location...</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(editSessionData.location === '' || !['Aria', 'Bellagio', 'WSOP', 'Venetian', 'Orleans', 'Borgata', 'Commerce', 'HPT', 'WPT', 'Local Casino', 'Home Game', 'Online'].includes(editSessionData.location)) && (
+                    <Input 
+                      placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
+                      value={editSessionData.location} 
+                      onChange={e => setEditSessionData({...editSessionData, location: e.target.value})} 
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
