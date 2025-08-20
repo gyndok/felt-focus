@@ -321,7 +321,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
         type: 'mtt',
         game_type: activeTournament.game_type,
         stakes: `$${activeTournament.buy_in}`,
-        location: activeTournament.name,
+        location: activeTournament.location || activeTournament.name,
         buy_in: activeTournament.buy_in,
         cash_out: prizeWon,
         duration: duration,
