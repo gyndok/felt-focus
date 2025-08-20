@@ -48,6 +48,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
   const [newTournament, setNewTournament] = useState({
     name: '',
+    location: '',
     buy_in: '',
     house_rake: '',
     starting_chips: '30000',
@@ -155,6 +156,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
 
       await createTournament({
         name: newTournament.name,
+        location: newTournament.location,
         buy_in: parseFloat(newTournament.buy_in),
         house_rake: parseFloat(newTournament.house_rake) || 0,
         starting_chips: startingChips,
@@ -171,6 +173,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       });
       setNewTournament({
         name: '',
+        location: '',
         buy_in: '',
         house_rake: '',
         starting_chips: '30000',
@@ -455,6 +458,52 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                   ...newTournament,
                   name: e.target.value
                 })} placeholder="Main Event" />
+                </div>
+
+                <div>
+                  <Label htmlFor="location">Location</Label>
+                  <div className="space-y-2">
+                    <Select value={newTournament.location} onValueChange={value => {
+                      if (value === 'custom') {
+                        setNewTournament({
+                          ...newTournament,
+                          location: ''
+                        });
+                      } else {
+                        setNewTournament({
+                          ...newTournament,
+                          location: value
+                        });
+                      }
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select or enter custom..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Aria">Aria (Las Vegas)</SelectItem>
+                        <SelectItem value="Bellagio">Bellagio (Las Vegas)</SelectItem>
+                        <SelectItem value="WSOP">WSOP (Las Vegas)</SelectItem>
+                        <SelectItem value="Venetian">Venetian (Las Vegas)</SelectItem>
+                        <SelectItem value="Orleans">Orleans (Las Vegas)</SelectItem>
+                        <SelectItem value="Borgata">Borgata (Atlantic City)</SelectItem>
+                        <SelectItem value="Commerce">Commerce Casino (LA)</SelectItem>
+                        <SelectItem value="HPT">Hollywood Poker Open</SelectItem>
+                        <SelectItem value="WPT">World Poker Tour</SelectItem>
+                        <SelectItem value="Local Casino">Local Casino</SelectItem>
+                        <SelectItem value="Home Game">Home Game</SelectItem>
+                        <SelectItem value="Online">Online</SelectItem>
+                        <SelectItem value="custom">Enter Custom Location...</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
+                      value={newTournament.location}
+                      onChange={e => setNewTournament({
+                        ...newTournament,
+                        location: e.target.value
+                      })}
+                    />
+                  </div>
                 </div>
 
                 <div>
