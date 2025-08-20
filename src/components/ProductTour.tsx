@@ -162,7 +162,10 @@ export const ProductTour = () => {
     getCurrentStep
   } = useProductTour();
 
-  console.log('ProductTour render - isActive:', isActive, 'currentStep:', currentStep);
+  console.log('=== ProductTour Debug ===');
+  console.log('isActive:', isActive);
+  console.log('currentStep:', currentStep);
+  console.log('totalSteps:', totalSteps);
 
   if (!isActive) {
     console.log('Tour not active, returning null');
@@ -170,11 +173,14 @@ export const ProductTour = () => {
   }
 
   const step = getCurrentStep();
-  console.log('Current step:', step);
+  console.log('Current step object:', step);
+  
   if (!step) {
     console.log('No step found, returning null');
     return null;
   }
+
+  console.log('About to render TourOverlay with target:', step.target);
 
   return (
     <TourOverlay
