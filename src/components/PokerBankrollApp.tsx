@@ -30,6 +30,7 @@ import TwoFactorSetup from './TwoFactorSetup';
 import { AccountDeletion } from './AccountDeletion';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
 import { ProductTour, TourStartButton } from './ProductTour';
+import { useProductTour } from '@/hooks/useProductTour';
 
 const PokerBankrollApp = () => {
   const {
@@ -51,6 +52,7 @@ const PokerBankrollApp = () => {
     toast
   } = useToast();
   const { unreadCount, isAdmin } = useFeedbackNotifications();
+  const { resetTour, startTour } = useProductTour();
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(false);
@@ -1847,6 +1849,18 @@ const PokerBankrollApp = () => {
                   >
                     <Bug size={16} className="mr-2" />
                     Send Feedback
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      resetTour();
+                      startTour();
+                      setShowSettings(false);
+                    }} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <Play size={16} className="mr-2" />
+                    Restart Product Tour
                   </Button>
                   <Button 
                     onClick={() => window.location.href = '/guide'} 
