@@ -36,7 +36,9 @@ const TourOverlay = ({
   const [overlayStyle, setOverlayStyle] = useState<React.CSSProperties>({});
 
   useEffect(() => {
+    console.log('Looking for target:', target);
     const element = document.querySelector(target) as HTMLElement;
+    console.log('Found element:', element);
     if (element) {
       setTargetElement(element);
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
