@@ -46,7 +46,7 @@ export const useTournaments = () => {
     }
   };
 
-  const createTournament = async (tournamentData: Omit<TournamentInsert, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+  const createTournament = async (tournamentData: Omit<TournamentInsert, 'id' | 'user_id' | 'created_at' | 'updated_at'> & { location?: string }) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
