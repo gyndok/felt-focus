@@ -63,15 +63,42 @@ export const useTermsOfService = () => {
     if (!user) return false;
 
     try {
-      const { error } = await supabase
+      // First, try to update existing record
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('user_profiles')
-        .upsert({
-          user_id: user.id,
-          tos_accepted_at: new Date().toISOString(),
-          tos_version: '1.0'
-        });
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      let profileError;
+      
+      if (existingProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({
+            tos_accepted_at: new Date().toISOString(),
+            tos_version: '1.0'
+          })
+          .eq('user_id', user.id);
+        profileError = error;
+      } else {
+        // Insert new profile
+        const { error } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            tos_accepted_at: new Date().toISOString(),
+            tos_version: '1.0'
+          });
+        profileError = error;
+      }
+
+      if (profileError) throw profileError;
 
       setTosAccepted(true);
       return true;
