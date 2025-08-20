@@ -62,7 +62,10 @@ const PokerBankrollApp = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [feedbackReviewOpen, setFeedbackReviewOpen] = useState(false);
-  const [startingBankroll, setStartingBankroll] = useState(0);
+  const [startingBankroll, setStartingBankroll] = useState(() => {
+    const saved = localStorage.getItem('starting-bankroll');
+    return saved ? Number(saved) : 0;
+  });
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -76,6 +79,11 @@ const PokerBankrollApp = () => {
       setActiveTab('tournament');
     }
   }, [activeTournament]);
+
+  // Save starting bankroll to localStorage
+  useEffect(() => {
+    localStorage.setItem('starting-bankroll', startingBankroll.toString());
+  }, [startingBankroll]);
 
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false);
