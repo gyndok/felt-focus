@@ -712,7 +712,7 @@ const PokerBankrollApp = () => {
               </div>
               
               <div className={`text-3xl font-bold ${stats.totalBankroll >= startingBankroll ? 'text-profit' : 'text-loss'}`}>
-                {showBankroll ? `$${stats.totalBankroll.toLocaleString()} Total Bankroll` : '••••••••••••'}
+                {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••••••••'}
               </div>
               
               {/* Show filtered P/L if different from total */}
