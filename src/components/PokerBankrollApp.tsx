@@ -273,13 +273,15 @@ const PokerBankrollApp = () => {
 
   // Chart data
   const chartData = useMemo(() => {
-    let runningTotal = startingBankroll;
+    let runningPL = 0;
     return filteredSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(session => {
-      runningTotal += session.cash_out - session.buy_in;
+      const sessionProfit = session.cash_out - session.buy_in;
+      runningPL += sessionProfit;
       return {
         date: session.date,
-        bankroll: runningTotal,
-        profit: session.cash_out - session.buy_in
+        bankroll: startingBankroll + runningPL,
+        profit: sessionProfit,
+        runningPL: runningPL
       };
     });
   }, [filteredSessions, startingBankroll]);
@@ -956,12 +958,12 @@ const PokerBankrollApp = () => {
                         fontSize: 12,
                         fill: 'hsl(var(--muted-foreground))'
                       }} />
-                        <Tooltip formatter={(value) => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'P/L']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
+                        <Tooltip formatter={(value) => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'Running P/L']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
                         backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px'
                       }} />
-                        <Line type="monotone" dataKey="profit" stroke="hsl(var(--primary))" strokeWidth={3} dot={{
+                        <Line type="monotone" dataKey="runningPL" stroke="hsl(var(--primary))" strokeWidth={3} dot={{
                         fill: 'hsl(var(--primary))',
                         strokeWidth: 2,
                         r: 4
