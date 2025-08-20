@@ -29,8 +29,6 @@ import { FeedbackReview } from './FeedbackReview';
 import TwoFactorSetup from './TwoFactorSetup';
 import { AccountDeletion } from './AccountDeletion';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
-import { ProductTour, TourStartButton } from './ProductTour';
-import { useProductTour } from '@/hooks/useProductTour';
 
 const PokerBankrollApp = () => {
   const {
@@ -52,7 +50,7 @@ const PokerBankrollApp = () => {
     toast
   } = useToast();
   const { unreadCount, isAdmin } = useFeedbackNotifications();
-  const { resetTour, startTour } = useProductTour();
+  
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
   const [showBankroll, setShowBankroll] = useState(false);
@@ -510,7 +508,7 @@ const PokerBankrollApp = () => {
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="User Guide">
               <BookOpen size={18} />
             </Button>
-            <TourStartButton />
+            
             <Button 
               variant="secondary" 
               size="sm" 
@@ -1851,18 +1849,6 @@ const PokerBankrollApp = () => {
                     Send Feedback
                   </Button>
                   <Button 
-                    onClick={() => {
-                      resetTour();
-                      startTour();
-                      setShowSettings(false);
-                    }} 
-                    variant="outline" 
-                    className="w-full justify-start"
-                  >
-                    <Play size={16} className="mr-2" />
-                    Restart Product Tour
-                  </Button>
-                  <Button 
                     onClick={() => window.location.href = '/guide'} 
                     variant="outline" 
                     className="w-full justify-start"
@@ -1991,9 +1977,6 @@ const PokerBankrollApp = () => {
           </div>
         </div>
       )}
-      
-      {/* Product Tour */}
-      <ProductTour />
     </div>
 };
 export default PokerBankrollApp;
