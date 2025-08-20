@@ -162,9 +162,12 @@ export const ProductTour = () => {
     getCurrentStep
   } = useProductTour();
 
+  console.log('ProductTour render - isActive:', isActive, 'currentStep:', currentStep);
+
   if (!isActive) return null;
 
   const step = getCurrentStep();
+  console.log('Current step:', step);
   if (!step) return null;
 
   return (
