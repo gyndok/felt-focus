@@ -164,11 +164,17 @@ export const ProductTour = () => {
 
   console.log('ProductTour render - isActive:', isActive, 'currentStep:', currentStep);
 
-  if (!isActive) return null;
+  if (!isActive) {
+    console.log('Tour not active, returning null');
+    return null;
+  }
 
   const step = getCurrentStep();
   console.log('Current step:', step);
-  if (!step) return null;
+  if (!step) {
+    console.log('No step found, returning null');
+    return null;
+  }
 
   return (
     <TourOverlay
