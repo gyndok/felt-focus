@@ -191,6 +191,7 @@ export type Database = {
           id: string
           is_paused: boolean
           level: number
+          location: string | null
           name: string
           paused_at: string | null
           percent_paid: number | null
@@ -221,6 +222,7 @@ export type Database = {
           id?: string
           is_paused?: boolean
           level?: number
+          location?: string | null
           name: string
           paused_at?: string | null
           percent_paid?: number | null
@@ -251,6 +253,7 @@ export type Database = {
           id?: string
           is_paused?: boolean
           level?: number
+          location?: string | null
           name?: string
           paused_at?: string | null
           percent_paid?: number | null
