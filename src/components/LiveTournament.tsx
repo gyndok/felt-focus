@@ -701,7 +701,11 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       <div className="gradient-casino text-white p-6 sticky top-0 z-10">
         <div className="max-w-md mx-auto text-center">
           <div className="mb-4">
-            <h1 className="text-xl font-bold mb-1">{activeTournament.name}</h1>
+            <div className="text-sm opacity-80 mb-1">Tournament</div>
+            <h1 className="text-2xl font-bold mb-2">{activeTournament.name}</h1>
+            {activeTournament.location && (
+              <div className="text-sm opacity-90 mb-3">@ {activeTournament.location}</div>
+            )}
             <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="p-4 h-auto hover:bg-white/10">
