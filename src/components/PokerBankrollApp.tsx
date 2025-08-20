@@ -189,6 +189,10 @@ const PokerBankrollApp = () => {
     const totalBuyIn = filteredSessions.reduce((sum, session) => sum + session.buy_in, 0);
     const totalCashOut = filteredSessions.reduce((sum, session) => sum + session.cash_out, 0);
     const winRate = filteredSessions.filter(s => s.cash_out > s.buy_in).length / filteredSessions.length * 100;
+    
+    // Calculate total bankroll from ALL sessions, not just filtered ones
+    const allSessionsProfit = sessions.reduce((sum, session) => sum + (session.cash_out - session.buy_in), 0);
+    
     return {
       totalProfit,
       totalBuyIn,
@@ -197,9 +201,9 @@ const PokerBankrollApp = () => {
       hourlyRate: totalHours > 0 ? totalProfit / totalHours : 0,
       totalSessions: filteredSessions.length,
       winRate: isNaN(winRate) ? 0 : winRate,
-      totalBankroll: startingBankroll + totalProfit
+      totalBankroll: startingBankroll + allSessionsProfit
     };
-  }, [filteredSessions, startingBankroll]);
+  }, [filteredSessions, sessions, startingBankroll]);
 
   // Chart data
   const chartData = useMemo(() => {
