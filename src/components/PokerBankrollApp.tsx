@@ -941,7 +941,7 @@ const PokerBankrollApp = () => {
               {/* Chart */}
               <Card className="glass-card" data-tour="profit-chart">
                 <CardHeader>
-                  <CardTitle className="text-lg">P/L Over Time</CardTitle>
+                  <CardTitle className="text-lg">P/L for Filtered Sessions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
