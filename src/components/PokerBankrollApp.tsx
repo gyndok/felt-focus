@@ -405,6 +405,15 @@ const PokerBankrollApp = () => {
   const getUniqueValues = (key: keyof PokerSession) => {
     return [...new Set(sessions.map(session => String(session[key])))];
   };
+
+  // Get unique locations from user's sessions
+  const userLocations = useMemo(() => {
+    return sessions
+      .map(session => session.location)
+      .filter(location => location && location.trim() !== '')
+      .filter((location, index, arr) => arr.indexOf(location) === index)
+      .sort();
+  }, [sessions]);
   const handleLogout = async () => {
     await signOut();
   };
@@ -1792,22 +1801,14 @@ const PokerBankrollApp = () => {
                       <SelectValue placeholder="Select or enter custom..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Aria">Aria (Las Vegas)</SelectItem>
-                      <SelectItem value="Bellagio">Bellagio (Las Vegas)</SelectItem>
-                      <SelectItem value="WSOP">WSOP (Las Vegas)</SelectItem>
-                      <SelectItem value="Venetian">Venetian (Las Vegas)</SelectItem>
-                      <SelectItem value="Orleans">Orleans (Las Vegas)</SelectItem>
-                      <SelectItem value="Borgata">Borgata (Atlantic City)</SelectItem>
-                      <SelectItem value="Commerce">Commerce Casino (LA)</SelectItem>
-                      <SelectItem value="HPT">Hollywood Poker Open</SelectItem>
-                      <SelectItem value="WPT">World Poker Tour</SelectItem>
-                      <SelectItem value="Local Casino">Local Casino</SelectItem>
-                      <SelectItem value="Home Game">Home Game</SelectItem>
-                      <SelectItem value="Online">Online</SelectItem>
-                      <SelectItem value="custom">Enter Custom Location...</SelectItem>
+                      {userLocations.map(location => (
+                        <SelectItem key={location} value={location}>{location}</SelectItem>
+                      ))}
+                      {userLocations.length > 0 && <SelectItem value="custom">Enter Custom Location...</SelectItem>}
+                      {userLocations.length === 0 && <SelectItem value="custom">Enter Location...</SelectItem>}
                     </SelectContent>
                   </Select>
-                  {(editSessionData.location === '' || !['Aria', 'Bellagio', 'WSOP', 'Venetian', 'Orleans', 'Borgata', 'Commerce', 'HPT', 'WPT', 'Local Casino', 'Home Game', 'Online'].includes(editSessionData.location)) && (
+                  {(editSessionData.location === '' || !userLocations.includes(editSessionData.location)) && (
                     <Input 
                       placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
                       value={editSessionData.location} 
