@@ -60,8 +60,10 @@ export const useProductTour = () => {
   }, []);
 
   const startTour = () => {
+    console.log('Starting tour...');
     // Small delay to ensure DOM elements are ready
     setTimeout(() => {
+      console.log('Setting tour active');
       setIsActive(true);
       setCurrentStep(0);
     }, 100);
