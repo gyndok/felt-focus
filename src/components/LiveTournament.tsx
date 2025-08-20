@@ -15,7 +15,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
 
-const LiveTournament = () => {
+interface LiveTournamentProps {
+  onSessionAdded?: () => void;
+}
+
+const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   const {
     toast
   } = useToast();
@@ -323,6 +327,9 @@ const LiveTournament = () => {
       
       // Refetch sessions to immediately update the recent sessions list
       await refetchSessions();
+      
+      // Notify parent component that a session was added
+      onSessionAdded?.();
       
       setEndData({
         final_position: '',

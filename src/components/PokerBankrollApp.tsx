@@ -41,7 +41,8 @@ const PokerBankrollApp = () => {
     loading,
     addSession,
     updateSession,
-    deleteSession
+    deleteSession,
+    refetch: refetchSessions
   } = usePokerSessions();
   const {
     activeTournament
@@ -733,7 +734,7 @@ const PokerBankrollApp = () => {
 
       {/* Render Live Tournament or Dashboard */}
       {activeTab === 'tournament' ? (
-        <LiveTournament />
+        <LiveTournament onSessionAdded={refetchSessions} />
       ) : (
         <div className="lg:max-w-7xl lg:mx-auto lg:px-8 lg:pb-8 max-w-md mx-auto px-4 pb-20">
           {/* Desktop: Bankroll Header */}
