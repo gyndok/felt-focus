@@ -714,6 +714,16 @@ const PokerBankrollApp = () => {
               <div className={`text-3xl font-bold ${stats.totalBankroll >= startingBankroll ? 'text-profit' : 'text-loss'}`}>
                 {showBankroll ? `$${stats.totalBankroll.toLocaleString()} Total Bankroll` : '••••••••••••'}
               </div>
+              
+              {/* Show filtered P/L if different from total */}
+              {filteredSessions.length !== sessions.length && (
+                <div className="mt-3">
+                  <div className="text-sm text-muted-foreground mb-1">Filtered Period P/L</div>
+                  <div className={`text-xl font-semibold ${stats.totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                    {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '••••••••'}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
