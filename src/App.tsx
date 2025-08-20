@@ -11,7 +11,7 @@ import NotFound from "./pages/NotFound";
 import UserGuide from "./components/UserGuide";
 import LandingPage from "./components/LandingPage";
 import EmailPreview from "./components/EmailPreview";
-import { useProductTour } from "./hooks/useProductTour";
+import { ProductTourProvider, useProductTour } from "./hooks/useProductTour";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -68,13 +68,15 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
+      <ProductTourProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </ProductTourProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

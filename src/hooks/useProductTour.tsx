@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 
 export interface TourStep {
   id: string;
@@ -46,7 +46,23 @@ const TOUR_STEPS: TourStep[] = [
   }
 ];
 
-export const useProductTour = () => {
+interface ProductTourContextType {
+  isActive: boolean;
+  currentStep: number;
+  hasCompletedTour: boolean;
+  totalSteps: number;
+  startTour: () => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  skipTour: () => void;
+  completeTour: () => void;
+  resetTour: () => void;
+  getCurrentStep: () => TourStep | undefined;
+}
+
+const ProductTourContext = createContext<ProductTourContextType | undefined>(undefined);
+
+export const ProductTourProvider = ({ children }: { children: React.ReactNode }) => {
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasCompletedTour, setHasCompletedTour] = useState(false);
@@ -101,7 +117,7 @@ export const useProductTour = () => {
 
   const getCurrentStep = () => TOUR_STEPS[currentStep];
 
-  return {
+  const value = {
     isActive,
     currentStep,
     hasCompletedTour,
@@ -114,4 +130,18 @@ export const useProductTour = () => {
     resetTour,
     getCurrentStep
   };
+
+  return (
+    <ProductTourContext.Provider value={value}>
+      {children}
+    </ProductTourContext.Provider>
+  );
+};
+
+export const useProductTour = () => {
+  const context = useContext(ProductTourContext);
+  if (context === undefined) {
+    throw new Error('useProductTour must be used within a ProductTourProvider');
+  }
+  return context;
 };
