@@ -29,6 +29,7 @@ import { FeedbackReview } from './FeedbackReview';
 import TwoFactorSetup from './TwoFactorSetup';
 import { AccountDeletion } from './AccountDeletion';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
+import { ProductTour, TourStartButton } from './ProductTour';
 
 const PokerBankrollApp = () => {
   const {
@@ -457,7 +458,7 @@ const PokerBankrollApp = () => {
       <div className="hidden lg:block gradient-casino text-white p-4 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Left: App Icon and Title */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" data-tour="main-header">
             <img 
               src="/lovable-uploads/cdc2af24-7343-4b17-83eb-e6944ab0ef53.png" 
               alt="Felt Focus" 
@@ -507,6 +508,7 @@ const PokerBankrollApp = () => {
             <Button variant="secondary" size="sm" onClick={() => window.location.href = '/guide'} className="bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm" title="User Guide">
               <BookOpen size={18} />
             </Button>
+            <TourStartButton />
             <Button 
               variant="secondary" 
               size="sm" 
@@ -583,7 +585,7 @@ const PokerBankrollApp = () => {
               <div className="flex justify-center">
                 <Dialog open={showAddSession} onOpenChange={setShowAddSession}>
                   <DialogTrigger asChild>
-                    <Button size="sm" className="bg-profit hover:bg-profit/90 shadow-lg hover-scale px-6">
+                    <Button size="sm" className="bg-profit hover:bg-profit/90 shadow-lg hover-scale px-6" data-tour="add-session">
                       <Plus size={18} className="mr-1" />
                       Add Session
                     </Button>
@@ -811,7 +813,7 @@ const PokerBankrollApp = () => {
             {/* Middle Column: Stats & Chart */}
             <div className="lg:col-span-6 space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4" data-tour="stats-cards">
                 <Card className="glass-card">
                   <CardContent className="p-4 text-center">
                     <div className="flex items-center justify-center text-primary mb-2">
@@ -855,7 +857,7 @@ const PokerBankrollApp = () => {
               </div>
 
               {/* Chart */}
-              <Card className="glass-card">
+              <Card className="glass-card" data-tour="profit-chart">
                 <CardHeader>
                   <CardTitle className="text-lg">Bankroll Over Time</CardTitle>
                 </CardHeader>
@@ -893,7 +895,7 @@ const PokerBankrollApp = () => {
 
             {/* Right Column: Session History */}
             <div className="lg:col-span-3">
-              <div className="space-y-4">
+              <div className="space-y-4" data-tour="sessions-list">
                 <div className="sticky top-24 bg-background/95 backdrop-blur-sm py-2 z-10 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">Recent Sessions</h3>
@@ -1975,6 +1977,9 @@ const PokerBankrollApp = () => {
           </div>
         </div>
       )}
+      
+      {/* Product Tour */}
+      <ProductTour />
     </div>
 };
 export default PokerBankrollApp;

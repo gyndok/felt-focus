@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,12 +11,24 @@ import NotFound from "./pages/NotFound";
 import UserGuide from "./components/UserGuide";
 import LandingPage from "./components/LandingPage";
 import EmailPreview from "./components/EmailPreview";
+import { useProductTour } from "./hooks/useProductTour";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user, loading } = useAuth();
+  const { hasCompletedTour, startTour } = useProductTour();
+  
+  // Auto-start tour for new users when they reach the dashboard
+  React.useEffect(() => {
+    if (user && !hasCompletedTour) {
+      const timer = setTimeout(() => {
+        startTour();
+      }, 2000); // Wait 2 seconds for the page to fully load
+      return () => clearTimeout(timer);
+    }
+  }, [user, hasCompletedTour, startTour]);
 
   if (loading) {
     return (
