@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter, FileSpreadsheet } from 'lucide-react';
+import { Plus, TrendingUp, Clock, DollarSign, Filter, Calendar as CalendarIcon, MapPin, Eye, EyeOff, Play, Pause, Square, LogOut, Edit, Edit2, Trash2, Settings, Paperclip, Bug, Share, MessageSquare, BookOpen, Shield, Camera, Twitter, FileSpreadsheet, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
@@ -105,6 +105,37 @@ const PokerBankrollApp = () => {
 
     loadUserProfile();
   }, [user]);
+
+  // Function to reset ToS acceptance for testing
+  const resetTosAcceptance = async () => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ tos_accepted_at: null, tos_version: null })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "ToS Reset",
+        description: "Terms of Service acceptance has been reset. Please refresh the page to see the ToS flow.",
+      });
+      
+      setShowSettings(false);
+      
+      // Refresh the page to show ToS flow
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (error: any) {
+      console.error('Error resetting ToS:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset ToS acceptance",
+        variant: "destructive"
+      });
+    }
+  };
 
   // Save starting bankroll to database
   const updateStartingBankroll = async (amount: number) => {
@@ -2018,6 +2049,34 @@ const PokerBankrollApp = () => {
                 </Button>
                 <p className="text-xs text-muted-foreground">
                   Add an extra layer of security to your account
+                </p>
+              </div>
+
+              <Separator />
+
+              {/* Testing Tools */}
+              <div className="space-y-2">
+                <Label>Testing Tools</Label>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button 
+                    onClick={() => window.location.href = '/terms-preview'} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <FileText size={16} className="mr-2" />
+                    View Terms of Service
+                  </Button>
+                  <Button 
+                    onClick={resetTosAcceptance} 
+                    variant="outline" 
+                    className="w-full justify-start text-orange-600 hover:text-orange-700"
+                  >
+                    <Shield size={16} className="mr-2" />
+                    Reset ToS Acceptance (Testing)
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Development tools to test the Terms of Service flow
                 </p>
               </div>
 

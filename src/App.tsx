@@ -58,6 +58,10 @@ const AppContent = () => {
         path="/email-preview" 
         element={<EmailPreview />} 
       />
+      <Route 
+        path="/terms-preview" 
+        element={<TermsOfService onAccept={() => window.history.back()} userEmail={user?.email} />} 
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
