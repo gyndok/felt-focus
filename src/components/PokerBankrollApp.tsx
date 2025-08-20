@@ -673,7 +673,7 @@ const PokerBankrollApp = () => {
         <div className="lg:max-w-7xl lg:mx-auto lg:px-8 lg:pb-8 max-w-md mx-auto px-4 pb-20">
           {/* Desktop: Bankroll Header */}
           {activeTab === 'dashboard' && (
-            <div className="hidden lg:block text-center py-6 border-b bg-gradient-to-r from-background to-muted/20">
+            <div className="hidden lg:block text-center py-8 border-b bg-gradient-to-r from-background via-muted/10 to-background rounded-lg mx-4 mb-6 shadow-sm">
               {/* Time Frame Display */}
               {filteredSessions.length > 0 && (() => {
                 const dates = filteredSessions.map(s => new Date(s.date)).sort((a, b) => a.getTime() - b.getTime());
@@ -699,27 +699,28 @@ const PokerBankrollApp = () => {
                 }
                 
                 return (
-                  <div className="text-sm text-muted-foreground mb-4">
+                  <div className="text-sm text-muted-foreground mb-6 bg-muted/30 px-4 py-2 rounded-full inline-block">
                     Session range: {timeFrame}
                   </div>
                 );
               })()}
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="text-lg font-medium">Total Bankroll</span>
-                <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-2">
+              
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <span className="text-lg font-medium text-foreground">Total Bankroll</span>
+                <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-2 hover:bg-muted/50">
                   {showBankroll ? <Eye size={20} /> : <EyeOff size={20} />}
                 </Button>
               </div>
               
-              <div className={`text-3xl font-bold ${stats.totalBankroll >= startingBankroll ? 'text-profit' : 'text-loss'}`}>
+              <div className={`text-4xl font-bold mb-2 ${stats.totalBankroll > startingBankroll ? 'text-emerald-600 dark:text-emerald-400' : stats.totalBankroll < startingBankroll ? 'text-red-600 dark:text-red-400' : 'text-foreground'}`}>
                 {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••••••••'}
               </div>
               
               {/* Show filtered P/L if different from total */}
               {filteredSessions.length !== sessions.length && (
-                <div className="mt-3">
-                  <div className="text-sm text-muted-foreground mb-1">Filtered Period P/L</div>
-                  <div className={`text-xl font-semibold ${stats.totalProfit >= 0 ? 'text-profit' : 'text-loss'}`}>
+                <div className="mt-6 pt-4 border-t border-muted/30">
+                  <div className="text-sm font-medium text-muted-foreground mb-2">Filtered Period P/L</div>
+                  <div className={`text-2xl font-semibold ${stats.totalProfit > 0 ? 'text-emerald-600 dark:text-emerald-400' : stats.totalProfit < 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
                     {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '••••••••'}
                   </div>
                 </div>
