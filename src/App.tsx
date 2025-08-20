@@ -33,7 +33,14 @@ const AppContent = () => {
 
   // If user is authenticated but hasn't accepted ToS, show ToS page
   if (user && tosAccepted === false) {
-    return <TermsOfService onAccept={acceptTerms} userEmail={user.email} />;
+    const handleAccept = async () => {
+      const success = await acceptTerms();
+      if (success) {
+        // Force a reload to update the ToS state and proceed to dashboard
+        window.location.reload();
+      }
+    };
+    return <TermsOfService onAccept={handleAccept} userEmail={user.email} />;
   }
 
   return (
@@ -60,7 +67,7 @@ const AppContent = () => {
       />
       <Route 
         path="/terms-preview" 
-        element={<TermsOfService onAccept={() => window.history.back()} userEmail={user?.email} />} 
+        element={<TermsOfService onAccept={() => window.location.href = '/app'} userEmail={user?.email} />} 
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
