@@ -683,6 +683,12 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                       autoFocus
                     />
                   </div>
+                  <div className="bg-muted/20 p-3 rounded-lg border border-border/50">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note:</strong> This quick update only changes your current chip stack display. 
+                      To update the progress graph, use the "Full Update" button below instead.
+                    </p>
+                  </div>
                   <div className="flex gap-2">
                     <Button 
                       onClick={() => {
