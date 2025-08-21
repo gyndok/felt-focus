@@ -22,7 +22,7 @@ const LandingPage = () => {
     {
       icon: <TrendingUp className="h-6 w-6 text-green-400" />,
       title: "ROI Calculations",
-      description: "Automatically calculate return on investment for your sessions and filtered time periods"
+      description: "Track your return on investment percentage to measure profitability across sessions, venues, and time periods"
     },
     {
       icon: <Clock className="h-6 w-6 text-blue-400" />,
