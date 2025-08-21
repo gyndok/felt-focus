@@ -1712,13 +1712,34 @@ const PokerBankrollApp = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Location</Label>
-                <Input placeholder="Casino name" value={newSession.location} onChange={e => setNewSession({
-                ...newSession,
-                location: e.target.value
-              })} />
-              </div>
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Select value={newSession.location === '' ? 'custom' : newSession.location} onValueChange={value => {
+                    if (value === 'custom') {
+                      setNewSession({...newSession, location: ''});
+                    } else {
+                      setNewSession({...newSession, location: value});
+                    }
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select casino/location" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      {userLocations.map(location => (
+                        <SelectItem key={location} value={location}>{location}</SelectItem>
+                      ))}
+                      {userLocations.length > 0 && <SelectItem value="custom">Enter Custom Location...</SelectItem>}
+                      {userLocations.length === 0 && <SelectItem value="custom">Enter Location...</SelectItem>}
+                    </SelectContent>
+                  </Select>
+                  {(newSession.location === '' || !userLocations.includes(newSession.location)) && (
+                    <Input 
+                      placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
+                      value={newSession.location} 
+                      onChange={e => setNewSession({...newSession, location: e.target.value})} 
+                    />
+                  )}
+                </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
