@@ -213,8 +213,8 @@ const PokerBankrollApp = () => {
     buy_in: '',
     cash_out: '',
     date: new Date(),
-    start_time: '',
-    end_time: '',
+    start_time: null as string | null,
+    end_time: null as string | null,
     duration: '',
     notes: '',
     receipt_image_url: null as string | null
@@ -474,8 +474,8 @@ const PokerBankrollApp = () => {
         buy_in: parseFloat(editSessionData.buy_in),
         cash_out: parseFloat(editSessionData.cash_out),
         date: format(editSessionData.date, 'yyyy-MM-dd'),
-        start_time: editSessionData.start_time,
-        end_time: editSessionData.end_time,
+        start_time: editSessionData.start_time || null,
+        end_time: editSessionData.end_time || null,
         duration: calculatedDuration,
         notes: editSessionData.notes,
         receipt_image_url: editSessionData.receipt_image_url
@@ -528,8 +528,8 @@ const PokerBankrollApp = () => {
       buy_in: session.buy_in.toString(),
       cash_out: session.cash_out.toString(),
       date: session.date ? new Date(session.date) : new Date(),
-      start_time: (session as any).start_time || '',
-      end_time: (session as any).end_time || '',
+      start_time: (session as any).start_time || null,
+      end_time: (session as any).end_time || null,
       duration: session.duration.toString(),
       notes: session.notes || '',
       receipt_image_url: session.receipt_image_url || null
@@ -2133,16 +2133,16 @@ const PokerBankrollApp = () => {
                       <Label>Start Time</Label>
                       <Input 
                         type="time" 
-                        value={editSessionData.start_time} 
-                        onChange={e => setEditSessionData({...editSessionData, start_time: e.target.value})} 
+                        value={editSessionData.start_time || ''} 
+                        onChange={e => setEditSessionData({...editSessionData, start_time: e.target.value || null})} 
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>End Time</Label>
                       <Input 
                         type="time" 
-                        value={editSessionData.end_time} 
-                        onChange={e => setEditSessionData({...editSessionData, end_time: e.target.value})} 
+                        value={editSessionData.end_time || ''} 
+                        onChange={e => setEditSessionData({...editSessionData, end_time: e.target.value || null})}
                       />
                     </div>
                   </div>
