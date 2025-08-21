@@ -399,11 +399,18 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
 
   // Load unique tournament locations
   useEffect(() => {
-    if (user) {
-      getUniqueLocations().then(locations => {
-        setTournamentLocations(locations);
-      }).catch(console.error);
-    }
+    const loadLocations = async () => {
+      if (user) {
+        try {
+          const locations = await getUniqueLocations();
+          setTournamentLocations(locations);
+        } catch (error) {
+          console.error('Failed to load locations:', error);
+        }
+      }
+    };
+    
+    loadLocations();
   }, [user, getUniqueLocations]);
 
   // Prepare chart data

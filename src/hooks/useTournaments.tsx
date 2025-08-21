@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import type { Database } from '@/integrations/supabase/types';
@@ -226,7 +226,7 @@ export const useTournaments = () => {
     }
   };
 
-  const getUniqueLocations = async () => {
+  const getUniqueLocations = useCallback(async () => {
     if (!user) return [];
 
     try {
@@ -245,7 +245,7 @@ export const useTournaments = () => {
       console.error('Failed to fetch unique locations:', err);
       return [];
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchTournaments();
