@@ -1039,59 +1039,65 @@ const PokerBankrollApp = () => {
             {/* Middle Column: Stats & Chart */}
             <div className="lg:col-span-6 space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6" data-tour="stats-cards">
-                <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardContent className="p-6 text-center">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10">
-                      <TrendingUp size={24} className="text-primary" />
-                    </div>
-                    <div className="text-3xl font-bold tracking-tight mb-2">${stats.hourlyRate.toFixed(0)}</div>
-                    <div className="text-sm font-medium text-muted-foreground mb-1">Hourly Rate</div>
-                    <div className="text-xs text-muted-foreground/80">{stats.totalHours.toFixed(1)}h total</div>
-                  </CardContent>
-                </Card>
+              <div className="space-y-6" data-tour="stats-cards">
+                {/* First Row - 3 Cards */}
+                <div className="grid grid-cols-3 gap-6">
+                  <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10">
+                        <TrendingUp size={24} className="text-primary" />
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight mb-2">${stats.hourlyRate.toFixed(0)}</div>
+                      <div className="text-sm font-medium text-muted-foreground mb-1">Hourly Rate</div>
+                      <div className="text-xs text-muted-foreground/80">{stats.totalHours.toFixed(1)}h total</div>
+                    </CardContent>
+                  </Card>
 
-                <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardContent className="p-6 text-center">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-500/10">
-                      <DollarSign size={24} className="text-emerald-500" />
-                    </div>
-                    <div className="text-3xl font-bold tracking-tight mb-2">{stats.winRate.toFixed(0)}%</div>
-                    <div className="text-sm font-medium text-muted-foreground">Win Rate</div>
-                  </CardContent>
-                </Card>
+                  <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-500/10">
+                        <DollarSign size={24} className="text-emerald-500" />
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight mb-2">{stats.winRate.toFixed(0)}%</div>
+                      <div className="text-sm font-medium text-muted-foreground">Win Rate</div>
+                    </CardContent>
+                  </Card>
 
-                <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardContent className="p-6 text-center">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-orange-500/10">
-                      <TrendingUp size={24} className="text-orange-500" />
-                    </div>
-                    <div className={`text-3xl font-bold tracking-tight mb-2 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                      {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
-                    </div>
-                    <div className="text-sm font-medium text-muted-foreground">ROI</div>
-                  </CardContent>
-                </Card>
+                  <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-orange-500/10">
+                        <TrendingUp size={24} className="text-orange-500" />
+                      </div>
+                      <div className={`text-3xl font-bold tracking-tight mb-2 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                        {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
+                      </div>
+                      <div className="text-sm font-medium text-muted-foreground">ROI</div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardContent className="p-6 text-center">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-blue-500/10">
-                      <DollarSign size={24} className="text-blue-500" />
-                    </div>
-                    <div className="text-3xl font-bold tracking-tight mb-2">${stats.totalBuyIn.toLocaleString()}</div>
-                    <div className="text-sm font-medium text-muted-foreground">Total Buy-In</div>
-                  </CardContent>
-                </Card>
+                {/* Second Row - 2 Cards */}
+                <div className="grid grid-cols-2 gap-6">
+                  <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-blue-500/10">
+                        <DollarSign size={24} className="text-blue-500" />
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight mb-2">${stats.totalBuyIn.toLocaleString()}</div>
+                      <div className="text-sm font-medium text-muted-foreground">Total Buy-In</div>
+                    </CardContent>
+                  </Card>
 
-                <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardContent className="p-6 text-center">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-green-500/10">
-                      <DollarSign size={24} className="text-green-500" />
-                    </div>
-                    <div className="text-3xl font-bold tracking-tight mb-2">${stats.totalCashOut.toLocaleString()}</div>
-                    <div className="text-sm font-medium text-muted-foreground">Total Cash-Out</div>
-                  </CardContent>
-                </Card>
+                  <Card className="glass-card hover:shadow-lg transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-green-500/10">
+                        <DollarSign size={24} className="text-green-500" />
+                      </div>
+                      <div className="text-3xl font-bold tracking-tight mb-2">${stats.totalCashOut.toLocaleString()}</div>
+                      <div className="text-sm font-medium text-muted-foreground">Total Cash-Out</div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
 
               {/* Chart */}
