@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeToggle } from './ThemeToggle';
@@ -55,6 +56,8 @@ const PokerBankrollApp = () => {
   
   const [showFilters, setShowFilters] = useState(false);
   const [showAddSession, setShowAddSession] = useState(false);
+  const [useTimeRange, setUseTimeRange] = useState(true); // Toggle between time range and direct duration
+  const [editUseTimeRange, setEditUseTimeRange] = useState(true); // Toggle for edit dialog
   const [showBankroll, setShowBankroll] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [selectedSession, setSelectedSession] = useState<PokerSession | null>(null);
@@ -323,18 +326,36 @@ const PokerBankrollApp = () => {
     });
   }, [filteredSessions, startingBankroll]);
   const handleAddSession = async () => {
-    if (!newSession.stakes || !newSession.location || !newSession.buy_in || !newSession.cash_out || !newSession.start_time || !newSession.end_time) {
+    if (!newSession.stakes || !newSession.location || !newSession.buy_in || !newSession.cash_out) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields including start and end time",
+        title: "Error", 
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (useTimeRange && (!newSession.start_time || !newSession.end_time)) {
+      toast({
+        title: "Error", 
+        description: "Please fill in both start and end time",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!useTimeRange && !newSession.duration) {
+      toast({
+        title: "Error", 
+        description: "Please enter the session duration",
         variant: "destructive"
       });
       return;
     }
     
-    // Calculate duration from start and end times
+    // Calculate duration based on the input method
     let calculatedDuration = 0;
-    if (newSession.start_time && newSession.end_time) {
+    if (useTimeRange && newSession.start_time && newSession.end_time) {
       const startTime = new Date(`2000-01-01 ${newSession.start_time}`);
       const endTime = new Date(`2000-01-01 ${newSession.end_time}`);
       calculatedDuration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60); // Convert to hours
@@ -343,6 +364,8 @@ const PokerBankrollApp = () => {
       if (calculatedDuration < 0) {
         calculatedDuration += 24;
       }
+    } else if (!useTimeRange && newSession.duration) {
+      calculatedDuration = parseFloat(newSession.duration);
     }
     
     try {
@@ -388,18 +411,36 @@ const PokerBankrollApp = () => {
 
   // Handle edit session
   const handleEditSession = async () => {
-    if (!editSession || !editSessionData.stakes || !editSessionData.location || !editSessionData.buy_in || !editSessionData.cash_out || !editSessionData.start_time || !editSessionData.end_time) {
+    if (!editSession || !editSessionData.stakes || !editSessionData.location || !editSessionData.buy_in || !editSessionData.cash_out) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields including start and end time",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
     }
 
-    // Calculate duration from start and end times
+    if (editUseTimeRange && (!editSessionData.start_time || !editSessionData.end_time)) {
+      toast({
+        title: "Error",
+        description: "Please fill in both start and end time",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!editUseTimeRange && !editSessionData.duration) {
+      toast({
+        title: "Error",
+        description: "Please enter the session duration",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Calculate duration based on the input method
     let calculatedDuration = 0;
-    if (editSessionData.start_time && editSessionData.end_time) {
+    if (editUseTimeRange && editSessionData.start_time && editSessionData.end_time) {
       const startTime = new Date(`2000-01-01 ${editSessionData.start_time}`);
       const endTime = new Date(`2000-01-01 ${editSessionData.end_time}`);
       calculatedDuration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60); // Convert to hours
@@ -408,6 +449,8 @@ const PokerBankrollApp = () => {
       if (calculatedDuration < 0) {
         calculatedDuration += 24;
       }
+    } else if (!editUseTimeRange && editSessionData.duration) {
+      calculatedDuration = parseFloat(editSessionData.duration);
     }
 
     try {
@@ -461,6 +504,10 @@ const PokerBankrollApp = () => {
   // Open edit dialog
   const openEditDialog = (session: PokerSession) => {
     setEditSession(session);
+    // Determine if we should use time range based on whether start_time and end_time exist
+    const hasTimeRange = (session as any).start_time && (session as any).end_time;
+    setEditUseTimeRange(hasTimeRange);
+    
     setEditSessionData({
       type: session.type as 'cash' | 'mtt',
       game_type: session.game_type,
@@ -1843,23 +1890,55 @@ const PokerBankrollApp = () => {
                 </Popover>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Start Time</Label>
-                  <Input 
-                    type="time" 
-                    value={newSession.start_time} 
-                    onChange={e => setNewSession({...newSession, start_time: e.target.value})} 
-                  />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Time Entry Method</Label>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="time-method" className={`text-xs ${!useTimeRange ? 'text-muted-foreground' : 'text-foreground'}`}>
+                      Start & End Times
+                    </Label>
+                    <Switch 
+                      id="time-method"
+                      checked={!useTimeRange}
+                      onCheckedChange={(checked) => setUseTimeRange(!checked)}
+                    />
+                    <Label htmlFor="time-method" className={`text-xs ${useTimeRange ? 'text-muted-foreground' : 'text-foreground'}`}>
+                      Duration Only
+                    </Label>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>End Time</Label>
-                  <Input 
-                    type="time" 
-                    value={newSession.end_time} 
-                    onChange={e => setNewSession({...newSession, end_time: e.target.value})} 
-                  />
-                </div>
+
+                {useTimeRange ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>Start Time</Label>
+                      <Input 
+                        type="time" 
+                        value={newSession.start_time} 
+                        onChange={e => setNewSession({...newSession, start_time: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End Time</Label>
+                      <Input 
+                        type="time" 
+                        value={newSession.end_time} 
+                        onChange={e => setNewSession({...newSession, end_time: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label>Duration (hours)</Label>
+                    <Input 
+                      type="number" 
+                      step="0.25"
+                      placeholder="e.g. 4.5"
+                      value={newSession.duration} 
+                      onChange={e => setNewSession({...newSession, duration: e.target.value})} 
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -2011,23 +2090,55 @@ const PokerBankrollApp = () => {
                 </Popover>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Start Time</Label>
-                  <Input 
-                    type="time" 
-                    value={editSessionData.start_time} 
-                    onChange={e => setEditSessionData({...editSessionData, start_time: e.target.value})} 
-                  />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Time Entry Method</Label>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="edit-time-method" className={`text-xs ${!editUseTimeRange ? 'text-muted-foreground' : 'text-foreground'}`}>
+                      Start & End Times
+                    </Label>
+                    <Switch 
+                      id="edit-time-method"
+                      checked={!editUseTimeRange}
+                      onCheckedChange={(checked) => setEditUseTimeRange(!checked)}
+                    />
+                    <Label htmlFor="edit-time-method" className={`text-xs ${editUseTimeRange ? 'text-muted-foreground' : 'text-foreground'}`}>
+                      Duration Only
+                    </Label>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>End Time</Label>
-                  <Input 
-                    type="time" 
-                    value={editSessionData.end_time} 
-                    onChange={e => setEditSessionData({...editSessionData, end_time: e.target.value})} 
-                  />
-                </div>
+
+                {editUseTimeRange ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>Start Time</Label>
+                      <Input 
+                        type="time" 
+                        value={editSessionData.start_time} 
+                        onChange={e => setEditSessionData({...editSessionData, start_time: e.target.value})} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End Time</Label>
+                      <Input 
+                        type="time" 
+                        value={editSessionData.end_time} 
+                        onChange={e => setEditSessionData({...editSessionData, end_time: e.target.value})} 
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label>Duration (hours)</Label>
+                    <Input 
+                      type="number" 
+                      step="0.25"
+                      placeholder="e.g. 4.5"
+                      value={editSessionData.duration} 
+                      onChange={e => setEditSessionData({...editSessionData, duration: e.target.value})} 
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
