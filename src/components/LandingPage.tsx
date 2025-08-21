@@ -56,8 +56,8 @@ const LandingPage = () => {
     },
     {
       icon: <Smartphone className="h-6 w-6 text-blue-400" />,
-      title: "Mobile Optimized",
-      description: "Fully responsive design works perfectly on desktop and mobile devices"
+      title: "Desktop, Tablet & Mobile",
+      description: "Fully optimized responsive design works seamlessly across all your devices"
     },
     {
       icon: <KeyRound className="h-6 w-6 text-green-400" />,
