@@ -193,6 +193,9 @@ const PokerBankrollApp = () => {
     location: '',
     buy_in: '',
     cash_out: '',
+    date: new Date(),
+    start_time: '',
+    end_time: '',
     duration: '',
     notes: '',
     receipt_image_url: null as string | null
@@ -317,24 +320,39 @@ const PokerBankrollApp = () => {
     });
   }, [filteredSessions, startingBankroll]);
   const handleAddSession = async () => {
-    if (!newSession.stakes || !newSession.location || !newSession.buy_in || !newSession.cash_out) {
+    if (!newSession.stakes || !newSession.location || !newSession.buy_in || !newSession.cash_out || !newSession.start_time || !newSession.end_time) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields including start and end time",
         variant: "destructive"
       });
       return;
     }
+    
+    // Calculate duration from start and end times
+    let calculatedDuration = 0;
+    if (newSession.start_time && newSession.end_time) {
+      const startTime = new Date(`2000-01-01 ${newSession.start_time}`);
+      const endTime = new Date(`2000-01-01 ${newSession.end_time}`);
+      calculatedDuration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60); // Convert to hours
+      
+      // Handle overnight sessions
+      if (calculatedDuration < 0) {
+        calculatedDuration += 24;
+      }
+    }
+    
     try {
       await addSession({
-        date: new Date().toISOString().split('T')[0],
+        date: format(newSession.date, 'yyyy-MM-dd'),
         type: newSession.type,
         game_type: newSession.game_type,
         stakes: newSession.stakes,
         location: newSession.location,
         buy_in: parseFloat(newSession.buy_in),
         cash_out: parseFloat(newSession.cash_out),
-        duration: parseFloat(newSession.duration) || 0,
+        duration: calculatedDuration,
+        notes: newSession.notes,
         receipt_image_url: newSession.receipt_image_url
       });
       setNewSession({
@@ -344,6 +362,9 @@ const PokerBankrollApp = () => {
         location: '',
         buy_in: '',
         cash_out: '',
+        date: new Date(),
+        start_time: '',
+        end_time: '',
         duration: '',
         notes: '',
         receipt_image_url: null
@@ -1759,11 +1780,46 @@ const PokerBankrollApp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Duration (hours)</Label>
-                <Input type="number" step="0.5" placeholder="4.5" value={newSession.duration} onChange={e => setNewSession({
-                ...newSession,
-                duration: e.target.value
-              })} />
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(newSession.date, "PPP")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={newSession.date}
+                      onSelect={(date) => date && setNewSession({...newSession, date})}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Start Time</Label>
+                  <Input 
+                    type="time" 
+                    value={newSession.start_time} 
+                    onChange={e => setNewSession({...newSession, start_time: e.target.value})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>End Time</Label>
+                  <Input 
+                    type="time" 
+                    value={newSession.end_time} 
+                    onChange={e => setNewSession({...newSession, end_time: e.target.value})} 
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
