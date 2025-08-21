@@ -1163,28 +1163,28 @@ const PokerBankrollApp = () => {
             {/* Timer Section */}
             <Card className="mb-6 glass-card">
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
                     <div className="text-xl font-mono font-bold">
                       {formatTime(currentSessionTime)}
                     </div>
-                     {isActive && <Badge variant="default" className="animate-pulse">
-                        Session Active
-                      </Badge>}
-                   </div>
-                   <div className="flex gap-2">
-                     {!isActive ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700" disabled={sessionLoading}>
-                         <Play className="h-4 w-4 mr-1" />
-                         Start
-                       </Button> : <>
-                         <Button onClick={resetTimer} variant="outline" size="sm" disabled={sessionLoading}>
-                           <Square className="h-4 w-4" />
-                         </Button>
-                         <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700" disabled={sessionLoading}>
-                           <Pause className="h-4 w-4 mr-1" />
-                           End Session
-                         </Button>
-                       </>}
+                    {isActive && <Badge variant="default" className="animate-pulse text-xs">
+                      Active
+                    </Badge>}
+                  </div>
+                  <div className="flex gap-2">
+                    {!isActive ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700 flex-1" disabled={sessionLoading}>
+                        <Play className="h-4 w-4 mr-1" />
+                        Start Session
+                      </Button> : <div className="flex gap-2 w-full">
+                        <Button onClick={resetTimer} variant="outline" size="sm" className="flex-shrink-0" disabled={sessionLoading}>
+                          <Square className="h-4 w-4" />
+                        </Button>
+                        <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700 flex-1" disabled={sessionLoading}>
+                          <Pause className="h-4 w-4 mr-1" />
+                          End Session
+                        </Button>
+                      </div>}
                   </div>
                 </div>
               </CardContent>
