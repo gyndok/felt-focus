@@ -315,7 +315,16 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange, onIm
             Import Sessions from CSV
           </DialogTitle>
           <DialogDescription>
-            Upload your poker session data in CSV format. Expected columns: date, description, buy_in, cash_out, game, type, location, hours, start_time, end_time, notes
+            <div className="space-y-2">
+              <p>Upload your poker session data in CSV format. Your CSV must include these columns in this exact order:</p>
+              <div className="bg-muted p-3 rounded-md text-xs font-mono">
+                <div className="font-semibold mb-1">Required Column Order:</div>
+                <div>Date, Type, Game Type, Stakes, Location, Buy-in ($), Cash-out ($), Profit/Loss ($), Duration (hours), Hourly Rate ($/hr), Notes</div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Alternative column names accepted: buy_in, cash_out, game, hours, description, start_time, end_time
+              </p>
+            </div>
           </DialogDescription>
         </DialogHeader>
 
@@ -326,7 +335,8 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange, onIm
               <Label htmlFor="csv-upload" className="cursor-pointer">
                 <div className="text-lg font-semibold mb-2">Upload your poker sessions CSV</div>
                 <div className="text-sm text-muted-foreground mb-4">
-                  Expected columns: date, description, buy_in, cash_out, game, type, location, hours, start_time, end_time, notes
+                  <div className="font-semibold mb-1">Required format matches your exported CSV:</div>
+                  <div className="font-mono text-xs">Date, Type, Game Type, Stakes, Location, Buy-in ($), Cash-out ($), Profit/Loss ($), Duration (hours), Hourly Rate ($/hr), Notes</div>
                 </div>
                 <Button>Choose CSV File</Button>
               </Label>
