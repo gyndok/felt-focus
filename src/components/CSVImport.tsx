@@ -42,9 +42,10 @@ interface MappedSession {
 interface CSVImportProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onImportComplete?: () => void;
 }
 
-export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) => {
+export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange, onImportComplete }) => {
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [mappedData, setMappedData] = useState<MappedSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -280,6 +281,8 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           title: "Import Complete",
           description: `Successfully imported ${successCount} sessions${errors.length > 0 ? ` with ${errors.length} errors` : ''}`,
         });
+        // Notify parent to refresh sessions list
+        onImportComplete?.();
       } else {
         setImportStatus('error');
         setImportErrors(errors);

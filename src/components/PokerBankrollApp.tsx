@@ -2192,7 +2192,11 @@ const PokerBankrollApp = () => {
           </DialogContent>
         </Dialog>
 
-        <CSVImport isOpen={showCSVImport} onOpenChange={setShowCSVImport} />
+        <CSVImport 
+          isOpen={showCSVImport} 
+          onOpenChange={setShowCSVImport} 
+          onImportComplete={refetchSessions} 
+        />
 
         <FeedbackDialog
           open={feedbackOpen}
