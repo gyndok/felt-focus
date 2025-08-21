@@ -230,17 +230,31 @@ export const useTournaments = () => {
     if (!user) return [];
 
     try {
-      const { data, error } = await supabase
-        .from('tournaments')
-        .select('location')
-        .eq('user_id', user.id)
-        .not('location', 'is', null)
-        .not('location', 'eq', '');
+      // Get locations from both tournaments and poker sessions
+      const [tournamentData, sessionData] = await Promise.all([
+        supabase
+          .from('tournaments')
+          .select('location')
+          .eq('user_id', user.id)
+          .not('location', 'is', null)
+          .not('location', 'eq', ''),
+        supabase
+          .from('poker_sessions')
+          .select('location')
+          .eq('user_id', user.id)
+          .not('location', 'is', null)
+          .not('location', 'eq', '')
+      ]);
 
-      if (error) throw error;
+      if (tournamentData.error) throw tournamentData.error;
+      if (sessionData.error) throw sessionData.error;
 
-      const locations = data?.map(item => item.location).filter(Boolean) || [];
-      return [...new Set(locations)]; // Remove duplicates
+      // Combine locations from both sources
+      const tournamentLocations = tournamentData.data?.map(item => item.location).filter(Boolean) || [];
+      const sessionLocations = sessionData.data?.map(item => item.location).filter(Boolean) || [];
+      const allLocations = [...tournamentLocations, ...sessionLocations];
+      
+      return [...new Set(allLocations)].sort(); // Remove duplicates and sort alphabetically
     } catch (err) {
       console.error('Failed to fetch unique locations:', err);
       return [];
