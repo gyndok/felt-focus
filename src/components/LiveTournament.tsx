@@ -38,7 +38,8 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     endTournament,
     getTournamentUpdates,
     pauseTournament,
-    resumeTournament
+    resumeTournament,
+    getUniqueLocations
   } = useTournaments();
   
   const [showStartDialog, setShowStartDialog] = useState(false);
@@ -84,6 +85,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   });
   const [chipDialogOpen, setChipDialogOpen] = useState(false);
   const [chipUpdateValue, setChipUpdateValue] = useState('');
+  const [tournamentLocations, setTournamentLocations] = useState<string[]>([]);
 
   // Calculate tournament economics
   const economics = useMemo(() => {
@@ -395,6 +397,15 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     }
   }, [activeTournament?.id, getTournamentUpdates]);
 
+  // Load unique tournament locations
+  useEffect(() => {
+    if (user) {
+      getUniqueLocations().then(locations => {
+        setTournamentLocations(locations);
+      }).catch(console.error);
+    }
+  }, [user, getUniqueLocations]);
+
   // Prepare chart data
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
@@ -463,7 +474,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                 <div>
                   <Label htmlFor="location">Location</Label>
                   <div className="space-y-2">
-                    <Select value={newTournament.location === '' ? 'custom' : newTournament.location} onValueChange={value => {
+                     <Select value={newTournament.location === '' ? 'custom' : (tournamentLocations.includes(newTournament.location) ? newTournament.location : 'custom')} onValueChange={value => {
                       if (value === 'custom') {
                         setNewTournament({
                           ...newTournament,
@@ -477,27 +488,19 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                       }
                     }}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select or enter custom..." />
+                        <SelectValue placeholder="Select tournament location" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Aria">Aria (Las Vegas)</SelectItem>
-                        <SelectItem value="Bellagio">Bellagio (Las Vegas)</SelectItem>
-                        <SelectItem value="WSOP">WSOP (Las Vegas)</SelectItem>
-                        <SelectItem value="Venetian">Venetian (Las Vegas)</SelectItem>
-                        <SelectItem value="Orleans">Orleans (Las Vegas)</SelectItem>
-                        <SelectItem value="Borgata">Borgata (Atlantic City)</SelectItem>
-                        <SelectItem value="Commerce">Commerce Casino (LA)</SelectItem>
-                        <SelectItem value="HPT">Hollywood Poker Open</SelectItem>
-                        <SelectItem value="WPT">World Poker Tour</SelectItem>
-                        <SelectItem value="Local Casino">Local Casino</SelectItem>
-                        <SelectItem value="Home Game">Home Game</SelectItem>
-                        <SelectItem value="Online">Online</SelectItem>
-                        <SelectItem value="custom">Enter Custom Location...</SelectItem>
+                      <SelectContent className="bg-background border z-50">
+                        {tournamentLocations.map(location => (
+                          <SelectItem key={location} value={location}>{location}</SelectItem>
+                        ))}
+                        {tournamentLocations.length > 0 && <SelectItem value="custom">Enter Custom Location...</SelectItem>}
+                        {tournamentLocations.length === 0 && <SelectItem value="custom">Enter Location...</SelectItem>}
                       </SelectContent>
                     </Select>
-                    {(newTournament.location === '' || !['Aria', 'Bellagio', 'WSOP', 'Venetian', 'Orleans', 'Borgata', 'Commerce', 'HPT', 'WPT', 'Local Casino', 'Home Game', 'Online'].includes(newTournament.location)) && (
+                    {(newTournament.location === '' || !tournamentLocations.includes(newTournament.location)) && (
                       <Input 
-                        placeholder="Enter custom location (e.g., MGM Grand, Hard Rock, etc.)"
+                        placeholder="Enter tournament location (e.g., Aria, Borgata, WSOP, etc.)"
                         value={newTournament.location}
                         onChange={e => setNewTournament({
                           ...newTournament,

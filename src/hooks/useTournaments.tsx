@@ -226,6 +226,27 @@ export const useTournaments = () => {
     }
   };
 
+  const getUniqueLocations = async () => {
+    if (!user) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('tournaments')
+        .select('location')
+        .eq('user_id', user.id)
+        .not('location', 'is', null)
+        .not('location', 'eq', '');
+
+      if (error) throw error;
+
+      const locations = data?.map(item => item.location).filter(Boolean) || [];
+      return [...new Set(locations)]; // Remove duplicates
+    } catch (err) {
+      console.error('Failed to fetch unique locations:', err);
+      return [];
+    }
+  };
+
   useEffect(() => {
     fetchTournaments();
   }, [user]);
@@ -242,6 +263,7 @@ export const useTournaments = () => {
     getTournamentUpdates,
     pauseTournament,
     resumeTournament,
+    getUniqueLocations,
     refetch: fetchTournaments
   };
 };
