@@ -403,10 +403,13 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       if (user) {
         try {
           const locations = await getUniqueLocations();
+          console.log('Loaded tournament locations:', locations);
           setTournamentLocations(locations);
         } catch (error) {
           console.error('Failed to load locations:', error);
         }
+      } else {
+        setTournamentLocations([]);
       }
     };
     
@@ -481,30 +484,31 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                 <div>
                   <Label htmlFor="location">Location</Label>
                   <div className="space-y-2">
-                     <Select value={newTournament.location === '' ? 'custom' : (tournamentLocations.includes(newTournament.location) ? newTournament.location : 'custom')} onValueChange={value => {
-                      if (value === 'custom') {
-                        setNewTournament({
-                          ...newTournament,
-                          location: ''
-                        });
-                      } else {
-                        setNewTournament({
-                          ...newTournament,
-                          location: value
-                        });
-                      }
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select tournament location" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background border z-50">
-                        {tournamentLocations.map(location => (
-                          <SelectItem key={location} value={location}>{location}</SelectItem>
-                        ))}
-                        {tournamentLocations.length > 0 && <SelectItem value="custom">Enter Custom Location...</SelectItem>}
-                        {tournamentLocations.length === 0 && <SelectItem value="custom">Enter Location...</SelectItem>}
-                      </SelectContent>
-                    </Select>
+                      <Select value={newTournament.location === '' ? 'custom' : (tournamentLocations.includes(newTournament.location) ? newTournament.location : 'custom')} onValueChange={value => {
+                       if (value === 'custom') {
+                         setNewTournament({
+                           ...newTournament,
+                           location: ''
+                         });
+                       } else {
+                         setNewTournament({
+                           ...newTournament,
+                           location: value
+                         });
+                       }
+                     }}>
+                       <SelectTrigger>
+                         <SelectValue placeholder="Select tournament location" />
+                       </SelectTrigger>
+                       <SelectContent className="bg-background border z-50">
+                         {tournamentLocations.length > 0 && tournamentLocations.map(location => (
+                           <SelectItem key={location} value={location}>{location}</SelectItem>
+                         ))}
+                         <SelectItem value="custom">
+                           {tournamentLocations.length > 0 ? 'Enter Custom Location...' : 'Enter Location...'}
+                         </SelectItem>
+                       </SelectContent>
+                     </Select>
                     {(newTournament.location === '' || !tournamentLocations.includes(newTournament.location)) && (
                       <Input 
                         placeholder="Enter tournament location (e.g., Aria, Borgata, WSOP, etc.)"
