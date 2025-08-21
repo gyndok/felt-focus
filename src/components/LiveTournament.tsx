@@ -602,7 +602,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                       className="rounded border-gray-300"
                     />
                     <Label htmlFor="is_day_2" className="text-sm font-medium">
-                      Day 2 Start (use different stack than starting chips)
+                      Restart (use different stack than starting chips)
                     </Label>
                   </div>
                   
