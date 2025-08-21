@@ -237,6 +237,7 @@ const PokerBankrollApp = () => {
         duration: endedSession.calculatedDuration.toString()
       }));
       setShowAddSession(true);
+      setCurrentSessionTime(0); // Reset timer display
     }
   };
 
