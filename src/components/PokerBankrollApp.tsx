@@ -1614,7 +1614,7 @@ const PokerBankrollApp = () => {
 
         {/* Session Detail Dialog */}
         <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto touch-pan-y sm:max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>Session Details</DialogTitle>
             </DialogHeader>
