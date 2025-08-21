@@ -319,7 +319,8 @@ const PokerBankrollApp = () => {
       hourlyRate: totalHours > 0 ? totalProfit / totalHours : 0,
       totalSessions: filteredSessions.length,
       winRate: isNaN(winRate) ? 0 : winRate,
-      totalBankroll: startingBankroll + allSessionsProfit
+      totalBankroll: startingBankroll + allSessionsProfit,
+      roi: totalBuyIn > 0 ? (totalProfit / totalBuyIn) * 100 : 0
     };
   }, [filteredSessions, sessions, startingBankroll]);
 
@@ -1038,7 +1039,7 @@ const PokerBankrollApp = () => {
             {/* Middle Column: Stats & Chart */}
             <div className="lg:col-span-6 space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-4" data-tour="stats-cards">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4" data-tour="stats-cards">
                 <Card className="glass-card">
                   <CardContent className="p-4 text-center">
                     <div className="flex items-center justify-center text-primary mb-2">
@@ -1057,6 +1058,18 @@ const PokerBankrollApp = () => {
                     </div>
                     <div className="text-2xl font-bold">{stats.winRate.toFixed(0)}%</div>
                     <div className="text-sm text-muted-foreground">Win Rate</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-card">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center text-orange-500 mb-2">
+                      <TrendingUp size={20} />
+                    </div>
+                    <div className={`text-2xl font-bold ${stats.roi >= 0 ? 'text-profit' : 'text-loss'}`}>
+                      {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">ROI</div>
                   </CardContent>
                 </Card>
 
@@ -1373,45 +1386,46 @@ const PokerBankrollApp = () => {
           </Card>}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="glass-card">
-            <CardContent className="p-4 text-center">
+            <CardContent className="p-3 text-center">
               <div className="flex items-center justify-center text-primary mb-2">
-                <TrendingUp size={20} />
+                <TrendingUp size={18} />
               </div>
-              <div className="text-2xl font-bold">${stats.hourlyRate.toFixed(0)}</div>
-              <div className="text-sm text-muted-foreground">Hourly Rate</div>
-              <div className="text-xs text-muted-foreground mt-1">{stats.totalHours.toFixed(1)}h total</div>
+              <div className="text-xl font-bold">${stats.hourlyRate.toFixed(0)}</div>
+              <div className="text-xs text-muted-foreground">Hourly Rate</div>
             </CardContent>
           </Card>
 
           <Card className="glass-card">
-            <CardContent className="p-4 text-center">
+            <CardContent className="p-3 text-center">
               <div className="flex items-center justify-center text-profit mb-2">
-                <DollarSign size={20} />
+                <DollarSign size={18} />
               </div>
-              <div className="text-2xl font-bold">{stats.winRate.toFixed(0)}%</div>
-              <div className="text-sm text-muted-foreground">Win Rate</div>
+              <div className="text-xl font-bold">{stats.winRate.toFixed(0)}%</div>
+              <div className="text-xs text-muted-foreground">Win Rate</div>
             </CardContent>
           </Card>
 
           <Card className="glass-card">
-            <CardContent className="p-4 text-center">
+            <CardContent className="p-3 text-center">
+              <div className="flex items-center justify-center text-orange-500 mb-2">
+                <TrendingUp size={18} />
+              </div>
+              <div className={`text-xl font-bold ${stats.roi >= 0 ? 'text-profit' : 'text-loss'}`}>
+                {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
+              </div>
+              <div className="text-xs text-muted-foreground">ROI</div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardContent className="p-3 text-center">
               <div className="flex items-center justify-center text-blue-500 mb-2">
-                <DollarSign size={20} />
+                <DollarSign size={18} />
               </div>
-              <div className="text-2xl font-bold">${stats.totalBuyIn.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Total Buy-In</div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center text-green-500 mb-2">
-                <DollarSign size={20} />
-              </div>
-              <div className="text-2xl font-bold">${stats.totalCashOut.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Total Cash-Out</div>
+              <div className="text-lg font-bold">${stats.totalBuyIn.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Buy-In</div>
             </CardContent>
           </Card>
         </div>
