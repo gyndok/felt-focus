@@ -61,7 +61,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     total_players: '',
     small_blind: '100',
     big_blind: '200',
-    game_type: 'NLH',
+    game_type: 'NLHE',
     percent_paid: '15'
   });
   const [updateData, setUpdateData] = useState({
@@ -187,7 +187,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
         total_players: '',
         small_blind: '100',
         big_blind: '200',
-        game_type: 'NLH',
+        game_type: 'NLHE',
         percent_paid: '15'
       });
       setShowStartDialog(false);
@@ -542,7 +542,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                         <SelectValue placeholder="Select or enter custom..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="NLH">No Limit Hold'em</SelectItem>
+                        <SelectItem value="NLHE">No Limit Hold'em</SelectItem>
                         <SelectItem value="PLO">Pot Limit Omaha</SelectItem>
                         <SelectItem value="PLO5">PLO5 (5-card)</SelectItem>
                         <SelectItem value="STUD">7-Card Stud</SelectItem>
