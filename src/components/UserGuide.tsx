@@ -280,10 +280,19 @@ const UserGuide = () => {
                 <AccordionItem value="csv-import">
                   <AccordionTrigger>How do I import my existing data?</AccordionTrigger>
                   <AccordionContent className="text-xs md:text-sm">
-                    You can import existing poker session data using CSV files. Click the "Import CSV" 
-                    button on the main dashboard. Your CSV should include columns for date, buy-in, 
-                    cash-out, duration, location, stakes, and game type. Download our template for 
-                    the correct format.
+                    <div className="space-y-2">
+                      <p>You can import existing poker session data using CSV files. Click the "Import CSV" 
+                      button on the main dashboard.</p>
+                      
+                      <div className="bg-muted p-2 rounded text-xs">
+                        <div className="font-semibold mb-1">Required CSV Format (exact column order):</div>
+                        <div className="font-mono">Date, Type, Game Type, Stakes, Location, Buy-in ($), Cash-out ($), Profit/Loss ($), Duration (hours), Hourly Rate ($/hr), Notes</div>
+                      </div>
+                      
+                      <p>Alternative column names also work: buy_in, cash_out, game, hours, description, start_time, end_time.</p>
+                      
+                      <p><strong>Tip:</strong> Export your current data first to see the exact format, then use that as a template for importing other data.</p>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
 
