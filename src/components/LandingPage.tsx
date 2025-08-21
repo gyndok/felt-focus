@@ -20,47 +20,52 @@ const LandingPage = () => {
       description: "Visualize your performance with interactive charts and comprehensive statistics"
     },
     {
-      icon: <Clock className="h-6 w-6 text-green-400" />,
+      icon: <TrendingUp className="h-6 w-6 text-green-400" />,
+      title: "ROI Calculations",
+      description: "Automatically calculate return on investment for your sessions and filtered time periods"
+    },
+    {
+      icon: <Clock className="h-6 w-6 text-blue-400" />,
       title: "Session Timer",
       description: "Built-in timer to accurately track session duration and calculate hourly rates"
     },
     {
-      icon: <PieChart className="h-6 w-6 text-blue-400" />,
+      icon: <PieChart className="h-6 w-6 text-green-400" />,
       title: "Hourly Rate Analysis",
       description: "Automatically calculate your hourly win rate across different games and stakes"
     },
     {
-      icon: <Calendar className="h-6 w-6 text-green-400" />,
+      icon: <Calendar className="h-6 w-6 text-blue-400" />,
       title: "Date Range Filtering",
       description: "Filter sessions by custom date ranges to analyze specific time periods"
     },
     {
-      icon: <MapPin className="h-6 w-6 text-blue-400" />,
+      icon: <MapPin className="h-6 w-6 text-green-400" />,
       title: "Location & Game Tracking",
       description: "Track different venues, game types, and stakes for detailed analysis"
     },
     {
-      icon: <Camera className="h-6 w-6 text-green-400" />,
+      icon: <Camera className="h-6 w-6 text-blue-400" />,
       title: "Receipt Photos",
       description: "Attach photos of your receipts or tickets for better record keeping"
     },
     {
-      icon: <FileSpreadsheet className="h-6 w-6 text-blue-400" />,
+      icon: <FileSpreadsheet className="h-6 w-6 text-green-400" />,
       title: "CSV Import/Export",
       description: "Import existing data or export your sessions for external analysis"
     },
     {
-      icon: <Timer className="h-6 w-6 text-green-400" />,
+      icon: <Timer className="h-6 w-6 text-blue-400" />,
       title: "Live Tournaments",
       description: "Track tournament progress in real-time with built-in tournament timer"
     },
     {
-      icon: <Smartphone className="h-6 w-6 text-blue-400" />,
+      icon: <Smartphone className="h-6 w-6 text-green-400" />,
       title: "Desktop, Tablet & Mobile",
       description: "Fully optimized responsive design works seamlessly across all your devices"
     },
     {
-      icon: <KeyRound className="h-6 w-6 text-green-400" />,
+      icon: <KeyRound className="h-6 w-6 text-blue-400" />,
       title: "Two-Factor Authentication",
       description: "Secure your account with 2FA using authenticator apps for enhanced protection"
     }
