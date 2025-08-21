@@ -1391,49 +1391,67 @@ const PokerBankrollApp = () => {
             </CardContent>
           </Card>}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:hidden gap-4 mb-8">
-          <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-primary/10">
-                <TrendingUp size={20} className="text-primary" />
-              </div>
-              <div className="text-2xl font-bold tracking-tight mb-1">${stats.hourlyRate.toFixed(0)}</div>
-              <div className="text-xs font-medium text-muted-foreground">Hourly Rate</div>
-            </CardContent>
-          </Card>
+        {/* Mobile Stats Cards */}
+        <div className="md:hidden mb-8 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-primary/10">
+                  <TrendingUp size={16} className="text-primary" />
+                </div>
+                <div className="text-lg font-bold tracking-tight mb-1">${stats.hourlyRate.toFixed(0)}</div>
+                <div className="text-xs font-medium text-muted-foreground">Hourly Rate</div>
+              </CardContent>
+            </Card>
 
-          <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-emerald-500/10">
-                <DollarSign size={20} className="text-emerald-500" />
-              </div>
-              <div className="text-2xl font-bold tracking-tight mb-1">{stats.winRate.toFixed(0)}%</div>
-              <div className="text-xs font-medium text-muted-foreground">Win Rate</div>
-            </CardContent>
-          </Card>
+            <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-emerald-500/10">
+                  <DollarSign size={16} className="text-emerald-500" />
+                </div>
+                <div className="text-lg font-bold tracking-tight mb-1">{stats.winRate.toFixed(0)}%</div>
+                <div className="text-xs font-medium text-muted-foreground">Win Rate</div>
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-orange-500/10">
-                <TrendingUp size={20} className="text-orange-500" />
-              </div>
-              <div className={`text-2xl font-bold tracking-tight mb-1 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
-              </div>
-              <div className="text-xs font-medium text-muted-foreground">ROI</div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-orange-500/10">
+                  <TrendingUp size={16} className="text-orange-500" />
+                </div>
+                <div className={`text-lg font-bold tracking-tight mb-1 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                  {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
+                </div>
+                <div className="text-xs font-medium text-muted-foreground">ROI</div>
+              </CardContent>
+            </Card>
 
-          <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-blue-500/10">
-                <DollarSign size={20} className="text-blue-500" />
-              </div>
-              <div className="text-xl font-bold tracking-tight mb-1">${stats.totalBuyIn.toLocaleString()}</div>
-              <div className="text-xs font-medium text-muted-foreground">Buy-In</div>
-            </CardContent>
-          </Card>
+            <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-blue-500/10">
+                  <DollarSign size={16} className="text-blue-500" />
+                </div>
+                <div className="text-lg font-bold tracking-tight mb-1">${stats.totalBuyIn.toLocaleString()}</div>
+                <div className="text-xs font-medium text-muted-foreground">Total Buy-In</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="w-1/2">
+              <Card className="glass-card hover:shadow-md transition-all duration-200 border-0 bg-gradient-to-br from-card to-card/80">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-green-500/10">
+                    <DollarSign size={16} className="text-green-500" />
+                  </div>
+                  <div className="text-lg font-bold tracking-tight mb-1">${stats.totalCashOut.toLocaleString()}</div>
+                  <div className="text-xs font-medium text-muted-foreground">Total Cash-Out</div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
 
         {/* Tablet Stats Cards */}
