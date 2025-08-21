@@ -1614,6 +1614,18 @@ const PokerBankrollApp = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 opacity-60 hover:opacity-100 hover:bg-muted"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSession(session);
+                        }}
+                        title="View details"
+                      >
+                        <Eye size={14} />
+                      </Button>
                       {session.receipt_image_url && (
                         <Button
                           variant="ghost"
