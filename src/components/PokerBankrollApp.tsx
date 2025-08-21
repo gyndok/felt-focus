@@ -1715,10 +1715,17 @@ const PokerBankrollApp = () => {
                   </div>
                 </div>
 
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Location</Label>
-                  <p className="text-lg">{selectedSession.location}</p>
-                </div>
+                {selectedSession.type === 'tournament' ? (
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Tournament</Label>
+                    <p className="text-lg">{selectedSession.location}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Location</Label>
+                    <p className="text-lg">{selectedSession.location}</p>
+                  </div>
+                )}
 
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground">Session Notes</Label>
