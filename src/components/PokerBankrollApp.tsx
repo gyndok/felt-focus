@@ -1199,13 +1199,16 @@ const PokerBankrollApp = () => {
                        <CardContent className="p-3">
                          <div className="flex items-start justify-between gap-3">
                            <div className="space-y-2 flex-1 cursor-pointer" onClick={() => setSelectedSession(session)}>
-                             <div className="font-semibold flex items-center gap-2 text-sm">
-                               {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
-                               <Badge variant="outline" className="text-xs">
-                                 {session.type.toUpperCase()}
-                               </Badge>
-                             </div>
-                             <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <div className="font-semibold flex items-center gap-2 text-sm">
+                                {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
+                                <Badge variant="outline" className="text-xs">
+                                  {session.type.toUpperCase()}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {new Date(session.date).toLocaleDateString()}
+                              </div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-1">
                                <MapPin size={10} />
                                {session.location}
                              </div>
