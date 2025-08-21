@@ -129,16 +129,43 @@ const TermsOfService = ({ onAccept, userEmail }: TermsOfServiceProps) => {
                   <li>Verifying all calculations and statistics independently</li>
                 </ul>
 
-                <h4 className="text-white font-semibold">4. Data and Privacy</h4>
-                <p>We collect and store only essential information:</p>
+                <h4 className="text-white font-semibold">4. Data Privacy and Protection</h4>
+                <p><strong>Our Privacy Commitment:</strong></p>
                 <ul className="list-disc pl-6">
-                  <li>Your email address for authentication</li>
-                  <li>Poker session data you voluntarily input</li>
-                  <li>Basic usage analytics to improve the Service</li>
+                  <li><strong>We cannot and will not share your data</strong> with any third parties for any purpose</li>
+                  <li>No data selling, renting, or marketing use - ever</li>
+                  <li>Poker session tracking is legal personal finance management</li>
+                  <li>Your data is treated as private financial records</li>
                 </ul>
-                <p>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p>
+                
+                <p><strong>Data We Collect (Minimal):</strong></p>
+                <ul className="list-disc pl-6">
+                  <li>Your email address for authentication only</li>
+                  <li>Poker session data you voluntarily input</li>
+                  <li>No IP logging, session tracking, or behavioral analytics</li>
+                  <li>No third-party integrations that could access your data</li>
+                </ul>
 
-                <h4 className="text-white font-semibold">5. Disclaimers</h4>
+                <h4 className="text-white font-semibold">5. Your Data Control Rights</h4>
+                <p>You maintain complete control over your data:</p>
+                <ul className="list-disc pl-6">
+                  <li><strong>Full Data Export:</strong> Download all your data in CSV format anytime</li>
+                  <li><strong>Complete Account Deletion:</strong> Permanently delete your account and all data with one click</li>
+                  <li><strong>No Data Lock-in:</strong> Your data remains yours and portable</li>
+                  <li><strong>Regular Backups Recommended:</strong> We encourage you to export your data regularly</li>
+                </ul>
+
+                <h4 className="text-white font-semibold">6. Technical Transparency</h4>
+                <p>We believe in transparency about how your data is handled:</p>
+                <ul className="list-disc pl-6">
+                  <li><strong>Hosting:</strong> Data is hosted securely using Supabase cloud infrastructure</li>
+                  <li><strong>Data Retention:</strong> Data is kept only as long as your account is active</li>
+                  <li><strong>Government Requests:</strong> We will not cooperate with data requests unless legally required by valid court order</li>
+                  <li><strong>Security:</strong> Industry-standard encryption and access controls</li>
+                  <li><strong>No Analytics:</strong> We do not track user behavior or usage patterns</li>
+                </ul>
+
+                <h4 className="text-white font-semibold">7. Disclaimers</h4>
                 <p><strong>Important Disclaimers:</strong></p>
                 <ul className="list-disc pl-6">
                   <li><strong>Tracking Tool Only:</strong> This Service is solely for tracking poker sessions. It does not facilitate gambling or gaming.</li>
@@ -147,13 +174,13 @@ const TermsOfService = ({ onAccept, userEmail }: TermsOfServiceProps) => {
                   <li><strong>Use At Your Own Risk:</strong> The Service is provided "as is" without warranties of any kind.</li>
                 </ul>
 
-                <h4 className="text-white font-semibold">6. Limitation of Liability</h4>
+                <h4 className="text-white font-semibold">8. Limitation of Liability</h4>
                 <p>To the maximum extent permitted by law, Felt Focus and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or other intangible losses resulting from your use of the Service.</p>
 
-                <h4 className="text-white font-semibold">7. Service Availability</h4>
+                <h4 className="text-white font-semibold">9. Service Availability</h4>
                 <p>We provide this Service on a best-effort basis. We do not guarantee uninterrupted access and may modify or discontinue the Service at any time.</p>
 
-                <h4 className="text-white font-semibold">8. Prohibited Uses</h4>
+                <h4 className="text-white font-semibold">10. Prohibited Uses</h4>
                 <p>You may not use the Service to:</p>
                 <ul className="list-disc pl-6">
                   <li>Violate any applicable laws or regulations</li>
@@ -162,19 +189,19 @@ const TermsOfService = ({ onAccept, userEmail }: TermsOfServiceProps) => {
                   <li>Use automated tools to access the Service</li>
                 </ul>
 
-                <h4 className="text-white font-semibold">9. Account Termination</h4>
+                <h4 className="text-white font-semibold">11. Account Termination</h4>
                 <p>We reserve the right to terminate accounts that violate these terms. You may delete your account at any time through the application settings.</p>
 
-                <h4 className="text-white font-semibold">10. Changes to Terms</h4>
+                <h4 className="text-white font-semibold">12. Changes to Terms</h4>
                 <p>We may update these terms from time to time. Continued use of the Service after changes constitutes acceptance of the new terms.</p>
 
-                <h4 className="text-white font-semibold">11. Legal Compliance</h4>
+                <h4 className="text-white font-semibold">13. Legal Compliance</h4>
                 <p>Users are responsible for ensuring their use of poker tracking complies with local gambling and taxation laws in their jurisdiction.</p>
 
-                <h4 className="text-white font-semibold">12. Contact Information</h4>
+                <h4 className="text-white font-semibold">14. Contact Information</h4>
                 <p>For questions about these terms, please contact us through the application's feedback system.</p>
 
-                <h4 className="text-white font-semibold">13. Governing Law</h4>
+                <h4 className="text-white font-semibold">15. Governing Law</h4>
                 <p>These terms are governed by applicable laws without regard to conflict of law principles.</p>
               </div>
             </ScrollArea>
