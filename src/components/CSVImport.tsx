@@ -24,6 +24,7 @@ interface CSVRow {
   start_time: string;
   end_time: string;
   notes?: string;
+  stakes?: string;
 }
 
 interface MappedSession {
@@ -98,16 +99,21 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'buyin': 'buy_in',
           'buy-in': 'buy_in',
           'buy_in': 'buy_in',
+          'buy-in ($)': 'buy_in',
           'cash out': 'cash_out',
           'cashout': 'cash_out',
           'cash-out': 'cash_out',
           'cash_out': 'cash_out',
+          'cash-out ($)': 'cash_out',
           'game': 'game',
+          'game type': 'game',
           'cash vs tournament': 'type',
           'type': 'type',
           'location': 'location',
           'locations': 'location',
           'hours': 'hours',
+          'duration': 'hours',
+          'duration (hours)': 'hours',
           'start time': 'start_time',
           'starttime': 'start_time',
           'start-time': 'start_time',
@@ -116,7 +122,8 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           'endtime': 'end_time',
           'end-time': 'end_time',
           'end_time': 'end_time',
-          'notes': 'notes'
+          'notes': 'notes',
+          'stakes': 'stakes'
         };
         
         const mappedField = fieldMap[header.toLowerCase().trim()] || header;
@@ -155,11 +162,12 @@ export const CSVImport: React.FC<CSVImportProps> = ({ isOpen, onOpenChange }) =>
           }
         }
 
-        // Extract game type and stakes from description
+        // Extract game type and stakes from description or direct fields
         let game_type = row.game || 'NLHE';
-        let stakes = '';
+        let stakes = row.stakes || '';
         
-        if (row.description) {
+        // If no direct stakes field, try to extract from description
+        if (!stakes && row.description) {
           // Try to extract stakes from description (e.g., "$600", "100k", "1/3")
           const stakeMatch = row.description.match(/\$?(\d+[kmKM]?|\d+\/\d+)/);
           if (stakeMatch) {
