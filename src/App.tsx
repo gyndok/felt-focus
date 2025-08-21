@@ -51,11 +51,11 @@ const AppContent = () => {
       />
       <Route 
         path="/app" 
-        element={user && tosAccepted ? <Index /> : <Navigate to="/auth" replace />} 
+        element={user && tosAccepted === true ? <Index /> : <Navigate to={user ? "/" : "/auth"} replace />} 
       />
       <Route 
         path="/auth" 
-        element={!user ? <Auth /> : <Navigate to="/app" replace />} 
+        element={!user ? <Auth /> : <Navigate to={tosAccepted === true ? "/app" : "/"} replace />} 
       />
       <Route 
         path="/guide" 
