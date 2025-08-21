@@ -1648,10 +1648,14 @@ const PokerBankrollApp = () => {
                   <p className="text-lg">{selectedSession.location}</p>
                 </div>
 
-                {selectedSession.notes && <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Description</Label>
-                    <p className="text-sm bg-muted p-3 rounded-md mt-1">{selectedSession.notes}</p>
-                  </div>}
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">Session Notes</Label>
+                  {selectedSession.notes ? (
+                    <p className="text-sm bg-muted p-3 rounded-md mt-1 border-l-4 border-primary">{selectedSession.notes}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic mt-1">No notes for this session</p>
+                  )}
+                </div>
 
                 {selectedSession.receipt_image_url && (
                   <div>
