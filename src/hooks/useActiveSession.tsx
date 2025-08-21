@@ -59,12 +59,12 @@ export const useActiveSession = (userId: string | undefined) => {
           user_id: userId,
           is_active: true,
           started_at: new Date().toISOString(),
-          // Set placeholder values for required fields
+          // Set default values for required fields
           date: new Date().toISOString().split('T')[0],
-          location: 'TBD',
-          stakes: 'TBD',
-          game_type: 'TBD',
-          type: 'TBD',
+          location: 'Live Session',
+          stakes: '1/2',
+          game_type: 'NLHE',
+          type: 'cash', // Use valid type value
           buy_in: 0,
           cash_out: 0,
           duration: 0
