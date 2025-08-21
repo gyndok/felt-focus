@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePokerSessions, type PokerSession } from '@/hooks/usePokerSessions';
 import { useTournaments } from '@/hooks/useTournaments';
+import { useActiveSession } from '@/hooks/useActiveSession';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -174,9 +175,8 @@ const PokerBankrollApp = () => {
     }
   };
 
-  // Timer state
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+  // Active session management
+  const { activeSession, loading: sessionLoading, startSession, endSession, cancelSession, getCurrentSessionTime, isActive } = useActiveSession(user?.id);
   const [currentSessionTime, setCurrentSessionTime] = useState(0);
   const [filters, setFilters] = useState({
     type: 'all',
@@ -211,38 +211,37 @@ const PokerBankrollApp = () => {
     receipt_image_url: null as string | null
   });
 
-  // Timer effect
+  // Timer effect for active sessions
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isTimerRunning && timerStartTime) {
+    if (isActive) {
       interval = setInterval(() => {
-        setCurrentSessionTime(Math.floor((Date.now() - timerStartTime) / 1000));
+        setCurrentSessionTime(getCurrentSessionTime());
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isTimerRunning, timerStartTime]);
-  const startTimer = () => {
-    setTimerStartTime(Date.now());
-    setIsTimerRunning(true);
-    setCurrentSessionTime(0);
+  }, [isActive, getCurrentSessionTime]);
+
+  const startTimer = async () => {
+    const session = await startSession();
+    if (session) {
+      setCurrentSessionTime(0);
+    }
   };
-  const stopTimer = () => {
-    if (timerStartTime) {
-      const totalSeconds = Math.floor((Date.now() - timerStartTime) / 1000);
-      const hours = (totalSeconds / 3600).toFixed(1);
+
+  const stopTimer = async () => {
+    const endedSession = await endSession();
+    if (endedSession) {
       setNewSession(prev => ({
         ...prev,
-        duration: hours
+        duration: endedSession.calculatedDuration.toString()
       }));
       setShowAddSession(true);
     }
-    setIsTimerRunning(false);
-    setTimerStartTime(null);
-    setCurrentSessionTime(0);
   };
-  const resetTimer = () => {
-    setIsTimerRunning(false);
-    setTimerStartTime(null);
+
+  const resetTimer = async () => {
+    await cancelSession();
     setCurrentSessionTime(0);
   };
   const formatTime = (seconds: number) => {
@@ -847,22 +846,22 @@ const PokerBankrollApp = () => {
                     <div className="text-2xl font-mono font-bold">
                       {formatTime(currentSessionTime)}
                     </div>
-                    {isTimerRunning && <Badge variant="default" className="animate-pulse">
+                     {isActive && <Badge variant="default" className="animate-pulse">
                         Session Active
                       </Badge>}
-                    <div className="flex gap-2 justify-center">
-                      {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
-                          <Play className="h-4 w-4 mr-1" />
-                          Start
-                        </Button> : <>
-                          <Button onClick={resetTimer} variant="outline" size="sm">
-                            <Square className="h-4 w-4" />
-                          </Button>
-                          <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
-                            <Pause className="h-4 w-4 mr-1" />
-                            End Session
-                          </Button>
-                        </>}
+                     <div className="flex gap-2 justify-center">
+                       {!isActive ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700" disabled={sessionLoading}>
+                           <Play className="h-4 w-4 mr-1" />
+                           Start
+                         </Button> : <>
+                           <Button onClick={resetTimer} variant="outline" size="sm" disabled={sessionLoading}>
+                             <Square className="h-4 w-4" />
+                           </Button>
+                           <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700" disabled={sessionLoading}>
+                             <Pause className="h-4 w-4 mr-1" />
+                             End Session
+                           </Button>
+                         </>}
                     </div>
                   </div>
                 </CardContent>
@@ -1168,23 +1167,23 @@ const PokerBankrollApp = () => {
                     <div className="text-xl font-mono font-bold">
                       {formatTime(currentSessionTime)}
                     </div>
-                    {isTimerRunning && <Badge variant="default" className="animate-pulse">
+                     {isActive && <Badge variant="default" className="animate-pulse">
                         Session Active
                       </Badge>}
-                  </div>
-                  <div className="flex gap-2">
-                    {!isTimerRunning ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700">
-                        <Play className="h-4 w-4 mr-1" />
-                        Start
-                      </Button> : <>
-                        <Button onClick={resetTimer} variant="outline" size="sm">
-                          <Square className="h-4 w-4" />
-                        </Button>
-                        <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700">
-                          <Pause className="h-4 w-4 mr-1" />
-                          End Session
-                        </Button>
-                      </>}
+                   </div>
+                   <div className="flex gap-2">
+                     {!isActive ? <Button onClick={startTimer} size="sm" className="bg-green-600 hover:bg-green-700" disabled={sessionLoading}>
+                         <Play className="h-4 w-4 mr-1" />
+                         Start
+                       </Button> : <>
+                         <Button onClick={resetTimer} variant="outline" size="sm" disabled={sessionLoading}>
+                           <Square className="h-4 w-4" />
+                         </Button>
+                         <Button onClick={stopTimer} size="sm" className="bg-red-600 hover:bg-red-700" disabled={sessionLoading}>
+                           <Pause className="h-4 w-4 mr-1" />
+                           End Session
+                         </Button>
+                       </>}
                   </div>
                 </div>
               </CardContent>
