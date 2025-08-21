@@ -240,10 +240,22 @@ const PokerBankrollApp = () => {
 
   const stopTimer = async () => {
     const endedSession = await endSession();
-    if (endedSession) {
+    if (endedSession && activeSession) {
+      // Calculate start and end times from the session timestamps
+      const startTime = new Date(activeSession.started_at);
+      const endTime = new Date();
+      
+      // Format times for time inputs (HH:MM format)
+      const startTimeString = startTime.toTimeString().slice(0, 5);
+      const endTimeString = endTime.toTimeString().slice(0, 5);
+      
+      setUseTimeRange(true); // Use time range mode when auto-populating from timed session
       setNewSession(prev => ({
         ...prev,
-        duration: endedSession.calculatedDuration.toString()
+        start_time: startTimeString,
+        end_time: endTimeString,
+        duration: endedSession.calculatedDuration.toString(),
+        date: new Date(activeSession.started_at) // Use the date when session was started
       }));
       setShowAddSession(true);
       setCurrentSessionTime(0); // Reset timer display
