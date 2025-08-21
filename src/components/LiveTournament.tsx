@@ -447,7 +447,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                 Start New Tournament
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto touch-pan-y sm:max-h-[90vh]">
               <DialogHeader>
                 <DialogTitle>Start Tournament</DialogTitle>
               </DialogHeader>
