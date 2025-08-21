@@ -209,6 +209,9 @@ const PokerBankrollApp = () => {
     location: '',
     buy_in: '',
     cash_out: '',
+    date: new Date(),
+    start_time: '',
+    end_time: '',
     duration: '',
     notes: '',
     receipt_image_url: null as string | null
@@ -385,13 +388,26 @@ const PokerBankrollApp = () => {
 
   // Handle edit session
   const handleEditSession = async () => {
-    if (!editSession || !editSessionData.stakes || !editSessionData.location || !editSessionData.buy_in || !editSessionData.cash_out) {
+    if (!editSession || !editSessionData.stakes || !editSessionData.location || !editSessionData.buy_in || !editSessionData.cash_out || !editSessionData.start_time || !editSessionData.end_time) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields including start and end time",
         variant: "destructive"
       });
       return;
+    }
+
+    // Calculate duration from start and end times
+    let calculatedDuration = 0;
+    if (editSessionData.start_time && editSessionData.end_time) {
+      const startTime = new Date(`2000-01-01 ${editSessionData.start_time}`);
+      const endTime = new Date(`2000-01-01 ${editSessionData.end_time}`);
+      calculatedDuration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60); // Convert to hours
+      
+      // Handle overnight sessions
+      if (calculatedDuration < 0) {
+        calculatedDuration += 24;
+      }
     }
 
     try {
@@ -402,7 +418,11 @@ const PokerBankrollApp = () => {
         location: editSessionData.location,
         buy_in: parseFloat(editSessionData.buy_in),
         cash_out: parseFloat(editSessionData.cash_out),
-        duration: parseFloat(editSessionData.duration) || 0,
+        date: format(editSessionData.date, 'yyyy-MM-dd'),
+        start_time: editSessionData.start_time,
+        end_time: editSessionData.end_time,
+        duration: calculatedDuration,
+        notes: editSessionData.notes,
         receipt_image_url: editSessionData.receipt_image_url
       });
 
@@ -448,6 +468,9 @@ const PokerBankrollApp = () => {
       location: session.location,
       buy_in: session.buy_in.toString(),
       cash_out: session.cash_out.toString(),
+      date: session.date ? new Date(session.date) : new Date(),
+      start_time: (session as any).start_time || '',
+      end_time: (session as any).end_time || '',
       duration: session.duration.toString(),
       notes: session.notes || '',
       receipt_image_url: session.receipt_image_url || null
@@ -1948,14 +1971,46 @@ const PokerBankrollApp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Duration (hours)</Label>
-                <Input 
-                  type="number" 
-                  step="0.5" 
-                  placeholder="4.5" 
-                  value={editSessionData.duration} 
-                  onChange={e => setEditSessionData({...editSessionData, duration: e.target.value})} 
-                />
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(editSessionData.date, "PPP")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editSessionData.date}
+                      onSelect={(date) => date && setEditSessionData({...editSessionData, date})}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Start Time</Label>
+                  <Input 
+                    type="time" 
+                    value={editSessionData.start_time} 
+                    onChange={e => setEditSessionData({...editSessionData, start_time: e.target.value})} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>End Time</Label>
+                  <Input 
+                    type="time" 
+                    value={editSessionData.end_time} 
+                    onChange={e => setEditSessionData({...editSessionData, end_time: e.target.value})} 
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

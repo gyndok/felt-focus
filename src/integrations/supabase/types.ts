@@ -57,6 +57,7 @@ export type Database = {
           created_at: string
           date: string
           duration: number
+          end_time: string | null
           game_type: string
           id: string
           is_active: boolean | null
@@ -64,6 +65,7 @@ export type Database = {
           notes: string | null
           receipt_image_url: string | null
           stakes: string
+          start_time: string | null
           started_at: string | null
           type: string
           updated_at: string
@@ -75,6 +77,7 @@ export type Database = {
           created_at?: string
           date?: string
           duration: number
+          end_time?: string | null
           game_type: string
           id?: string
           is_active?: boolean | null
@@ -82,6 +85,7 @@ export type Database = {
           notes?: string | null
           receipt_image_url?: string | null
           stakes: string
+          start_time?: string | null
           started_at?: string | null
           type: string
           updated_at?: string
@@ -93,6 +97,7 @@ export type Database = {
           created_at?: string
           date?: string
           duration?: number
+          end_time?: string | null
           game_type?: string
           id?: string
           is_active?: boolean | null
@@ -100,6 +105,7 @@ export type Database = {
           notes?: string | null
           receipt_image_url?: string | null
           stakes?: string
+          start_time?: string | null
           started_at?: string | null
           type?: string
           updated_at?: string
