@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
+import { useActiveTournament } from '@/hooks/useActiveTournament';
 
 interface LiveTournamentProps {
   onSessionAdded?: () => void;
@@ -86,6 +87,9 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   const [chipDialogOpen, setChipDialogOpen] = useState(false);
   const [chipUpdateValue, setChipUpdateValue] = useState('');
   const [tournamentLocations, setTournamentLocations] = useState<string[]>([]);
+
+  // Tournament timer
+  const { currentTime, formattedTime, formattedDuration, isRunning } = useActiveTournament(activeTournament);
 
   // Calculate tournament economics
   const economics = useMemo(() => {
@@ -720,6 +724,21 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
             {activeTournament.location && (
               <div className="text-sm opacity-90 mb-3">@ {activeTournament.location}</div>
             )}
+            
+            {/* Tournament Timer */}
+            <div className="mb-4 space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="w-4 h-4" />
+                <div className="text-lg font-mono font-bold">{formattedTime}</div>
+                {isRunning && (
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                )}
+              </div>
+              <div className="text-xs opacity-75">
+                Tournament Duration: {formattedDuration}
+                {activeTournament.is_paused && " (Paused)"}
+              </div>
+            </div>
             <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="p-4 h-auto hover:bg-white/10">
