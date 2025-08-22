@@ -726,19 +726,23 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
             )}
             
             {/* Tournament Timer */}
-            <div className="mb-4 space-y-2">
-              <div className="flex items-center justify-center gap-2">
-                <Clock className="w-4 h-4" />
-                <div className="text-lg font-mono font-bold">{formattedTime}</div>
-                {isRunning && (
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                )}
-              </div>
-              <div className="text-xs opacity-75">
-                Tournament Duration: {formattedDuration}
-                {activeTournament.is_paused && " (Paused)"}
-              </div>
-            </div>
+            <Card className="mb-4 bg-white/10 border-white/20 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="space-y-2 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    <div className="text-xl font-mono font-bold tracking-wider">{formattedTime}</div>
+                    {isRunning && (
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    )}
+                  </div>
+                  <div className="text-sm opacity-80">
+                    Tournament Duration: {formattedDuration}
+                    {activeTournament.is_paused && " (Paused)"}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="ghost" className="p-4 h-auto hover:bg-white/10">
