@@ -36,6 +36,7 @@ export const useActiveTournament = (tournament: Tournament | null) => {
         }, 1000);
       }
     } else {
+      // Reset to 0 when tournament is not active or null
       setCurrentTime(0);
     }
 
