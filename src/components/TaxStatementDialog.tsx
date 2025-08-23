@@ -93,15 +93,6 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
     const totalCashOuts = yearSessions.reduce((sum, s) => sum + s.cash_out, 0);
     const netProfit = totalCashOuts - totalBuyIns;
 
-    // Validate required fields
-    if (!playerName.trim()) {
-      toast({
-        title: "Error",
-        description: "Player name is required",
-        variant: "destructive"
-      });
-      return;
-    }
 
     downloadPokerTaxStatement({
       playerName: playerName.trim(),
@@ -178,33 +169,33 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="player-name">Player Name</Label>
+            <Label htmlFor="player-name">Player Name (optional)</Label>
             <Input
               id="player-name"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Enter your full name"
+              placeholder="Enter your full name (optional)"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="player-ssn">SSN (Last 4 digits)</Label>
+            <Label htmlFor="player-ssn">SSN (optional)</Label>
             <Input
               id="player-ssn"
               value={playerSSN}
               onChange={(e) => setPlayerSSN(e.target.value)}
-              placeholder="XXX-XX-1234"
+              placeholder="XXX-XX-1234 (optional)"
               maxLength={11}
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="player-address">Address</Label>
+            <Label htmlFor="player-address">Address (optional)</Label>
             <textarea
               id="player-address"
               value={playerAddress}
               onChange={(e) => setPlayerAddress(e.target.value)}
-              placeholder="Street Address&#10;City, State ZIP"
+              placeholder="Street Address&#10;City, State ZIP (optional)"
               rows={3}
               className="w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
