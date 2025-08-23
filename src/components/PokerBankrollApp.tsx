@@ -863,16 +863,6 @@ const PokerBankrollApp = () => {
                   </div>
                 );
               })()}
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-sm opacity-90">Total Bankroll</span>
-                <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-1 h-auto">
-                  {showBankroll ? <Eye size={16} /> : <EyeOff size={16} />}
-                </Button>
-              </div>
-              
-              <div className={`text-sm ${stats.totalProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()} Total P/L` : '••••••'}
-              </div>
             </div>
           )}
         </div>
