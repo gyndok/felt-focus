@@ -18,7 +18,7 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
   const [playerName, setPlayerName] = useState('Geffrey H. Klein, MD');
   const [playerSSN, setPlayerSSN] = useState('XXX-XX-1234');
   const [playerAddress, setPlayerAddress] = useState('');
-  const [taxYear, setTaxYear] = useState(new Date().getFullYear());
+  const [taxYear, setTaxYear] = useState(2025);
   const { toast } = useToast();
 
   const handleGeneratePDF = () => {
@@ -39,14 +39,8 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
         sessionYear = new Date(sessionDate).getFullYear();
       }
       
-      // Debug logging
-      console.log('Session date:', session.date, 'Parsed year:', sessionYear, 'Target year:', taxYear);
-      
       return sessionYear === taxYear;
     });
-
-    console.log(`Filtered ${yearSessions.length} sessions for year ${taxYear}`);
-    console.log('Session dates in filtered set:', yearSessions.map(s => s.date));
 
     if (yearSessions.length === 0) {
       toast({

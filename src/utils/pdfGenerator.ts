@@ -116,11 +116,18 @@ export const generatePokerTaxStatement = (options: PDFGenerationOptions) => {
   // All sessions sorted by date ascending, grouped by month
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  const sortedSessions = [...sessions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const sortedSessions = [...sessions].sort((a, b) => {
+    // Use consistent date parsing for sorting
+    const dateA = new Date(a.date + 'T00:00:00');
+    const dateB = new Date(b.date + 'T00:00:00');
+    return dateA.getTime() - dateB.getTime();
+  });
   
-  // Group sessions by month
+  // Group sessions by month using consistent date parsing
   const sessionsByMonth = sortedSessions.reduce((acc, session) => {
-    const monthKey = format(new Date(session.date), 'yyyy-MM');
+    // Parse date consistently to avoid timezone issues
+    const sessionDate = new Date(session.date + 'T00:00:00');
+    const monthKey = format(sessionDate, 'yyyy-MM');
     if (!acc[monthKey]) {
       acc[monthKey] = [];
     }
@@ -151,7 +158,7 @@ export const generatePokerTaxStatement = (options: PDFGenerationOptions) => {
 
     // Month label
     pdf.setFont('helvetica', 'bold');
-    pdf.text(format(new Date(monthKey + '-01'), 'MMMM yyyy'), margin, yPosition);
+    pdf.text(format(new Date(monthKey + '-01T00:00:00'), 'MMMM yyyy'), margin, yPosition);
     yPosition += 8;
     pdf.setFont('helvetica', 'normal');
 
@@ -183,7 +190,7 @@ export const generatePokerTaxStatement = (options: PDFGenerationOptions) => {
       
       xPos = margin;
       const rowData = [
-        format(new Date(session.date), 'MM/dd/yy'),
+        format(new Date(session.date + 'T00:00:00'), 'MM/dd/yy'),
         (session.location || 'N/A').substring(0, 10),
         session.type === 'cash' ? 'Cash' : 'Tourn',
         `${session.game_type} ${session.stakes}`.substring(0, 9),
