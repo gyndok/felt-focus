@@ -924,7 +924,7 @@ const PokerBankrollApp = () => {
                 </Button>
               </div>
               
-              <div className={`text-4xl font-bold mb-2 ${stats.totalBankroll > startingBankroll ? 'text-profit' : stats.totalBankroll < startingBankroll ? 'text-loss' : 'text-foreground'}`}>
+              <div className="text-4xl font-bold mb-2 text-profit">
                 {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••••••••'}
               </div>
               
