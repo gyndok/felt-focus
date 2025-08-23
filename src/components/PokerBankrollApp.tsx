@@ -924,7 +924,7 @@ const PokerBankrollApp = () => {
                 </Button>
               </div>
               
-              <div className={`text-4xl font-bold mb-2 ${stats.totalBankroll > startingBankroll ? 'text-emerald-600 dark:text-emerald-400' : stats.totalBankroll < startingBankroll ? 'text-red-600 dark:text-red-400' : 'text-foreground'}`}>
+              <div className={`text-4xl font-bold mb-2 ${stats.totalBankroll > startingBankroll ? 'text-profit' : stats.totalBankroll < startingBankroll ? 'text-loss' : 'text-foreground'}`}>
                 {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••••••••'}
               </div>
               
@@ -932,7 +932,7 @@ const PokerBankrollApp = () => {
               {filteredSessions.length !== sessions.length && (
                 <div className="mt-6 pt-4 border-t border-muted/30">
                   <div className="text-sm font-medium text-muted-foreground mb-2">Filtered Period P/L</div>
-                  <div className={`text-2xl font-semibold ${stats.totalProfit > 0 ? 'text-emerald-600 dark:text-emerald-400' : stats.totalProfit < 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
+                  <div className={`text-2xl font-semibold ${stats.totalProfit > 0 ? 'text-profit' : stats.totalProfit < 0 ? 'text-loss' : 'text-muted-foreground'}`}>
                     {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '••••••••'}
                   </div>
                 </div>
@@ -1047,7 +1047,7 @@ const PokerBankrollApp = () => {
                       <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10">
                         <TrendingUp size={24} className="text-primary" />
                       </div>
-                      <div className="text-3xl font-bold tracking-tight mb-2">${stats.hourlyRate.toFixed(0)}</div>
+                      <div className={`text-3xl font-bold tracking-tight mb-2 ${stats.hourlyRate >= 0 ? 'text-profit' : 'text-loss'}`}>${stats.hourlyRate.toFixed(0)}</div>
                       <div className="text-sm font-medium text-muted-foreground mb-1">Hourly Rate</div>
                       <div className="text-xs text-muted-foreground/80">{stats.totalHours.toFixed(1)}h total</div>
                     </CardContent>
@@ -1068,7 +1068,7 @@ const PokerBankrollApp = () => {
                       <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-orange-500/10">
                         <TrendingUp size={24} className="text-orange-500" />
                       </div>
-                      <div className={`text-3xl font-bold tracking-tight mb-2 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                      <div className={`text-3xl font-bold tracking-tight mb-2 ${stats.roi >= 0 ? 'text-profit' : 'text-loss'}`}>
                         {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
                       </div>
                       <div className="text-sm font-medium text-muted-foreground">ROI</div>
@@ -1399,7 +1399,7 @@ const PokerBankrollApp = () => {
                 <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-primary/10">
                   <TrendingUp size={16} className="text-primary" />
                 </div>
-                <div className="text-lg font-bold tracking-tight mb-1">${stats.hourlyRate.toFixed(0)}</div>
+                <div className={`text-lg font-bold tracking-tight mb-1 ${stats.hourlyRate >= 0 ? 'text-profit' : 'text-loss'}`}>${stats.hourlyRate.toFixed(0)}</div>
                 <div className="text-xs font-medium text-muted-foreground">Hourly Rate</div>
               </CardContent>
             </Card>
@@ -1421,7 +1421,7 @@ const PokerBankrollApp = () => {
                 <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 rounded-full bg-orange-500/10">
                   <TrendingUp size={16} className="text-orange-500" />
                 </div>
-                <div className={`text-lg font-bold tracking-tight mb-1 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                <div className={`text-lg font-bold tracking-tight mb-1 ${stats.roi >= 0 ? 'text-profit' : 'text-loss'}`}>
                   {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
                 </div>
                 <div className="text-xs font-medium text-muted-foreground">ROI</div>
@@ -1462,7 +1462,7 @@ const PokerBankrollApp = () => {
                 <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-primary/10">
                   <TrendingUp size={20} className="text-primary" />
                 </div>
-                <div className="text-2xl font-bold tracking-tight mb-1">${stats.hourlyRate.toFixed(0)}</div>
+                <div className={`text-2xl font-bold tracking-tight mb-1 ${stats.hourlyRate >= 0 ? 'text-profit' : 'text-loss'}`}>${stats.hourlyRate.toFixed(0)}</div>
                 <div className="text-xs font-medium text-muted-foreground mb-1">Hourly Rate</div>
                 <div className="text-xs text-muted-foreground/80">{stats.totalHours.toFixed(1)}h total</div>
               </CardContent>
@@ -1483,7 +1483,7 @@ const PokerBankrollApp = () => {
                 <div className="flex items-center justify-center w-10 h-10 mx-auto mb-3 rounded-full bg-orange-500/10">
                   <TrendingUp size={20} className="text-orange-500" />
                 </div>
-                <div className={`text-2xl font-bold tracking-tight mb-1 ${stats.roi >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                <div className={`text-2xl font-bold tracking-tight mb-1 ${stats.roi >= 0 ? 'text-profit' : 'text-loss'}`}>
                   {stats.roi >= 0 ? '+' : ''}{stats.roi.toFixed(1)}%
                 </div>
                 <div className="text-xs font-medium text-muted-foreground">ROI</div>
