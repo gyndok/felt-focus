@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,39 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
   const [playerAddress, setPlayerAddress] = useState('');
   const [taxYear, setTaxYear] = useState(2025);
   const { toast } = useToast();
+
+  // Calculate available years from sessions data
+  const availableYears = useMemo(() => {
+    const years = sessions.map(session => {
+      const sessionDate = session.date;
+      if (typeof sessionDate === 'string' && sessionDate.includes('-')) {
+        return parseInt(sessionDate.split('-')[0]);
+      } else {
+        return new Date(sessionDate).getFullYear();
+      }
+    });
+    
+    const uniqueYears = [...new Set(years)].sort((a, b) => b - a); // Sort descending (newest first)
+    return uniqueYears;
+  }, [sessions]);
+
+  // Get session counts by year
+  const sessionCounts = useMemo(() => {
+    return availableYears.reduce((acc, year) => {
+      const count = sessions.filter(session => {
+        const sessionDate = session.date;
+        let sessionYear: number;
+        if (typeof sessionDate === 'string' && sessionDate.includes('-')) {
+          sessionYear = parseInt(sessionDate.split('-')[0]);
+        } else {
+          sessionYear = new Date(sessionDate).getFullYear();
+        }
+        return sessionYear === year;
+      }).length;
+      acc[year] = count;
+      return acc;
+    }, {} as Record<number, number>);
+  }, [sessions, availableYears]);
 
   const handleGeneratePDF = () => {
     // Filter sessions for the selected tax year with robust date handling
@@ -115,8 +148,33 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
               onChange={(e) => setTaxYear(parseInt(e.target.value) || new Date().getFullYear())}
               min="2020"
               max={new Date().getFullYear()}
-              placeholder="2024"
+              placeholder="2025"
             />
+            
+            {availableYears.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Available years with data:</p>
+                <div className="flex flex-wrap gap-2">
+                  {availableYears.map(year => (
+                    <Button
+                      key={year}
+                      variant={taxYear === year ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTaxYear(year)}
+                      className="h-8 text-xs"
+                    >
+                      {year} ({sessionCounts[year]} sessions)
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {availableYears.length === 0 && (
+              <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950 p-2 rounded">
+                No poker sessions found in database
+              </p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -164,10 +222,17 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
               }
               return sessionYear === taxYear;
             }).length} sessions found for {taxYear}</p>
+            {!availableYears.includes(taxYear) && availableYears.length > 0 && (
+              <p className="text-amber-600 mt-1">⚠️ No data available for {taxYear}</p>
+            )}
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button onClick={handleGeneratePDF} className="flex-1">
+            <Button 
+              onClick={handleGeneratePDF} 
+              className="flex-1"
+              disabled={!availableYears.includes(taxYear)}
+            >
               Generate PDF
             </Button>
             <Button variant="outline" onClick={() => setIsOpen(false)}>
