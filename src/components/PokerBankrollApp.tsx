@@ -1172,28 +1172,28 @@ const PokerBankrollApp = () => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="end">
-                        <div className="flex">
-                          <div className="p-3">
-                            <div className="text-sm font-medium mb-2">From</div>
-                             <Calendar
-                               mode="single"
-                               selected={filters.startDate}
-                               onSelect={(date) => setFilters(prev => ({ ...prev, startDate: date }))}
-                               className="pointer-events-auto"
-                             />
-                           </div>
-                           <div className="p-3 border-l">
-                             <div className="text-sm font-medium mb-2">To</div>
-                             <Calendar
-                               mode="single"
-                               selected={filters.endDate}
-                               onSelect={(date) => setFilters(prev => ({ ...prev, endDate: date }))}
-                               disabled={(date) => filters.startDate ? date < filters.startDate : false}
-                               className="pointer-events-auto"
-                             />
-                           </div>
-                         </div>
+                       <PopoverContent className="w-auto p-0 max-w-[95vw]" align="center" side="bottom" sideOffset={4}>
+                         <div className="flex flex-col sm:flex-row">
+                           <div className="p-3">
+                             <div className="text-sm font-medium mb-2">From</div>
+                              <Calendar
+                                mode="single"
+                                selected={filters.startDate}
+                                onSelect={(date) => setFilters(prev => ({ ...prev, startDate: date }))}
+                                className="pointer-events-auto"
+                              />
+                            </div>
+                            <div className="p-3 border-t sm:border-t-0 sm:border-l">
+                              <div className="text-sm font-medium mb-2">To</div>
+                              <Calendar
+                                mode="single"
+                                selected={filters.endDate}
+                                onSelect={(date) => setFilters(prev => ({ ...prev, endDate: date }))}
+                                disabled={(date) => filters.startDate ? date < filters.startDate : false}
+                                className="pointer-events-auto"
+                              />
+                            </div>
+                          </div>
                          <div className="p-3 border-t">
                            <Button
                              variant="outline"
@@ -1584,28 +1584,28 @@ const PokerBankrollApp = () => {
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <div className="flex">
-                    <div className="p-3">
-                      <div className="text-sm font-medium mb-2">From</div>
-                       <Calendar
-                         mode="single"
-                         selected={filters.startDate}
-                         onSelect={(date) => setFilters(prev => ({ ...prev, startDate: date }))}
-                         className="pointer-events-auto"
-                       />
-                     </div>
-                     <div className="p-3 border-l">
-                       <div className="text-sm font-medium mb-2">To</div>
-                       <Calendar
-                         mode="single"
-                         selected={filters.endDate}
-                         onSelect={(date) => setFilters(prev => ({ ...prev, endDate: date }))}
-                         disabled={(date) => filters.startDate ? date < filters.startDate : false}
-                         className="pointer-events-auto"
-                       />
-                     </div>
-                   </div>
+                 <PopoverContent className="w-auto p-0 max-w-[95vw]" align="center" side="bottom" sideOffset={4}>
+                   <div className="flex flex-col sm:flex-row">
+                     <div className="p-3">
+                       <div className="text-sm font-medium mb-2">From</div>
+                        <Calendar
+                          mode="single"
+                          selected={filters.startDate}
+                          onSelect={(date) => setFilters(prev => ({ ...prev, startDate: date }))}
+                          className="pointer-events-auto"
+                        />
+                      </div>
+                      <div className="p-3 border-t sm:border-t-0 sm:border-l">
+                        <div className="text-sm font-medium mb-2">To</div>
+                        <Calendar
+                          mode="single"
+                          selected={filters.endDate}
+                          onSelect={(date) => setFilters(prev => ({ ...prev, endDate: date }))}
+                          disabled={(date) => filters.startDate ? date < filters.startDate : false}
+                          className="pointer-events-auto"
+                        />
+                      </div>
+                    </div>
                    <div className="p-3 border-t">
                      <Button
                        variant="outline"
