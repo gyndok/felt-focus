@@ -1391,6 +1391,32 @@ const PokerBankrollApp = () => {
             </CardContent>
           </Card>}
 
+        {/* Mobile: Bankroll Header */}
+        {activeTab === 'dashboard' && (
+          <div className="md:hidden text-center py-6 mb-6">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="text-lg font-medium text-foreground">Total Bankroll</span>
+              <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-2 hover:bg-muted/50">
+                {showBankroll ? <Eye size={18} /> : <EyeOff size={18} />}
+              </Button>
+            </div>
+            
+            <div className="text-3xl font-bold mb-2 text-profit">
+              {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••••••••'}
+            </div>
+            
+            {/* Show filtered P/L if different from total */}
+            {filteredSessions.length !== sessions.length && (
+              <div className="mt-4 pt-4 border-t border-muted/30">
+                <div className="text-sm font-medium text-muted-foreground mb-2">Filtered Period P/L</div>
+                <div className={`text-xl font-semibold ${stats.totalProfit > 0 ? 'text-profit' : stats.totalProfit < 0 ? 'text-loss' : 'text-muted-foreground'}`}>
+                  {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '••••••••'}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Mobile Stats Cards */}
         <div className="md:hidden mb-8 space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -1453,6 +1479,32 @@ const PokerBankrollApp = () => {
             </div>
           </div>
         </div>
+
+        {/* Tablet: Bankroll Header */}
+        {activeTab === 'dashboard' && (
+          <div className="hidden md:block lg:hidden text-center py-6 mb-6">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="text-lg font-medium text-foreground">Total Bankroll</span>
+              <Button variant="ghost" size="sm" onClick={() => setShowBankroll(!showBankroll)} className="p-2 hover:bg-muted/50">
+                {showBankroll ? <Eye size={18} /> : <EyeOff size={18} />}
+              </Button>
+            </div>
+            
+            <div className="text-4xl font-bold mb-2 text-profit">
+              {showBankroll ? `$${stats.totalBankroll.toLocaleString()}` : '••••••••••••'}
+            </div>
+            
+            {/* Show filtered P/L if different from total */}
+            {filteredSessions.length !== sessions.length && (
+              <div className="mt-6 pt-4 border-t border-muted/30">
+                <div className="text-sm font-medium text-muted-foreground mb-2">Filtered Period P/L</div>
+                <div className={`text-2xl font-semibold ${stats.totalProfit > 0 ? 'text-profit' : stats.totalProfit < 0 ? 'text-loss' : 'text-muted-foreground'}`}>
+                  {showBankroll ? `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toLocaleString()}` : '••••••••'}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Tablet Stats Cards */}
         <div className="hidden md:block lg:hidden mb-8">
