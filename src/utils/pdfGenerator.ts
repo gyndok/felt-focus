@@ -113,16 +113,31 @@ export const generatePokerTaxStatement = (options: PDFGenerationOptions) => {
   
   yPosition += 10;
 
-  // All sessions sorted by date ascending
+  // All sessions sorted by date ascending, grouped by month
+  pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
   const sortedSessions = [...sessions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
-  sortedSessions.forEach((session) => {
-    if (yPosition > 250) { // New page if needed
+  // Group sessions by month
+  const sessionsByMonth = sortedSessions.reduce((acc, session) => {
+    const monthKey = format(new Date(session.date), 'yyyy-MM');
+    if (!acc[monthKey]) {
+      acc[monthKey] = [];
+    }
+    acc[monthKey].push(session);
+    return acc;
+  }, {} as Record<string, typeof sortedSessions>);
+
+  let totalRowCount = 0;
+
+  Object.entries(sessionsByMonth).forEach(([monthKey, monthSessions]) => {
+    // Month header
+    if (yPosition > 240) {
       pdf.addPage();
       yPosition = 30;
       
       // Redraw headers on new page
+      pdf.setFontSize(10);
       pdf.setFont('helvetica', 'bold');
       xPos = margin;
       headers.forEach((header, i) => {
@@ -130,48 +145,118 @@ export const generatePokerTaxStatement = (options: PDFGenerationOptions) => {
         xPos += colWidths[i];
       });
       pdf.line(margin, yPosition + 2, pageWidth - margin, yPosition + 2);
-      yPosition += 10;
-      pdf.setFont('helvetica', 'normal');
+      yPosition += 12;
+      pdf.setFontSize(9);
     }
+
+    // Month label
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(format(new Date(monthKey + '-01'), 'MMMM yyyy'), margin, yPosition);
+    yPosition += 8;
+    pdf.setFont('helvetica', 'normal');
+
+    // Month sessions with alternating row shading
+    monthSessions.forEach((session, index) => {
+      if (yPosition > 265) {
+        pdf.addPage();
+        yPosition = 30;
+        
+        // Redraw headers on new page
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        xPos = margin;
+        headers.forEach((header, i) => {
+          pdf.text(header, xPos, yPosition);
+          xPos += colWidths[i];
+        });
+        pdf.line(margin, yPosition + 2, pageWidth - margin, yPosition + 2);
+        yPosition += 12;
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+      }
+
+      // Alternating row background
+      if ((totalRowCount + index) % 2 === 1) {
+        pdf.setFillColor(245, 245, 245); // Light gray
+        pdf.rect(margin - 2, yPosition - 6, pageWidth - 2 * margin + 4, 7, 'F');
+      }
+      
+      xPos = margin;
+      const rowData = [
+        format(new Date(session.date), 'MM/dd/yy'),
+        (session.location || 'N/A').substring(0, 10),
+        session.type === 'cash' ? 'Cash' : 'Tourn',
+        `${session.game_type} ${session.stakes}`.substring(0, 9),
+        `$${session.buy_in.toLocaleString()}`,
+        `$${session.cash_out.toLocaleString()}`,
+        `${(session.cash_out - session.buy_in) >= 0 ? '+' : ''}$${(session.cash_out - session.buy_in).toLocaleString()}`,
+        (session.notes || '').substring(0, 12)
+      ];
+      
+      pdf.setTextColor(0, 0, 0); // Reset text color
+      rowData.forEach((data, i) => {
+        pdf.text(data, xPos, yPosition);
+        xPos += colWidths[i];
+      });
+      
+      yPosition += 7;
+    });
+
+    // Month subtotal
+    const monthBuyIns = monthSessions.reduce((sum, s) => sum + s.buy_in, 0);
+    const monthCashOuts = monthSessions.reduce((sum, s) => sum + s.cash_out, 0);
+    const monthNet = monthCashOuts - monthBuyIns;
+
+    yPosition += 2;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFillColor(220, 220, 220); // Darker gray for subtotal
+    pdf.rect(margin - 2, yPosition - 6, pageWidth - 2 * margin + 4, 7, 'F');
     
     xPos = margin;
-    const rowData = [
-      format(new Date(session.date), 'MM/dd/yy'),
-      (session.location || 'N/A').substring(0, 12),
-      session.type === 'cash' ? 'Cash' : 'Tournament',
-      `${session.game_type} ${session.stakes}`.substring(0, 11),
-      `$${session.buy_in.toLocaleString()}`,
-      `$${session.cash_out.toLocaleString()}`,
-      `${(session.cash_out - session.buy_in) >= 0 ? '+' : ''}$${(session.cash_out - session.buy_in).toLocaleString()}`,
-      (session.notes || '').substring(0, 15)
+    const subtotalData = [
+      'Subtotal:',
+      '',
+      '',
+      '',
+      `$${monthBuyIns.toLocaleString()}`,
+      `$${monthCashOuts.toLocaleString()}`,
+      `${monthNet >= 0 ? '+' : ''}$${monthNet.toLocaleString()}`,
+      ''
     ];
     
-    rowData.forEach((data, i) => {
+    subtotalData.forEach((data, i) => {
       pdf.text(data, xPos, yPosition);
       xPos += colWidths[i];
     });
     
-    yPosition += 8;
+    yPosition += 12;
+    pdf.setFont('helvetica', 'normal');
+    totalRowCount += monthSessions.length;
   });
 
-  // Totals row
+  // Grand totals row
   yPosition += 5;
   pdf.line(margin, yPosition, pageWidth - margin, yPosition);
   yPosition += 8;
   
+  pdf.setFontSize(10);
   pdf.setFont('helvetica', 'bold');
+  pdf.setFillColor(200, 200, 200); // Even darker gray for grand total
+  pdf.rect(margin - 2, yPosition - 6, pageWidth - 2 * margin + 4, 8, 'F');
+  
   xPos = margin;
   const totalsData = [
-    'TOTALS:',
+    'GRAND TOTAL:',
     '',
     '',
     '',
     `$${totalBuyIns.toLocaleString()}`,
-    `$${totalWinnings.toLocaleString()}`,
+    `$${(totalBuyIns + netProfit).toLocaleString()}`,
     `${netProfit >= 0 ? '+' : ''}$${netProfit.toLocaleString()}`,
     ''
   ];
   
+  pdf.setTextColor(0, 0, 0);
   totalsData.forEach((data, i) => {
     pdf.text(data, xPos, yPosition);
     xPos += colWidths[i];
