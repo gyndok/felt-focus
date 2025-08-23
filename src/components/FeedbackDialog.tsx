@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Bug, Lightbulb, Send } from 'lucide-react';
+import { Bug, Lightbulb, Send, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -119,6 +119,30 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
               onChange={(e) => setMessage(e.target.value)}
               className="min-h-[100px]"
             />
+          </div>
+          
+          <div className="flex items-center gap-2 my-4">
+            <div className="flex-1 border-t border-border"></div>
+            <span className="text-xs text-muted-foreground px-2">OR</span>
+            <div className="flex-1 border-t border-border"></div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Reach out on X</Label>
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                window.open('https://x.com/feltfocus', '_blank');
+                onOpenChange(false);
+              }}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Message @feltfocus on X
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              You can also send us feedback directly on X (Twitter)
+            </p>
           </div>
         </div>
         
