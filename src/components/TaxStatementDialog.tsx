@@ -22,11 +22,31 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
   const { toast } = useToast();
 
   const handleGeneratePDF = () => {
-    // Filter sessions for the selected tax year
+    // Filter sessions for the selected tax year with robust date handling
     const yearSessions = sessions.filter(session => {
-      const sessionYear = new Date(session.date).getFullYear();
+      // Handle date string parsing more reliably
+      const sessionDate = session.date;
+      let sessionYear: number;
+      
+      if (typeof sessionDate === 'string') {
+        // If it's a date string like "2024-12-01", extract year directly
+        if (sessionDate.includes('-')) {
+          sessionYear = parseInt(sessionDate.split('-')[0]);
+        } else {
+          sessionYear = new Date(sessionDate).getFullYear();
+        }
+      } else {
+        sessionYear = new Date(sessionDate).getFullYear();
+      }
+      
+      // Debug logging
+      console.log('Session date:', session.date, 'Parsed year:', sessionYear, 'Target year:', taxYear);
+      
       return sessionYear === taxYear;
     });
+
+    console.log(`Filtered ${yearSessions.length} sessions for year ${taxYear}`);
+    console.log('Session dates in filtered set:', yearSessions.map(s => s.date));
 
     if (yearSessions.length === 0) {
       toast({
@@ -140,7 +160,16 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
 
           <div className="text-sm text-muted-foreground bg-muted p-3 rounded">
             <p className="font-medium">Preview:</p>
-            <p>{sessions.filter(s => new Date(s.date).getFullYear() === taxYear).length} sessions found for {taxYear}</p>
+            <p>{sessions.filter(s => {
+              const sessionDate = s.date;
+              let sessionYear: number;
+              if (typeof sessionDate === 'string' && sessionDate.includes('-')) {
+                sessionYear = parseInt(sessionDate.split('-')[0]);
+              } else {
+                sessionYear = new Date(sessionDate).getFullYear();
+              }
+              return sessionYear === taxYear;
+            }).length} sessions found for {taxYear}</p>
           </div>
 
           <div className="flex gap-2 pt-4">
