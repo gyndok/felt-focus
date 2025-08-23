@@ -31,6 +31,7 @@ import { FeedbackReview } from './FeedbackReview';
 import TwoFactorSetup from './TwoFactorSetup';
 import { AccountDeletion } from './AccountDeletion';
 import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
+import { downloadPokerTaxStatement } from '@/utils/pdfGenerator';
 
 const PokerBankrollApp = () => {
   const {
@@ -615,6 +616,32 @@ const PokerBankrollApp = () => {
     });
   };
 
+  // Generate tax statement PDF
+  const generateTaxStatementPDF = (sessions: PokerSession[]) => {
+    const totalWinnings = sessions
+      .filter(s => (s.cash_out - s.buy_in) > 0)
+      .reduce((sum, s) => sum + s.cash_out, 0);
+    
+    const totalBuyIns = sessions.reduce((sum, s) => sum + s.buy_in, 0);
+    const totalCashOuts = sessions.reduce((sum, s) => sum + s.cash_out, 0);
+    const netProfit = totalCashOuts - totalBuyIns;
+
+    downloadPokerTaxStatement({
+      playerName: "Geffrey H. Klein, MD",
+      playerSSN: "XXX-XX-1234",
+      sessions,
+      totalWinnings,
+      totalBuyIns,
+      netProfit,
+      taxYear: 2024
+    });
+
+    toast({
+      title: "Success",
+      description: "Tax statement PDF generated and downloaded"
+    });
+  };
+
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
@@ -1136,14 +1163,25 @@ const PokerBankrollApp = () => {
                     <Badge variant="secondary">{filteredSessions.length}</Badge>
                   </div>
                   
-                  <div className="flex flex-col gap-2">
+                   <div className="flex flex-col gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => exportSessionsToCSV(filteredSessions)}
                       className="h-8"
                     >
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
                       Export CSV
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => generateTaxStatementPDF(filteredSessions)}
+                      className="h-8"
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      Tax PDF
                     </Button>
                     
                     <Popover>
@@ -1607,7 +1645,18 @@ const PokerBankrollApp = () => {
                 onClick={() => exportSessionsToCSV(filteredSessions)}
                 className="h-8 flex-shrink-0"
               >
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
                 Export CSV
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateTaxStatementPDF(filteredSessions)}
+                className="h-8 flex-shrink-0"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Tax PDF
               </Button>
               
               <Popover>
