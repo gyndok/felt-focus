@@ -17,6 +17,7 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
   const [isOpen, setIsOpen] = useState(false);
   const [playerName, setPlayerName] = useState('Geffrey H. Klein, MD');
   const [playerSSN, setPlayerSSN] = useState('XXX-XX-1234');
+  const [playerAddress, setPlayerAddress] = useState('');
   const [taxYear, setTaxYear] = useState(new Date().getFullYear());
   const { toast } = useToast();
 
@@ -58,6 +59,7 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
     downloadPokerTaxStatement({
       playerName: playerName.trim(),
       playerSSN: playerSSN.trim(),
+      playerAddress: playerAddress.trim(),
       sessions: yearSessions,
       totalWinnings,
       totalBuyIns,
@@ -121,6 +123,18 @@ export const TaxStatementDialog = ({ sessions, className }: TaxStatementDialogPr
               onChange={(e) => setPlayerSSN(e.target.value)}
               placeholder="XXX-XX-1234"
               maxLength={11}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="player-address">Address</Label>
+            <textarea
+              id="player-address"
+              value={playerAddress}
+              onChange={(e) => setPlayerAddress(e.target.value)}
+              placeholder="Street Address&#10;City, State ZIP"
+              rows={3}
+              className="w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
 
