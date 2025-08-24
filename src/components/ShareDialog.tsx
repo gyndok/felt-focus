@@ -17,7 +17,7 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const { toast } = useToast();
   
-  const appUrl = window.location.origin;
+  const appUrl = "https://feltfocus.com";
   const shareText = "Check out Felt Focus - an awesome poker bankroll tracking app!";
 
   useEffect(() => {
