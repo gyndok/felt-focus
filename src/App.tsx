@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +17,13 @@ import TermsOfService from "./components/TermsOfService";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
+
+// Twitter conversion tracking
+declare global {
+  interface Window {
+    twq: any;
+  }
+}
 
 const AppContent = () => {
   const { user, loading: authLoading } = useAuth();
@@ -74,18 +81,38 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    // Initialize Twitter tracking queue if not already present
+    if (!window.twq) {
+      window.twq = function(a: string, b?: string, c?: any) {
+        window.twq.queue = window.twq.queue || [];
+        window.twq.queue.push(arguments);
+      };
+    }
+
+    // Fire Twitter conversion event on page load
+    try {
+      window.twq('event', 'tw-qdy1n-qdy5y', {});
+      console.log('Twitter conversion event fired');
+    } catch (error) {
+      console.error('Error firing Twitter conversion event:', error);
+    }
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
