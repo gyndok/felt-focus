@@ -18,7 +18,7 @@ import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
-// Twitter conversion tracking
+// Twitter conversion tracking base code
 declare global {
   interface Window {
     twq: any;
@@ -83,20 +83,17 @@ const AppContent = () => {
 
 const App = () => {
   useEffect(() => {
-    // Initialize Twitter tracking queue if not already present
+    // Twitter conversion tracking base code
     if (!window.twq) {
-      window.twq = function(a: string, b?: string, c?: any) {
-        window.twq.queue = window.twq.queue || [];
-        window.twq.queue.push(arguments);
-      };
-    }
-
-    // Fire Twitter conversion event on page load
-    try {
-      window.twq('event', 'tw-qdy1n-qdy5y', {});
-      console.log('Twitter conversion event fired');
-    } catch (error) {
-      console.error('Error firing Twitter conversion event:', error);
+      (function(e: any, t: any, n: any) {
+        let s: any, u: any, a: any;
+        e.twq || (s = e.twq = function() {
+          s.exe ? s.exe.apply(s, arguments) : s.queue.push(arguments);
+        }, s.version = '1.1', s.queue = [], u = t.createElement(n), u.async = !0, u.src = 'https://static.ads-twitter.com/uwt.js',
+        a = t.getElementsByTagName(n)[0], a.parentNode.insertBefore(u, a));
+      })(window, document, 'script');
+      window.twq('config', 'qdy1n');
+      console.log('Twitter base tracking code loaded');
     }
   }, []);
 
