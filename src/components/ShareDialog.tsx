@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Share, Copy, Mail, MessageSquare } from 'lucide-react';
+import { Share, Copy, Mail, MessageSquare, QrCode } from 'lucide-react';
+import QRCode from 'qrcode';
 
 interface ShareDialogProps {
   open: boolean;
@@ -13,10 +14,33 @@ interface ShareDialogProps {
 
 export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
   const [email, setEmail] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
   const { toast } = useToast();
   
   const appUrl = window.location.origin;
   const shareText = "Check out Felt Focus - an awesome poker bankroll tracking app!";
+
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const qrDataUrl = await QRCode.toDataURL(appUrl, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        });
+        setQrCodeUrl(qrDataUrl);
+      } catch (error) {
+        console.error('Error generating QR code:', error);
+      }
+    };
+
+    if (open) {
+      generateQRCode();
+    }
+  }, [appUrl, open]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -107,6 +131,25 @@ export function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
               </Button>
             </div>
           </div>
+          
+          {qrCodeUrl && (
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <QrCode className="h-4 w-4" />
+                QR Code
+              </Label>
+              <div className="flex justify-center p-4 bg-white rounded-lg border">
+                <img 
+                  src={qrCodeUrl} 
+                  alt="QR Code for app URL" 
+                  className="w-32 h-32"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Scan to share the app instantly
+              </p>
+            </div>
+          )}
           
           <div className="space-y-3">
             <Label>Quick Share</Label>
