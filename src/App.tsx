@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +17,13 @@ import TermsOfService from "./components/TermsOfService";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
+
+// Twitter conversion tracking
+declare global {
+  interface Window {
+    twq: any;
+  }
+}
 
 const AppContent = () => {
   const { user, loading: authLoading } = useAuth();
@@ -74,18 +81,56 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    // Fire Twitter conversion event on page load
+    const fireConversionEvent = () => {
+      if (window.twq) {
+        try {
+          window.twq('event', 'tw-qdy1n-qdy5y', {
+            value: null,
+            currency: null,
+            contents: [
+              {
+                content_type: null,
+                content_id: null,
+                content_name: null,
+                content_price: null,
+                num_items: null,
+                content_group_id: null
+              }
+            ],
+            conversion_id: null,
+            email_address: null,
+            phone_number: null
+          });
+          console.log('Twitter conversion event fired');
+        } catch (error) {
+          console.error('Error firing Twitter conversion event:', error);
+        }
+      } else {
+        // Retry after a short delay if twq is not ready yet
+        setTimeout(fireConversionEvent, 100);
+      }
+    };
+
+    // Fire the event after a brief delay to ensure Twitter pixel is loaded
+    setTimeout(fireConversionEvent, 500);
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
