@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,13 +17,6 @@ import TermsOfService from "./components/TermsOfService";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
-
-// Twitter conversion tracking base code
-declare global {
-  interface Window {
-    twq: any;
-  }
-}
 
 const AppContent = () => {
   const { user, loading: authLoading } = useAuth();
@@ -81,35 +74,18 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
-  useEffect(() => {
-    // Twitter conversion tracking base code
-    if (!window.twq) {
-      (function(e: any, t: any, n: any) {
-        let s: any, u: any, a: any;
-        e.twq || (s = e.twq = function() {
-          s.exe ? s.exe.apply(s, arguments) : s.queue.push(arguments);
-        }, s.version = '1.1', s.queue = [], u = t.createElement(n), u.async = !0, u.src = 'https://static.ads-twitter.com/uwt.js',
-        a = t.getElementsByTagName(n)[0], a.parentNode.insertBefore(u, a));
-      })(window, document, 'script');
-      window.twq('config', 'qdy1n');
-      console.log('Twitter base tracking code loaded');
-    }
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;
