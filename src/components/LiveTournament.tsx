@@ -715,49 +715,50 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       </div>;
   }
   return <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="gradient-casino text-white p-6 sticky top-0 z-10">
-        <div className="max-w-md mx-auto text-center">
-          <div className="mb-4">
-            <div className="text-sm opacity-80 mb-1">Tournament</div>
-            <h1 className="text-2xl font-bold mb-2">{activeTournament.name}</h1>
+      {/* Compact Mobile Header */}
+      <div className="gradient-casino text-white p-3 sticky top-0 z-10">
+        <div className="max-w-md mx-auto">
+          {/* Tournament Name & Location */}
+          <div className="text-center mb-3">
+            <h1 className="text-lg font-bold truncate">{activeTournament.name}</h1>
             {activeTournament.location && (
-              <div className="text-sm opacity-90 mb-3">@ {activeTournament.location}</div>
+              <div className="text-xs opacity-80 truncate">@ {activeTournament.location}</div>
             )}
-            
-            {/* Tournament Timer */}
-            <Card className="mb-4 bg-white/10 border-white/20 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="space-y-2 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <Clock className="w-5 h-5" />
-                    <div className="text-xl font-mono font-bold tracking-wider">{formattedTime}</div>
-                    {isRunning && (
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    )}
-                  </div>
-                  <div className="text-sm opacity-80">
-                    Tournament Duration: {formattedDuration}
-                    {activeTournament.is_paused && " (Paused)"}
-                  </div>
+          </div>
+          
+          {/* Compact Timer & Chips Row */}
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            {/* Timer */}
+            <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
+              <CardContent className="p-2">
+                <div className="flex items-center justify-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <div className="text-sm font-mono font-bold">{formattedTime}</div>
+                  {isRunning && (
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                  )}
+                </div>
+                <div className="text-xs opacity-70 text-center truncate">
+                  {formattedDuration}{activeTournament.is_paused && " (Paused)"}
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Chips */}
             <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="ghost" className="p-4 h-auto hover:bg-white/10">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">
-                      {activeTournament.current_chips.toLocaleString()} chips
+                <Card className="bg-white/10 border-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/15 transition-colors">
+                  <CardContent className="p-2">
+                    <div className="text-center">
+                      <div className="text-sm font-bold truncate">
+                        {activeTournament.current_chips.toLocaleString()}
+                      </div>
+                      <div className="text-xs opacity-80 truncate">
+                        {activeTournament.bb_stack?.toFixed(1)} BB
+                      </div>
                     </div>
-                    <div className="text-sm opacity-90">
-                      {activeTournament.bb_stack?.toFixed(1)} Big Blinds
-                    </div>
-                    <div className="text-xs opacity-70 mt-1">
-                      Click to update
-                    </div>
-                  </div>
-                </Button>
+                  </CardContent>
+                </Card>
               </DialogTrigger>
               <DialogContent className="bg-background/95 backdrop-blur-md border border-white/20">
                 <DialogHeader>
@@ -814,16 +815,20 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
               </DialogContent>
             </Dialog>
           </div>
-          {activeTournament.is_paused && (
-            <Badge className="bg-orange-500">
-              Tournament Paused
-            </Badge>
-          )}
-          {!activeTournament.is_paused && (
-            <Badge className={`${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
-              {stackHealth === 'healthy' ? 'Healthy Stack' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
-            </Badge>
-          )}
+          
+          {/* Status Badge - Compact */}
+          <div className="flex justify-center">
+            {activeTournament.is_paused && (
+              <Badge className="bg-orange-500 text-xs px-2 py-0.5">
+                Paused
+              </Badge>
+            )}
+            {!activeTournament.is_paused && (
+              <Badge className={`text-xs px-2 py-0.5 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
+                {stackHealth === 'healthy' ? 'Healthy' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
