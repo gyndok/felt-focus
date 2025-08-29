@@ -717,22 +717,32 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       </div>;
   }
   return <div className="min-h-screen bg-background">
-      {/* Simplified Header */}
-      <div className="gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-[5]">
-        <div className="max-w-md mx-auto">
-          <div className="text-center">
-            <h1 className="text-lg font-bold truncate">{activeTournament.name}</h1>
-            {activeTournament.location && (
-              <div className="text-xs opacity-80 truncate">@ {activeTournament.location}</div>
-            )}
+      {/* Simplified Header - Desktop Only */}
+      {!isMobile && (
+        <div className="gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-[5]">
+          <div className="max-w-md mx-auto">
+            <div className="text-center">
+              <h1 className="text-lg font-bold truncate">{activeTournament.name}</h1>
+              {activeTournament.location && (
+                <div className="text-xs opacity-80 truncate">@ {activeTournament.location}</div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="max-w-md mx-auto px-4 pb-20 space-y-6" style={{ paddingTop: isMobile ? '80px' : '120px' }}>
-        {/* Mobile Timer, Chips & Status */}
+      <div className="max-w-md mx-auto px-4 pb-20 space-y-6" style={{ paddingTop: isMobile ? '20px' : '120px' }}>
+        {/* Mobile Tournament Info, Timer, Chips & Status */}
         {isMobile && (
           <div className="space-y-4">
+            {/* Tournament Name & Location */}
+            <div className="text-center space-y-1">
+              <h1 className="text-xl font-bold">{activeTournament.name}</h1>
+              {activeTournament.location && (
+                <div className="text-sm text-muted-foreground">@ {activeTournament.location}</div>
+              )}
+            </div>
+            
             {/* Timer & Chips Row */}
             <div className="grid grid-cols-2 gap-4">
               {/* Timer */}
