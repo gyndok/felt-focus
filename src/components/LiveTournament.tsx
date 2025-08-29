@@ -742,7 +742,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   }
   return <div className="min-h-screen bg-background">
       {/* Compact Mobile Header */}
-      <div className={`gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-5 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className={`gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-0 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-md mx-auto">
           {/* Tournament Name & Location */}
           <div className="text-center mb-3">
