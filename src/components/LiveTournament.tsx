@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
 import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -87,6 +87,8 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   const [chipDialogOpen, setChipDialogOpen] = useState(false);
   const [chipUpdateValue, setChipUpdateValue] = useState('');
   const [tournamentLocations, setTournamentLocations] = useState<string[]>([]);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   // Tournament timer
   const { currentTime, formattedTime, formattedDuration, isRunning } = useActiveTournament(activeTournament);
@@ -420,6 +422,29 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     loadLocations();
   }, [user, getUniqueLocations]);
 
+  // Header auto-hide on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < 10) {
+        // Always show header at top
+        setHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
+        // Hide header when scrolling down
+        setHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY.current) {
+        // Show header when scrolling up
+        setHeaderVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Prepare chart data
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
@@ -716,7 +741,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   }
   return <div className="min-h-screen bg-background">
       {/* Compact Mobile Header */}
-      <div className="gradient-casino text-white p-3 sticky top-0 z-10">
+      <div className={`gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-10 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-md mx-auto">
           {/* Tournament Name & Location */}
           <div className="text-center mb-3">
@@ -832,7 +857,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 pb-20 space-y-6">
+      <div className="max-w-md mx-auto px-4 pb-20 space-y-6" style={{ paddingTop: '120px' }}>
         {/* Tournament Economics */}
         {economics && (
           <div className="space-y-4">
