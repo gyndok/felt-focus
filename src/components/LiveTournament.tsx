@@ -428,14 +428,14 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       const currentScrollY = window.scrollY;
       const scrollDifference = currentScrollY - lastScrollY.current;
       
-      if (currentScrollY < 20) {
-        // Always show header near top
+      if (currentScrollY < 50) {
+        // Always show header when near top
         setHeaderVisible(true);
-      } else if (scrollDifference > 5) {
-        // Hide header when scrolling down (more than 5px)
+      } else if (scrollDifference > 10) {
+        // Hide header when scrolling down significantly
         setHeaderVisible(false);
-      } else if (scrollDifference < -5) {
-        // Show header when scrolling up (more than 5px)
+      } else if (scrollDifference < -10) {
+        // Show header when scrolling up significantly
         setHeaderVisible(true);
       }
       
@@ -742,7 +742,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   }
   return <div className="min-h-screen bg-background">
       {/* Compact Mobile Header */}
-      <div className={`gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-0 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className={`gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-[5] transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-md mx-auto">
           {/* Tournament Name & Location */}
           <div className="text-center mb-3">
