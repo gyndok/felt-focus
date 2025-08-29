@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useActiveTournament } from '@/hooks/useActiveTournament';
 
 interface LiveTournamentProps {
@@ -87,19 +88,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   const [chipDialogOpen, setChipDialogOpen] = useState(false);
   const [chipUpdateValue, setChipUpdateValue] = useState('');
   const [tournamentLocations, setTournamentLocations] = useState<string[]>([]);
-  const [headerVisible, setHeaderVisible] = useState(true);
-  const lastScrollY = useRef(0);
-
-  // Add debugging
-  console.log('LiveTournament - headerVisible:', headerVisible, 'activeTournament:', !!activeTournament);
-  
-  // Force header visible for debugging
-  console.log('activeTournament details:', activeTournament ? {
-    id: activeTournament.id,
-    name: activeTournament.name,
-    current_chips: activeTournament.current_chips,
-    bb_stack: activeTournament.bb_stack
-  } : 'null');
+  const isMobile = useIsMobile();
 
   // Tournament timer
   const { currentTime, formattedTime, formattedDuration, isRunning } = useActiveTournament(activeTournament);
@@ -433,30 +422,6 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     loadLocations();
   }, [user, getUniqueLocations]);
 
-  // Header auto-hide on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDifference = currentScrollY - lastScrollY.current;
-      
-      if (currentScrollY < 50) {
-        // Always show header when near top
-        setHeaderVisible(true);
-      } else if (scrollDifference > 10) {
-        // Hide header when scrolling down significantly
-        setHeaderVisible(false);
-      } else if (scrollDifference < -10) {
-        // Show header when scrolling up significantly
-        setHeaderVisible(true);
-      }
-      
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Prepare chart data
   const chartData = useMemo(() => {
     if (!activeTournament) return [];
@@ -752,124 +717,127 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       </div>;
   }
   return <div className="min-h-screen bg-background">
-      {/* Compact Mobile Header */}
-      <div className={`gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-[5] transition-transform duration-300 translate-y-0`}>
+      {/* Simplified Header */}
+      <div className="gradient-casino text-white p-3 fixed top-0 left-0 right-0 z-[5]">
         <div className="max-w-md mx-auto">
-          {/* Tournament Name & Location */}
-          <div className="text-center mb-3">
+          <div className="text-center">
             <h1 className="text-lg font-bold truncate">{activeTournament.name}</h1>
             {activeTournament.location && (
               <div className="text-xs opacity-80 truncate">@ {activeTournament.location}</div>
             )}
           </div>
-          
-          {/* Compact Timer & Chips Row */}
-          <div className="grid grid-cols-2 gap-2 mb-2">
-            {/* Timer */}
-            <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
-              <CardContent className="p-2">
-                <div className="flex items-center justify-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <div className="text-sm font-mono font-bold">{formattedTime}</div>
-                  {isRunning && (
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                  )}
-                </div>
-                <div className="text-xs opacity-70 text-center truncate">
-                  {formattedDuration}{activeTournament.is_paused && " (Paused)"}
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Chips */}
-            <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
-              <DialogTrigger asChild>
-                <Card className="bg-white/10 border-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/15 transition-colors">
-                  <CardContent className="p-2">
-                    <div className="text-center">
-                      <div className="text-sm font-bold truncate">
-                        {activeTournament.current_chips.toLocaleString()}
-                      </div>
-                      <div className="text-xs opacity-80 truncate">
-                        {activeTournament.bb_stack?.toFixed(1)} BB
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <DialogContent className="bg-background/95 backdrop-blur-md border border-white/20">
-                <DialogHeader>
-                  <DialogTitle>Update Chip Stack</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="chip-amount">New Chip Amount</Label>
-                    <Input
-                      id="chip-amount"
-                      type="number"
-                      value={chipUpdateValue}
-                      onChange={(e) => setChipUpdateValue(e.target.value)}
-                      placeholder={activeTournament.current_chips.toString()}
-                      autoFocus
-                    />
-                  </div>
-                  <div className="bg-muted/20 p-3 rounded-lg border border-border/50">
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Note:</strong> This quick update only changes your current chip stack display. 
-                      To update the progress graph, use the "Full Update" button below instead.
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={() => {
-                        const newChips = parseFloat(chipUpdateValue);
-                        if (newChips && newChips > 0) {
-                          const newBBStack = newChips / activeTournament.big_blind;
-                          updateTournament(activeTournament.id, { 
-                            current_chips: newChips,
-                            bb_stack: newBBStack
-                          });
-                          setChipDialogOpen(false);
-                          setChipUpdateValue('');
-                          toast({
-                            title: "Chip stack updated",
-                            description: `Updated to ${newChips.toLocaleString()} chips`
-                          });
-                        }
-                      }}
-                      disabled={!chipUpdateValue || parseFloat(chipUpdateValue) <= 0}
-                    >
-                      Update
-                    </Button>
-                    <Button variant="outline" onClick={() => {
-                      setChipDialogOpen(false);
-                      setChipUpdateValue('');
-                    }}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          {/* Status Badge - Compact */}
-          <div className="flex justify-center">
-            {activeTournament.is_paused && (
-              <Badge className="bg-orange-500 text-xs px-2 py-0.5">
-                Paused
-              </Badge>
-            )}
-            {!activeTournament.is_paused && (
-              <Badge className={`text-xs px-2 py-0.5 ${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
-                {stackHealth === 'healthy' ? 'Healthy' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
-              </Badge>
-            )}
-          </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 pb-20 space-y-6" style={{ paddingTop: '120px' }}>
+      <div className="max-w-md mx-auto px-4 pb-20 space-y-6" style={{ paddingTop: isMobile ? '80px' : '120px' }}>
+        {/* Mobile Timer, Chips & Status */}
+        {isMobile && (
+          <div className="space-y-4">
+            {/* Timer & Chips Row */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Timer */}
+              <Card className="glass-card">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Clock className="w-4 h-4" />
+                    <div className="text-lg font-mono font-bold">{formattedTime}</div>
+                    {isRunning && (
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    )}
+                  </div>
+                  <div className="text-sm text-muted-foreground text-center">
+                    {formattedDuration}{activeTournament.is_paused && " (Paused)"}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Chips */}
+              <Dialog open={chipDialogOpen} onOpenChange={setChipDialogOpen}>
+                <DialogTrigger asChild>
+                  <Card className="glass-card cursor-pointer hover:bg-accent/50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="text-center">
+                        <div className="text-lg font-bold mb-1">
+                          {activeTournament.current_chips.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {activeTournament.bb_stack?.toFixed(1)} BB
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="bg-background/95 backdrop-blur-md border border-white/20">
+                  <DialogHeader>
+                    <DialogTitle>Update Chip Stack</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="chip-amount">New Chip Amount</Label>
+                      <Input
+                        id="chip-amount"
+                        type="number"
+                        value={chipUpdateValue}
+                        onChange={(e) => setChipUpdateValue(e.target.value)}
+                        placeholder={activeTournament.current_chips.toString()}
+                        autoFocus
+                      />
+                    </div>
+                    <div className="bg-muted/20 p-3 rounded-lg border border-border/50">
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Note:</strong> This quick update only changes your current chip stack display. 
+                        To update the progress graph, use the "Full Update" button below instead.
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => {
+                          const newChips = parseFloat(chipUpdateValue);
+                          if (newChips && newChips > 0) {
+                            const newBBStack = newChips / activeTournament.big_blind;
+                            updateTournament(activeTournament.id, { 
+                              current_chips: newChips,
+                              bb_stack: newBBStack
+                            });
+                            setChipDialogOpen(false);
+                            setChipUpdateValue('');
+                            toast({
+                              title: "Chip stack updated",
+                              description: `Updated to ${newChips.toLocaleString()} chips`
+                            });
+                          }
+                        }}
+                        disabled={!chipUpdateValue || parseFloat(chipUpdateValue) <= 0}
+                      >
+                        Update
+                      </Button>
+                      <Button variant="outline" onClick={() => {
+                        setChipDialogOpen(false);
+                        setChipUpdateValue('');
+                      }}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            {/* Status Badge */}
+            <div className="flex justify-center">
+              {activeTournament.is_paused && (
+                <Badge className="bg-orange-500">
+                  Paused
+                </Badge>
+              )}
+              {!activeTournament.is_paused && (
+                <Badge className={`${stackHealth === 'healthy' ? 'bg-green-500' : stackHealth === 'caution' ? 'bg-yellow-500' : stackHealth === 'danger' ? 'bg-orange-500' : 'bg-red-500'}`}>
+                  {stackHealth === 'healthy' ? 'Healthy' : stackHealth === 'caution' ? 'Caution' : stackHealth === 'danger' ? 'Danger' : 'Critical'}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
         {/* Tournament Economics */}
         {economics && (
           <div className="space-y-4">
