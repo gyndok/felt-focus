@@ -426,15 +426,16 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const scrollDifference = currentScrollY - lastScrollY.current;
       
-      if (currentScrollY < 10) {
-        // Always show header at top
+      if (currentScrollY < 20) {
+        // Always show header near top
         setHeaderVisible(true);
-      } else if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
-        // Hide header when scrolling down
+      } else if (scrollDifference > 5) {
+        // Hide header when scrolling down (more than 5px)
         setHeaderVisible(false);
-      } else if (currentScrollY < lastScrollY.current) {
-        // Show header when scrolling up
+      } else if (scrollDifference < -5) {
+        // Show header when scrolling up (more than 5px)
         setHeaderVisible(true);
       }
       
