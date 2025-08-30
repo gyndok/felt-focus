@@ -1115,45 +1115,40 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                       </Card>
 
                       {activeTournament.guarantee && (
-                        <>
-                          <Card className="glass-card">
-                            <CardContent className="p-4 text-center">
-                              <div className="text-lg lg:text-xl font-bold text-orange-600">
-                                ${activeTournament.guarantee.toLocaleString()}
-                              </div>
-                              <div className="text-xs lg:text-sm text-muted-foreground">
-                                Guarantee {economics.overlay > 0 ? '(overlay)' : ''}
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="glass-card">
-                            <CardContent className="p-4 text-center">
-                              <div className="text-lg lg:text-xl font-bold text-blue-600">
-                                {economics.playersNeededForGuarantee}
-                              </div>
-                              <div className="text-xs lg:text-sm text-muted-foreground">
-                                Players Needed
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </>
+                        <Card className="glass-card">
+                          <CardContent className="p-4 text-center">
+                            <div className="text-lg lg:text-xl font-bold text-orange-600">
+                              ${activeTournament.guarantee.toLocaleString()}
+                            </div>
+                            <div className="text-xs lg:text-sm text-muted-foreground">
+                              Guarantee {economics.overlay > 0 ? '(overlay)' : ''}
+                            </div>
+                          </CardContent>
+                        </Card>
                       )}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Middle Column - Current Status & Progress */}
+              {/* Middle Column - Tournament Status */}
               <div className="space-y-6">
-                {/* Current Status */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-center">Current Status</h3>
+                  <h3 className="text-lg font-semibold text-center">Tournament Status</h3>
                   <div className="grid grid-cols-1 gap-4">
                     <Card className="glass-card">
                       <CardContent className="p-4 text-center">
                         <div className="text-xl lg:text-2xl font-bold">Level {activeTournament.level}</div>
                         <div className="text-xs lg:text-sm text-muted-foreground">Current Level</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xl lg:text-2xl font-bold">
+                          {activeTournament.small_blind}/{activeTournament.big_blind}
+                        </div>
+                        <div className="text-xs lg:text-sm text-muted-foreground">Current Blinds</div>
                       </CardContent>
                     </Card>
 
@@ -1209,15 +1204,28 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                       </CardContent>
                     </Card>
 
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-xl lg:text-2xl font-bold">
-                          {activeTournament.small_blind}/{activeTournament.big_blind}
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">Current Blinds</div>
-                      </CardContent>
-                    </Card>
+                    {economics?.playersNeededForGuarantee > 0 && (
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-lg lg:text-xl font-bold text-blue-600">
+                            {economics.playersNeededForGuarantee}
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">
+                            Players Needed for Guarantee
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                </div>
+              </div>
 
+              {/* Right Column - Stack & Money Status */}
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-center">Stack & Money Status</h3>
+                  
+                  <div className="grid grid-cols-1 gap-4">
                     {currentAvgStack && (
                       <Card className="glass-card">
                         <CardContent className="p-4 text-center">
@@ -1231,25 +1239,15 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                         </CardContent>
                       </Card>
                     )}
-                  </div>
-                </div>
-              </div>
 
-              {/* Right Column - Money Status */}
-              <div className="space-y-6">
-                {/* Money Status */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-center">Money Status</h3>
-                  
-                  {economics?.playersInMoney > 0 && (() => {
-                    const playersLeft = activeTournament.players_left || activeTournament.total_players;
-                    const totalPlayers = activeTournament.total_players;
-                    const percentPaid = activeTournament.percent_paid || 15;
-                    const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
-                    const isInMoney = playersLeft <= playersPaid;
-                    
-                    return (
-                      <div className="grid grid-cols-1 gap-4">
+                    {economics?.playersInMoney > 0 && (() => {
+                      const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                      const totalPlayers = activeTournament.total_players;
+                      const percentPaid = activeTournament.percent_paid || 15;
+                      const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                      const isInMoney = playersLeft <= playersPaid;
+                      
+                      return (
                         <Card className="glass-card">
                           <CardContent className="p-4 text-center">
                             <div className="text-lg lg:text-xl font-bold text-green-600">
@@ -1263,89 +1261,97 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                             </div>
                           </CardContent>
                         </Card>
+                      );
+                    })()}
 
-                        {!isInMoney ? (
-                          <Card className="glass-card">
-                            <CardContent className="p-4 text-center">
-                              <div className="text-lg lg:text-xl font-bold text-purple-600">
-                                {Math.floor(economics.avgStackAtBubble).toLocaleString()}
-                              </div>
-                              <div className="text-xs lg:text-sm text-muted-foreground">
-                                Avg Stack at Bubble
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ) : (
-                          <Card className="glass-card">
-                            <CardContent className="p-4 text-center">
-                              <div className="text-lg lg:text-xl font-bold text-blue-600">
-                                {((activeTournament.current_chips / (activeTournament.starting_chips * activeTournament.total_players)) * 100).toFixed(1)}%
-                              </div>
-                              <div className="text-xs lg:text-sm text-muted-foreground">
-                                Chip Share
-                              </div>
-                              <div className="text-xs text-muted-foreground">of total in play</div>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  {/* In the Money Status */}
-                  <Card className="glass-card">
-                    <CardContent className="p-4 text-center">
-                        {/* Enhanced In the Money Indicator */}
-                        {(() => {
-                          const playersLeft = activeTournament.players_left || activeTournament.total_players;
-                          const totalPlayers = activeTournament.total_players;
-                          const percentPaid = activeTournament.percent_paid || 15;
-                          const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
-                          const isInMoney = playersLeft <= playersPaid;
-                          const eliminationsToMoney = playersPaid - playersLeft;
-                          const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
-                          
-                          return (
-                            <div className="space-y-2">
-                              {isInMoney ? (
-                                <div className="animate-fade-in">
-                                  <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
-                                    🏆 IN THE MONEY! 🏆
-                                  </Badge>
-                                  <div className="text-xs text-green-600 font-medium mt-1">
-                                    Congratulations! Minimum payout secured 🎉
-                                  </div>
-                                </div>
-                              ) : bubbleZone ? (
-                                <div className="animate-fade-in">
-                                  <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse border-2 border-orange-300">
-                                    🫧 BUBBLE TIME! 🫧
-                                  </Badge>
-                                  <div className="text-xs text-orange-600 font-medium">
-                                    Just {eliminationsToMoney} elimination{eliminationsToMoney > 1 ? 's' : ''} to the money!
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="space-y-1">
-                                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                                    <div 
-                                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
-                                      style={{ width: `${Math.max(10, ((totalPlayers - playersLeft) / (totalPlayers - playersPaid)) * 100)}%` }}
-                                    />
-                                  </div>
-                                  <div className="text-xs text-muted-foreground text-center">
-                                    {eliminationsToMoney} eliminations to money
-                                  </div>
-                                </div>
-                              )}
-                              <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
-                                💰 Top {playersPaid} players paid ({percentPaid}%)
-                              </div>
+                    {economics?.playersInMoney > 0 && (() => {
+                      const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                      const totalPlayers = activeTournament.total_players;
+                      const percentPaid = activeTournament.percent_paid || 15;
+                      const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                      const isInMoney = playersLeft <= playersPaid;
+                      
+                      return !isInMoney ? (
+                        <Card className="glass-card">
+                          <CardContent className="p-4 text-center">
+                            <div className="text-lg lg:text-xl font-bold text-purple-600">
+                              {Math.floor(economics.avgStackAtBubble).toLocaleString()}
                             </div>
-                          );
-                        })()}
-                      </CardContent>
-                    </Card>
+                            <div className="text-xs lg:text-sm text-muted-foreground">
+                              Avg Stack at Bubble
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <Card className="glass-card">
+                          <CardContent className="p-4 text-center">
+                            <div className="text-lg lg:text-xl font-bold text-blue-600">
+                              {((activeTournament.current_chips / (activeTournament.starting_chips * activeTournament.total_players)) * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs lg:text-sm text-muted-foreground">
+                              Chip Share
+                            </div>
+                            <div className="text-xs text-muted-foreground">of total in play</div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })()}
+
+                    {/* In the Money Status */}
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                          {/* Enhanced In the Money Indicator */}
+                          {(() => {
+                            const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                            const totalPlayers = activeTournament.total_players;
+                            const percentPaid = activeTournament.percent_paid || 15;
+                            const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                            const isInMoney = playersLeft <= playersPaid;
+                            const eliminationsToMoney = playersPaid - playersLeft;
+                            const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
+                            
+                            return (
+                              <div className="space-y-2">
+                                {isInMoney ? (
+                                  <div className="animate-fade-in">
+                                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
+                                      🏆 IN THE MONEY! 🏆
+                                    </Badge>
+                                    <div className="text-xs text-green-600 font-medium mt-1">
+                                      Congratulations! Minimum payout secured 🎉
+                                    </div>
+                                  </div>
+                                ) : bubbleZone ? (
+                                  <div className="animate-fade-in">
+                                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse border-2 border-orange-300">
+                                      🫧 BUBBLE TIME! 🫧
+                                    </Badge>
+                                    <div className="text-xs text-orange-600 font-medium">
+                                      Just {eliminationsToMoney} elimination{eliminationsToMoney > 1 ? 's' : ''} to the money!
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1">
+                                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                                      <div 
+                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+                                        style={{ width: `${Math.max(10, ((totalPlayers - playersLeft) / (totalPlayers - playersPaid)) * 100)}%` }}
+                                      />
+                                    </div>
+                                    <div className="text-xs text-muted-foreground text-center">
+                                      {eliminationsToMoney} eliminations to money
+                                    </div>
+                                  </div>
+                                )}
+                                <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
+                                  💰 Top {playersPaid} players paid ({percentPaid}%)
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </CardContent>
+                      </Card>
+                  </div>
                 </div>
               </div>
             </div>
