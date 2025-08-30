@@ -474,15 +474,15 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     // Different tweet styles based on tournament status
     if (tournament.status === 'finished') {
       if (tournament.final_position && tournament.final_position <= 3) {
-        return `🏆 Just finished ${tournament.final_position === 1 ? '1st' : tournament.final_position === 2 ? '2nd' : '3rd'} place in "${tournament.name}"${guaranteeText}! Prize: $${tournament.prize_won?.toLocaleString() || 0} 💰\n\nTrack your poker results at ${siteUrl} #poker #tournament #grind`;
+        return `🏆 Just finished ${tournament.final_position === 1 ? '1st' : tournament.final_position === 2 ? '2nd' : '3rd'} place in "${tournament.name}"${guaranteeText}! Prize: $${tournament.prize_won?.toLocaleString() || 0} 💰\n\nTrack your poker results at ${siteUrl} @feltfocus #poker #tournament #grind`;
       } else if (tournament.prize_won && tournament.prize_won > 0) {
-        return `💰 Cashed in "${tournament.name}"${guaranteeText}! Finished ${tournament.final_position ? `${tournament.final_position}th` : 'ITM'} for $${tournament.prize_won.toLocaleString()}\n\nManage your poker bankroll at ${siteUrl} #poker #cash #grind`;
+        return `💰 Cashed in "${tournament.name}"${guaranteeText}! Finished ${tournament.final_position ? `${tournament.final_position}th` : 'ITM'} for $${tournament.prize_won.toLocaleString()}\n\nManage your poker bankroll at ${siteUrl} @feltfocus #poker #cash #grind`;
       } else {
-        return `Gave it my best shot in "${tournament.name}"${guaranteeText} 💪 The grind continues!\n\nBuild your poker bankroll at ${siteUrl} #poker #tournament #nevergiveup`;
+        return `Gave it my best shot in "${tournament.name}"${guaranteeText} 💪 The grind continues!\n\nBuild your poker bankroll at ${siteUrl} @feltfocus #poker #tournament #nevergiveup`;
       }
     } else if (tournament.is_paused) {
       const currentBB = tournament.bb_stack ? Math.round(tournament.bb_stack) : 0;
-      return `📊 Day 1 of "${tournament.name}"${guaranteeText} complete! Bagged ${tournament.current_chips?.toLocaleString()} chips (${currentBB}BB)\n\nBack tomorrow to battle! 🎯\n\nTrack your tournaments at ${siteUrl} #poker #tournament #day2`;
+      return `📊 Day 1 of "${tournament.name}"${guaranteeText} complete! Bagged ${tournament.current_chips?.toLocaleString()} chips (${currentBB}BB)\n\nBack tomorrow to battle! 🎯\n\nTrack your tournaments at ${siteUrl} @feltfocus #poker #tournament #day2`;
     } else {
       // Active tournament
       const level = tournament.level;
@@ -493,13 +493,13 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       if (playersLeft && totalPlayers && economics?.playersInMoney) {
         const bubbleDistance = playersLeft - economics.playersInMoney;
         if (bubbleDistance <= 5 && bubbleDistance > 0) {
-          return `🔥 ${bubbleDistance} spots from the money bubble in "${tournament.name}"${guaranteeText}! ${currentBB}BB stack, level ${level}\n\n${playersLeft}/${totalPlayers} remaining 💪\n\nTrack your poker stats at ${siteUrl} #poker #bubble #pressure`;
+          return `🔥 ${bubbleDistance} spots from the money bubble in "${tournament.name}"${guaranteeText}! ${currentBB}BB stack, level ${level}\n\n${playersLeft}/${totalPlayers} remaining 💪\n\nTrack your poker stats at ${siteUrl} @feltfocus #poker #bubble #pressure`;
         } else if (bubbleDistance <= 0) {
-          return `💰 IN THE MONEY at "${tournament.name}"${guaranteeText}! Level ${level}, ${currentBB}BB stack\n\n${playersLeft}/${totalPlayers} remaining - time to ladder up! 🚀\n\nManage your poker success at ${siteUrl} #poker #ITM #tournament`;
+          return `💰 IN THE MONEY at "${tournament.name}"${guaranteeText}! Level ${level}, ${currentBB}BB stack\n\n${playersLeft}/${totalPlayers} remaining - time to ladder up! 🚀\n\nManage your poker success at ${siteUrl} @feltfocus #poker #ITM #tournament`;
         }
       }
       
-      return `🎯 Grinding "${tournament.name}"${guaranteeText}! Level ${level}, ${currentBB}BB stack\n\n${playersLeft ? `${playersLeft}/${totalPlayers} players remain` : 'Deep in the field'} 💪\n\nTrack your poker sessions at ${siteUrl} #poker #tournament #grind`;
+      return `🎯 Grinding "${tournament.name}"${guaranteeText}! Level ${level}, ${currentBB}BB stack\n\n${playersLeft ? `${playersLeft}/${totalPlayers} players remain` : 'Deep in the field'} 💪\n\nTrack your poker sessions at ${siteUrl} @feltfocus #poker #tournament #grind`;
     }
   };
 
