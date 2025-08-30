@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns';
+import { formatDateForDisplay, formatDateForChart } from '@/utils/dateHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from 'next-themes';
@@ -1103,15 +1104,12 @@ const PokerBankrollApp = () => {
                         <XAxis dataKey="date" tick={{
                         fontSize: 12,
                         fill: 'hsl(var(--muted-foreground))'
-                      }} tickFormatter={date => new Date(date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })} />
+                      }} tickFormatter={date => formatDateForChart(date)} />
                         <YAxis tick={{
                         fontSize: 12,
                         fill: 'hsl(var(--muted-foreground))'
                       }} />
-                        <Tooltip formatter={(value) => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'Running P/L']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
+                        <Tooltip formatter={(value) => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'Running P/L']} labelFormatter={date => formatDateForDisplay(date)} contentStyle={{
                         backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px'
@@ -1221,9 +1219,9 @@ const PokerBankrollApp = () => {
                                   {session.type.toUpperCase()}
                                 </Badge>
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                {new Date(session.date).toLocaleDateString()}
-                              </div>
+                               <div className="text-xs text-muted-foreground">
+                                 {session.date}
+                               </div>
                               <div className="text-xs text-muted-foreground flex items-center gap-1">
                                <MapPin size={10} />
                                {session.location}
@@ -1575,15 +1573,12 @@ const PokerBankrollApp = () => {
                   <XAxis dataKey="date" tick={{
                   fontSize: 12,
                   fill: 'hsl(var(--muted-foreground))'
-                }} tickFormatter={date => new Date(date).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric'
-                })} />
+                }} tickFormatter={date => formatDateForChart(date)} />
                   <YAxis tick={{
                   fontSize: 12,
                   fill: 'hsl(var(--muted-foreground))'
                 }} />
-                  <Tooltip formatter={value => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'Running P/L']} labelFormatter={date => new Date(date).toLocaleDateString()} contentStyle={{
+                  <Tooltip formatter={value => [`${Number(value) >= 0 ? '+' : ''}$${Number(value)?.toLocaleString()}`, 'Running P/L']} labelFormatter={date => formatDateForDisplay(date)} contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px'
@@ -1862,7 +1857,7 @@ const PokerBankrollApp = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Date</Label>
-                    <p className="text-lg">{new Date(selectedSession.date).toLocaleDateString()}</p>
+                    <p className="text-lg">{formatDateForDisplay(selectedSession.date)}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Type</Label>

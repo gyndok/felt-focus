@@ -1,9 +1,28 @@
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 /**
- * Gets the current date and time in the user's local timezone as an ISO string
- * This ensures dates are stored relative to the user's location, not UTC
+ * Formats a date string (YYYY-MM-DD) for display without timezone conversion
+ * This prevents dates from shifting when displayed in different timezones
  */
+export function formatDateForDisplay(dateString: string): string {
+  // Parse the date components directly to avoid timezone issues
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day); // month is 0-indexed
+  return date.toLocaleDateString();
+}
+
+/**
+ * Formats a date string for chart display (short format)
+ */
+export function formatDateForChart(dateString: string): string {
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
 export function getCurrentLocalDateTime(): string {
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const now = new Date();
