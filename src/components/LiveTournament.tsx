@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
-import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3 } from 'lucide-react';
+import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,14 +41,19 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     getTournamentUpdates,
     pauseTournament,
     resumeTournament,
-    getUniqueLocations
+    getUniqueLocations,
+    deleteTournamentUpdate,
+    updateTournamentUpdate
   } = useTournaments();
   
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showQuickUpdateDialog, setShowQuickUpdateDialog] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
+  const [showUpdatesDialog, setShowUpdatesDialog] = useState(false);
+  const [showEditUpdateDialog, setShowEditUpdateDialog] = useState(false);
   const [tournamentUpdates, setTournamentUpdates] = useState<any[]>([]);
+  const [editingUpdate, setEditingUpdate] = useState<any>(null);
   const [newTournament, setNewTournament] = useState({
     name: '',
     location: '',
@@ -397,6 +402,66 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     }
   };
 
+  const handleDeleteUpdate = async (updateId: string) => {
+    try {
+      await deleteTournamentUpdate(updateId);
+      // Refresh the tournament updates
+      if (activeTournament?.id) {
+        const updates = await getTournamentUpdates(activeTournament.id);
+        setTournamentUpdates(updates || []);
+      }
+      toast({
+        title: "Update Deleted",
+        description: "Tournament update has been removed"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete update",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditUpdate = (update: any) => {
+    setEditingUpdate(update);
+    setShowEditUpdateDialog(true);
+  };
+
+  const handleSaveEditedUpdate = async () => {
+    if (!editingUpdate) return;
+    
+    try {
+      await updateTournamentUpdate(editingUpdate.id, {
+        level: editingUpdate.level,
+        small_blind: editingUpdate.small_blind,
+        big_blind: editingUpdate.big_blind,
+        current_chips: editingUpdate.current_chips,
+        players_left: editingUpdate.players_left,
+        notes: editingUpdate.notes
+      });
+      
+      // Refresh the tournament updates
+      if (activeTournament?.id) {
+        const updates = await getTournamentUpdates(activeTournament.id);
+        setTournamentUpdates(updates || []);
+      }
+      
+      setShowEditUpdateDialog(false);
+      setEditingUpdate(null);
+      toast({
+        title: "Update Saved",
+        description: "Tournament update has been modified"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save update",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Load tournament updates for chart
   useEffect(() => {
     if (activeTournament?.id) {
@@ -405,6 +470,15 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       }).catch(console.error);
     }
   }, [activeTournament?.id, getTournamentUpdates]);
+
+  // Reload tournament updates when the manage updates dialog opens
+  useEffect(() => {
+    if (showUpdatesDialog && activeTournament?.id) {
+      getTournamentUpdates(activeTournament.id).then(updates => {
+        setTournamentUpdates(updates || []);
+      }).catch(console.error);
+    }
+  }, [showUpdatesDialog, activeTournament?.id, getTournamentUpdates]);
 
   // Load unique tournament locations
   useEffect(() => {
@@ -1847,6 +1921,187 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                       Quick Update
                     </Button>
                   </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={showUpdatesDialog} onOpenChange={setShowUpdatesDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Manage Updates
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Tournament Updates History</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {tournamentUpdates.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No tournament updates recorded yet.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {tournamentUpdates.map((update) => (
+                          <Card key={update.id} className="p-4">
+                            <div className="grid grid-cols-6 gap-4 items-center text-sm">
+                              <div>
+                                <div className="font-medium">Level {update.level}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {new Date(update.timestamp).toLocaleString()}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="font-medium">{update.small_blind}/{update.big_blind}</div>
+                                <div className="text-xs text-muted-foreground">Blinds</div>
+                              </div>
+                              <div>
+                                <div className="font-medium">{update.current_chips.toLocaleString()}</div>
+                                <div className="text-xs text-muted-foreground">Chips</div>
+                              </div>
+                              <div>
+                                <div className="font-medium">{update.bb_stack?.toFixed(1)} BB</div>
+                                <div className="text-xs text-muted-foreground">Stack</div>
+                              </div>
+                              <div>
+                                <div className="font-medium">{update.players_left || 'N/A'}</div>
+                                <div className="text-xs text-muted-foreground">Players</div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleEditUpdate(update)}
+                                >
+                                  Edit
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleDeleteUpdate(update.id)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                            {update.notes && (
+                              <div className="mt-2 pt-2 border-t text-xs text-muted-foreground">
+                                <strong>Notes:</strong> {update.notes}
+                              </div>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Edit Update Dialog */}
+              <Dialog open={showEditUpdateDialog} onOpenChange={setShowEditUpdateDialog}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Edit Tournament Update</DialogTitle>
+                  </DialogHeader>
+                  {editingUpdate && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <Label htmlFor="edit_level">Level</Label>
+                          <Input 
+                            id="edit_level" 
+                            type="number" 
+                            value={editingUpdate.level} 
+                            onChange={e => setEditingUpdate({
+                              ...editingUpdate,
+                              level: parseInt(e.target.value) || 1
+                            })} 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit_small_blind">Small Blind</Label>
+                          <Input 
+                            id="edit_small_blind" 
+                            type="number" 
+                            value={editingUpdate.small_blind} 
+                            onChange={e => setEditingUpdate({
+                              ...editingUpdate,
+                              small_blind: parseFloat(e.target.value) || 0
+                            })} 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit_big_blind">Big Blind</Label>
+                          <Input 
+                            id="edit_big_blind" 
+                            type="number" 
+                            value={editingUpdate.big_blind} 
+                            onChange={e => setEditingUpdate({
+                              ...editingUpdate,
+                              big_blind: parseFloat(e.target.value) || 0
+                            })} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="edit_current_chips">Current Chips</Label>
+                          <Input 
+                            id="edit_current_chips" 
+                            type="number" 
+                            value={editingUpdate.current_chips} 
+                            onChange={e => setEditingUpdate({
+                              ...editingUpdate,
+                              current_chips: parseFloat(e.target.value) || 0
+                            })} 
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit_players_left">Players Left</Label>
+                          <Input 
+                            id="edit_players_left" 
+                            type="number" 
+                            value={editingUpdate.players_left || ''} 
+                            onChange={e => setEditingUpdate({
+                              ...editingUpdate,
+                              players_left: e.target.value ? parseInt(e.target.value) : null
+                            })} 
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="edit_notes">Notes</Label>
+                        <Textarea 
+                          id="edit_notes" 
+                          value={editingUpdate.notes || ''} 
+                          onChange={e => setEditingUpdate({
+                            ...editingUpdate,
+                            notes: e.target.value
+                          })} 
+                          placeholder="Optional notes..."
+                        />
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button onClick={handleSaveEditedUpdate} className="flex-1">
+                          Save Changes
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setShowEditUpdateDialog(false);
+                            setEditingUpdate(null);
+                          }}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </DialogContent>
               </Dialog>
 

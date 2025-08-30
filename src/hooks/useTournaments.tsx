@@ -262,6 +262,39 @@ export const useTournaments = () => {
     }
   }, [user]);
 
+  const deleteTournamentUpdate = async (updateId: string) => {
+    if (!user) throw new Error('User not authenticated');
+
+    try {
+      const { error } = await supabase
+        .from('tournament_updates')
+        .delete()
+        .eq('id', updateId);
+
+      if (error) throw error;
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to delete tournament update');
+    }
+  };
+
+  const updateTournamentUpdate = async (updateId: string, updateData: Partial<Omit<TournamentUpdateInsert, 'id' | 'tournament_id' | 'timestamp'>>) => {
+    if (!user) throw new Error('User not authenticated');
+
+    try {
+      const { data, error } = await supabase
+        .from('tournament_updates')
+        .update(updateData)
+        .eq('id', updateId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as TournamentUpdateRecord;
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Failed to update tournament update');
+    }
+  };
+
   useEffect(() => {
     fetchTournaments();
   }, [user]);
@@ -279,6 +312,8 @@ export const useTournaments = () => {
     pauseTournament,
     resumeTournament,
     getUniqueLocations,
+    deleteTournamentUpdate,
+    updateTournamentUpdate,
     refetch: fetchTournaments
   };
 };
