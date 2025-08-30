@@ -465,7 +465,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   const composeTweet = () => {
     if (!activeTournament) return '';
     
-    const siteUrl = window.location.origin;
+    const siteUrl = 'https://feltfocus.com';
     const tournament = activeTournament;
     
     // Different tweet styles based on tournament status
