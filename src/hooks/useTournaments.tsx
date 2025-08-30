@@ -264,15 +264,27 @@ export const useTournaments = () => {
 
   const deleteTournamentUpdate = async (updateId: string) => {
     if (!user) throw new Error('User not authenticated');
+    
+    console.log('Attempting to delete tournament update:', updateId);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('tournament_updates')
         .delete()
-        .eq('id', updateId);
+        .eq('id', updateId)
+        .select();
 
-      if (error) throw error;
+      console.log('Delete result:', { data, error });
+      
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
+      
+      console.log('Successfully deleted tournament update:', updateId);
+      return data;
     } catch (err) {
+      console.error('Delete failed:', err);
       throw err instanceof Error ? err : new Error('Failed to delete tournament update');
     }
   };
