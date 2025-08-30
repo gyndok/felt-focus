@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
-import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, Edit, Trash2 } from 'lucide-react';
+import { Play, Pause, Square, Trophy, Users, Clock, TrendingUp, DollarSign, Target, BarChart3, Edit, Trash2, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -460,6 +460,50 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
         variant: "destructive"
       });
     }
+  };
+
+  const composeTweet = () => {
+    if (!activeTournament) return '';
+    
+    const siteUrl = window.location.origin;
+    const tournament = activeTournament;
+    
+    // Different tweet styles based on tournament status
+    if (tournament.status === 'finished') {
+      if (tournament.final_position && tournament.final_position <= 3) {
+        return `🏆 Just finished ${tournament.final_position === 1 ? '1st' : tournament.final_position === 2 ? '2nd' : '3rd'} place in ${tournament.name}! Prize: $${tournament.prize_won?.toLocaleString() || 0} 💰\n\nTrack your poker results at ${siteUrl} #poker #tournament #grind`;
+      } else if (tournament.prize_won && tournament.prize_won > 0) {
+        return `💰 Cashed in ${tournament.name}! Finished ${tournament.final_position ? `${tournament.final_position}th` : 'ITM'} for $${tournament.prize_won.toLocaleString()}\n\nTrack your poker journey at ${siteUrl} #poker #cash #grind`;
+      } else {
+        return `Gave it my best shot in ${tournament.name} 💪 The grind continues!\n\nTrack your poker progress at ${siteUrl} #poker #tournament #nevergiveup`;
+      }
+    } else if (tournament.is_paused) {
+      const currentBB = tournament.bb_stack ? Math.round(tournament.bb_stack) : 0;
+      return `📊 Day 1 of ${tournament.name} complete! Bagged ${tournament.current_chips?.toLocaleString()} chips (${currentBB}BB)\n\nBack tomorrow to battle! 🎯\n\nFollow my poker journey at ${siteUrl} #poker #tournament #day2`;
+    } else {
+      // Active tournament
+      const level = tournament.level;
+      const currentBB = tournament.bb_stack ? Math.round(tournament.bb_stack) : 0;
+      const playersLeft = tournament.players_left;
+      const totalPlayers = tournament.total_players;
+      
+      if (playersLeft && totalPlayers && economics?.playersInMoney) {
+        const bubbleDistance = playersLeft - economics.playersInMoney;
+        if (bubbleDistance <= 5 && bubbleDistance > 0) {
+          return `🔥 ${bubbleDistance} spots from the money bubble in ${tournament.name}! ${currentBB}BB stack, level ${level}\n\n${playersLeft}/${totalPlayers} remaining 💪\n\nFollow the action at ${siteUrl} #poker #bubble #pressure`;
+        } else if (bubbleDistance <= 0) {
+          return `💰 IN THE MONEY at ${tournament.name}! Level ${level}, ${currentBB}BB stack\n\n${playersLeft}/${totalPlayers} remaining - time to ladder up! 🚀\n\nTrack your poker success at ${siteUrl} #poker #ITM #tournament`;
+        }
+      }
+      
+      return `🎯 Grinding ${tournament.name}! Level ${level}, ${currentBB}BB stack\n\n${playersLeft ? `${playersLeft}/${totalPlayers} players remain` : 'Deep in the field'} 💪\n\nFollow my poker journey at ${siteUrl} #poker #tournament #grind`;
+    }
+  };
+
+  const handleTweet = () => {
+    const tweetText = composeTweet();
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
   };
 
   // Load tournament updates for chart
@@ -2183,6 +2227,16 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                   </div>
                 </DialogContent>
               </Dialog>
+              
+              <Button 
+                onClick={handleTweet}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                <Twitter className="w-4 h-4 mr-2" />
+                Tweet Update
+              </Button>
             </div>
           </CardContent>
         </Card>
