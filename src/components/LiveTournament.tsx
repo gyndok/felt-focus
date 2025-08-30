@@ -1059,361 +1059,363 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
 
         {/* Desktop/Tablet Multi-Column Layout */}
         {!isMobile ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Tournament Economics */}
-            <div className="space-y-6">
-              {economics && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-center">Tournament Economics</h3>
-                  
-                  <div className="grid grid-cols-1 gap-4">
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-lg lg:text-xl font-bold">
-                          ${activeTournament.buy_in.toLocaleString()}
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">
-                          Buy-in ({economics.rakePercentage.toFixed(1)}% rake)
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-lg lg:text-xl font-bold text-green-600">
-                          ${economics.prizePool.toLocaleString()}
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">Prize Pool</div>
-                        {economics.overlay > 0 && (
-                          <div className="text-xs text-orange-500">+${economics.overlay.toLocaleString()} overlay</div>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-lg lg:text-xl font-bold">
-                          ${economics.totalCollected.toLocaleString()}
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">Total Collected</div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-lg lg:text-xl font-bold text-red-600">
-                          ${((activeTournament.total_players || 0) * activeTournament.house_rake).toLocaleString()}
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">
-                          House Rake
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          ${activeTournament.house_rake}/entry
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {activeTournament.guarantee && (
-                      <>
-                        <Card className="glass-card">
-                          <CardContent className="p-4 text-center">
-                            <div className="text-lg lg:text-xl font-bold text-orange-600">
-                              ${activeTournament.guarantee.toLocaleString()}
-                            </div>
-                            <div className="text-xs lg:text-sm text-muted-foreground">
-                              Guarantee {economics.overlay > 0 ? '(overlay)' : ''}
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="glass-card">
-                          <CardContent className="p-4 text-center">
-                            <div className="text-lg lg:text-xl font-bold text-blue-600">
-                              {economics.playersNeededForGuarantee}
-                            </div>
-                            <div className="text-xs lg:text-sm text-muted-foreground">
-                              Players Needed
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Middle Column - Current Status & Progress */}
-            <div className="space-y-6">
-              {/* Current Status */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-center">Current Status</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <Card className="glass-card">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-xl lg:text-2xl font-bold">Level {activeTournament.level}</div>
-                      <div className="text-xs lg:text-sm text-muted-foreground">Current Level</div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="glass-card">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-lg lg:text-xl font-bold">
-                        {Math.floor(activeTournament.total_players * activeTournament.starting_chips).toLocaleString()}
-                      </div>
-                      <div className="text-xs lg:text-sm text-muted-foreground">Total Chips in Play</div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="glass-card">
-                    <CardContent className="p-4 text-center">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="h-6 w-6 p-0"
-                          onClick={() => {
-                            const currentPlayersLeft = activeTournament.players_left || activeTournament.total_players;
-                            if (currentPlayersLeft > 0) {
-                              updateTournament(activeTournament.id, { 
-                                players_left: currentPlayersLeft - 1 
-                              });
-                            }
-                          }}
-                          disabled={!activeTournament.players_left || activeTournament.players_left <= 0}
-                        >
-                          -
-                        </Button>
-                        <div className="text-xl lg:text-2xl font-bold min-w-[60px]">
-                          {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
-                        </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="h-6 w-6 p-0"
-                          onClick={() => {
-                            const currentPlayersLeft = activeTournament.players_left || activeTournament.total_players;
-                            if (currentPlayersLeft < activeTournament.total_players) {
-                              updateTournament(activeTournament.id, { 
-                                players_left: currentPlayersLeft + 1 
-                              });
-                            }
-                          }}
-                          disabled={!activeTournament.total_players || (activeTournament.players_left || 0) >= activeTournament.total_players}
-                        >
-                          +
-                        </Button>
-                      </div>
-                      <div className="text-xs lg:text-sm text-muted-foreground">Players Left/Entered</div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="glass-card">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-xl lg:text-2xl font-bold">
-                        {activeTournament.small_blind}/{activeTournament.big_blind}
-                      </div>
-                      <div className="text-xs lg:text-sm text-muted-foreground">Current Blinds</div>
-                    </CardContent>
-                  </Card>
-
-                  {currentAvgStack && (
-                    <Card className="glass-card">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-xl lg:text-2xl font-bold">
-                          {(currentAvgStack / activeTournament.big_blind).toFixed(0)} BB
-                        </div>
-                        <div className="text-xs lg:text-sm text-muted-foreground">Average Stack</div>
-                        <div className="text-xs text-muted-foreground">
-                          {Math.floor(currentAvgStack).toLocaleString()} chips
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Money Status & Chart */}
-            <div className="space-y-6">
-              {/* Money Status */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-center">Money Status</h3>
-                
-                {economics?.playersInMoney > 0 && (() => {
-                  const playersLeft = activeTournament.players_left || activeTournament.total_players;
-                  const totalPlayers = activeTournament.total_players;
-                  const percentPaid = activeTournament.percent_paid || 15;
-                  const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
-                  const isInMoney = playersLeft <= playersPaid;
-                  
-                  return (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column - Tournament Economics */}
+              <div className="space-y-6">
+                {economics && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-center">Tournament Economics</h3>
+                    
                     <div className="grid grid-cols-1 gap-4">
                       <Card className="glass-card">
                         <CardContent className="p-4 text-center">
-                          <div className="text-lg lg:text-xl font-bold text-green-600">
-                            {economics.playersInMoney}
+                          <div className="text-lg lg:text-xl font-bold">
+                            ${activeTournament.buy_in.toLocaleString()}
                           </div>
                           <div className="text-xs lg:text-sm text-muted-foreground">
-                            {isInMoney ? "Players Paid" : "In the Money"}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {activeTournament.percent_paid || 15}% of field cashes
+                            Buy-in ({economics.rakePercentage.toFixed(1)}% rake)
                           </div>
                         </CardContent>
                       </Card>
 
-                      {!isInMoney ? (
-                        <Card className="glass-card">
-                          <CardContent className="p-4 text-center">
-                            <div className="text-lg lg:text-xl font-bold text-purple-600">
-                              {Math.floor(economics.avgStackAtBubble).toLocaleString()}
-                            </div>
-                            <div className="text-xs lg:text-sm text-muted-foreground">
-                              Avg Stack at Bubble
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <Card className="glass-card">
-                          <CardContent className="p-4 text-center">
-                            <div className="text-lg lg:text-xl font-bold text-blue-600">
-                              {((activeTournament.current_chips / (activeTournament.starting_chips * activeTournament.total_players)) * 100).toFixed(1)}%
-                            </div>
-                            <div className="text-xs lg:text-sm text-muted-foreground">
-                              Chip Share
-                            </div>
-                            <div className="text-xs text-muted-foreground">of total in play</div>
-                          </CardContent>
-                        </Card>
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-lg lg:text-xl font-bold text-green-600">
+                            ${economics.prizePool.toLocaleString()}
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">Prize Pool</div>
+                          {economics.overlay > 0 && (
+                            <div className="text-xs text-orange-500">+${economics.overlay.toLocaleString()} overlay</div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-lg lg:text-xl font-bold">
+                            ${economics.totalCollected.toLocaleString()}
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">Total Collected</div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-lg lg:text-xl font-bold text-red-600">
+                            ${((activeTournament.total_players || 0) * activeTournament.house_rake).toLocaleString()}
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">
+                            House Rake
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ${activeTournament.house_rake}/entry
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {activeTournament.guarantee && (
+                        <>
+                          <Card className="glass-card">
+                            <CardContent className="p-4 text-center">
+                              <div className="text-lg lg:text-xl font-bold text-orange-600">
+                                ${activeTournament.guarantee.toLocaleString()}
+                              </div>
+                              <div className="text-xs lg:text-sm text-muted-foreground">
+                                Guarantee {economics.overlay > 0 ? '(overlay)' : ''}
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="glass-card">
+                            <CardContent className="p-4 text-center">
+                              <div className="text-lg lg:text-xl font-bold text-blue-600">
+                                {economics.playersNeededForGuarantee}
+                              </div>
+                              <div className="text-xs lg:text-sm text-muted-foreground">
+                                Players Needed
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </>
                       )}
                     </div>
-                  );
-                })()}
-
-                {/* In the Money Status */}
-                <Card className="glass-card">
-                  <CardContent className="p-4 text-center">
-                      {/* Enhanced In the Money Indicator */}
-                      {(() => {
-                        const playersLeft = activeTournament.players_left || activeTournament.total_players;
-                        const totalPlayers = activeTournament.total_players;
-                        const percentPaid = activeTournament.percent_paid || 15;
-                        const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
-                        const isInMoney = playersLeft <= playersPaid;
-                        const eliminationsToMoney = playersPaid - playersLeft;
-                        const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
-                        
-                        return (
-                          <div className="space-y-2">
-                            {isInMoney ? (
-                              <div className="animate-fade-in">
-                                <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
-                                  🏆 IN THE MONEY! 🏆
-                                </Badge>
-                                <div className="text-xs text-green-600 font-medium mt-1">
-                                  Congratulations! Minimum payout secured 🎉
-                                </div>
-                              </div>
-                            ) : bubbleZone ? (
-                              <div className="animate-fade-in">
-                                <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse border-2 border-orange-300">
-                                  🫧 BUBBLE TIME! 🫧
-                                </Badge>
-                                <div className="text-xs text-orange-600 font-medium">
-                                  Just {eliminationsToMoney} elimination{eliminationsToMoney > 1 ? 's' : ''} to the money!
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                                  <div 
-                                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
-                                    style={{ width: `${Math.max(10, ((totalPlayers - playersLeft) / (totalPlayers - playersPaid)) * 100)}%` }}
-                                  />
-                                </div>
-                                <div className="text-xs text-muted-foreground text-center">
-                                  {eliminationsToMoney} eliminations to money
-                                </div>
-                              </div>
-                            )}
-                            <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
-                              💰 Top {playersPaid} players paid ({percentPaid}%)
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </CardContent>
-                  </Card>
+                  </div>
+                )}
               </div>
 
-              {/* Stack Progression Chart */}
-              {chartData.length > 0 && (
-                <Card className="glass-card">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5" />
-                        Stack Progression
-                      </CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64 w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                          <defs>
-                            <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                            </linearGradient>
-                          </defs>
-                          <XAxis 
-                            dataKey="level" 
-                            tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis 
-                            tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                            axisLine={false}
-                            tickLine={false}
-                            tickFormatter={value => `${(value / 1000).toFixed(0)}k`}
-                          />
-                          <Tooltip 
-                            labelFormatter={value => `Level ${value}`} 
-                            formatter={(value: number) => [`${value.toLocaleString()} chips`, 'Stack']} 
-                            contentStyle={{
-                              backgroundColor: 'hsl(var(--card))',
-                              border: '1px solid hsl(var(--border))',
-                              borderRadius: '8px'
+              {/* Middle Column - Current Status & Progress */}
+              <div className="space-y-6">
+                {/* Current Status */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-center">Current Status</h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xl lg:text-2xl font-bold">Level {activeTournament.level}</div>
+                        <div className="text-xs lg:text-sm text-muted-foreground">Current Level</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-lg lg:text-xl font-bold">
+                          {Math.floor(activeTournament.total_players * activeTournament.starting_chips).toLocaleString()}
+                        </div>
+                        <div className="text-xs lg:text-sm text-muted-foreground">Total Chips in Play</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-6 w-6 p-0"
+                            onClick={() => {
+                              const currentPlayersLeft = activeTournament.players_left || activeTournament.total_players;
+                              if (currentPlayersLeft > 0) {
+                                updateTournament(activeTournament.id, { 
+                                  players_left: currentPlayersLeft - 1 
+                                });
+                              }
                             }}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="chips" 
-                            stroke="hsl(var(--primary))" 
-                            strokeWidth={3}
-                            fill="url(#chipGradient)"
-                            dot={{
-                              fill: 'hsl(var(--primary))',
-                              strokeWidth: 2,
-                              r: 4
+                            disabled={!activeTournament.players_left || activeTournament.players_left <= 0}
+                          >
+                            -
+                          </Button>
+                          <div className="text-xl lg:text-2xl font-bold min-w-[60px]">
+                            {activeTournament.players_left || activeTournament.total_players}/{activeTournament.total_players}
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-6 w-6 p-0"
+                            onClick={() => {
+                              const currentPlayersLeft = activeTournament.players_left || activeTournament.total_players;
+                              if (currentPlayersLeft < activeTournament.total_players) {
+                                updateTournament(activeTournament.id, { 
+                                  players_left: currentPlayersLeft + 1 
+                                });
+                              }
                             }}
-                            activeDot={{
-                              r: 6,
-                              stroke: 'hsl(var(--primary))',
-                              strokeWidth: 2
-                            }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                            disabled={!activeTournament.total_players || (activeTournament.players_left || 0) >= activeTournament.total_players}
+                          >
+                            +
+                          </Button>
+                        </div>
+                        <div className="text-xs lg:text-sm text-muted-foreground">Players Left/Entered</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="glass-card">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xl lg:text-2xl font-bold">
+                          {activeTournament.small_blind}/{activeTournament.big_blind}
+                        </div>
+                        <div className="text-xs lg:text-sm text-muted-foreground">Current Blinds</div>
+                      </CardContent>
+                    </Card>
+
+                    {currentAvgStack && (
+                      <Card className="glass-card">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-xl lg:text-2xl font-bold">
+                            {(currentAvgStack / activeTournament.big_blind).toFixed(0)} BB
+                          </div>
+                          <div className="text-xs lg:text-sm text-muted-foreground">Average Stack</div>
+                          <div className="text-xs text-muted-foreground">
+                            {Math.floor(currentAvgStack).toLocaleString()} chips
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - Money Status */}
+              <div className="space-y-6">
+                {/* Money Status */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-center">Money Status</h3>
+                  
+                  {economics?.playersInMoney > 0 && (() => {
+                    const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                    const totalPlayers = activeTournament.total_players;
+                    const percentPaid = activeTournament.percent_paid || 15;
+                    const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                    const isInMoney = playersLeft <= playersPaid;
+                    
+                    return (
+                      <div className="grid grid-cols-1 gap-4">
+                        <Card className="glass-card">
+                          <CardContent className="p-4 text-center">
+                            <div className="text-lg lg:text-xl font-bold text-green-600">
+                              {economics.playersInMoney}
+                            </div>
+                            <div className="text-xs lg:text-sm text-muted-foreground">
+                              {isInMoney ? "Players Paid" : "In the Money"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {activeTournament.percent_paid || 15}% of field cashes
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {!isInMoney ? (
+                          <Card className="glass-card">
+                            <CardContent className="p-4 text-center">
+                              <div className="text-lg lg:text-xl font-bold text-purple-600">
+                                {Math.floor(economics.avgStackAtBubble).toLocaleString()}
+                              </div>
+                              <div className="text-xs lg:text-sm text-muted-foreground">
+                                Avg Stack at Bubble
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ) : (
+                          <Card className="glass-card">
+                            <CardContent className="p-4 text-center">
+                              <div className="text-lg lg:text-xl font-bold text-blue-600">
+                                {((activeTournament.current_chips / (activeTournament.starting_chips * activeTournament.total_players)) * 100).toFixed(1)}%
+                              </div>
+                              <div className="text-xs lg:text-sm text-muted-foreground">
+                                Chip Share
+                              </div>
+                              <div className="text-xs text-muted-foreground">of total in play</div>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* In the Money Status */}
+                  <Card className="glass-card">
+                    <CardContent className="p-4 text-center">
+                        {/* Enhanced In the Money Indicator */}
+                        {(() => {
+                          const playersLeft = activeTournament.players_left || activeTournament.total_players;
+                          const totalPlayers = activeTournament.total_players;
+                          const percentPaid = activeTournament.percent_paid || 15;
+                          const playersPaid = Math.ceil(totalPlayers * (percentPaid / 100));
+                          const isInMoney = playersLeft <= playersPaid;
+                          const eliminationsToMoney = playersPaid - playersLeft;
+                          const bubbleZone = eliminationsToMoney <= 5 && eliminationsToMoney > 0;
+                          
+                          return (
+                            <div className="space-y-2">
+                              {isInMoney ? (
+                                <div className="animate-fade-in">
+                                  <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse border-2 border-green-300 shadow-lg">
+                                    🏆 IN THE MONEY! 🏆
+                                  </Badge>
+                                  <div className="text-xs text-green-600 font-medium mt-1">
+                                    Congratulations! Minimum payout secured 🎉
+                                  </div>
+                                </div>
+                              ) : bubbleZone ? (
+                                <div className="animate-fade-in">
+                                  <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse border-2 border-orange-300">
+                                    🫧 BUBBLE TIME! 🫧
+                                  </Badge>
+                                  <div className="text-xs text-orange-600 font-medium">
+                                    Just {eliminationsToMoney} elimination{eliminationsToMoney > 1 ? 's' : ''} to the money!
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                                    <div 
+                                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+                                      style={{ width: `${Math.max(10, ((totalPlayers - playersLeft) / (totalPlayers - playersPaid)) * 100)}%` }}
+                                    />
+                                  </div>
+                                  <div className="text-xs text-muted-foreground text-center">
+                                    {eliminationsToMoney} eliminations to money
+                                  </div>
+                                </div>
+                              )}
+                              <div className="text-xs text-muted-foreground bg-muted/30 rounded px-2 py-1">
+                                💰 Top {playersPaid} players paid ({percentPaid}%)
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </CardContent>
+                    </Card>
+                </div>
+              </div>
             </div>
-          </div>
+
+            {/* Full Width Stack Progression Chart - Desktop Only */}
+            {chartData.length > 0 && (
+              <Card className="glass-card">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5" />
+                      Stack Progression
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-96 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <defs>
+                          <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis 
+                          dataKey="level" 
+                          tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                          axisLine={false}
+                          tickLine={false}
+                          tickFormatter={value => `${(value / 1000).toFixed(0)}k`}
+                        />
+                        <Tooltip 
+                          labelFormatter={value => `Level ${value}`} 
+                          formatter={(value: number) => [`${value.toLocaleString()} chips`, 'Stack']} 
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="chips" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={3}
+                          fill="url(#chipGradient)"
+                          dot={{
+                            fill: 'hsl(var(--primary))',
+                            strokeWidth: 2,
+                            r: 4
+                          }}
+                          activeDot={{
+                            r: 6,
+                            stroke: 'hsl(var(--primary))',
+                            strokeWidth: 2
+                          }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
         ) : (
           /* Mobile Single-Column Layout */
           <div className="space-y-6">
