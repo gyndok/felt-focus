@@ -88,7 +88,8 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
   });
   const [endData, setEndData] = useState({
     final_position: '',
-    prize_won: '0'
+    prize_won: '0',
+    notes: ''
   });
   const [chipDialogOpen, setChipDialogOpen] = useState(false);
   const [chipUpdateValue, setChipUpdateValue] = useState('');
@@ -341,7 +342,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
         buy_in: activeTournament.buy_in,
         cash_out: prizeWon,
         duration: duration,
-        notes: finalPosition ? `Finished ${finalPosition}` : 'Eliminated'
+        notes: endData.notes || (finalPosition ? `Finished ${finalPosition}` : 'Eliminated')
       });
       
       // Refetch sessions to immediately update the recent sessions list
@@ -352,7 +353,8 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       
       setEndData({
         final_position: '',
-        prize_won: '0'
+        prize_won: '0',
+        notes: ''
       });
       setShowEndDialog(false);
       toast({
@@ -2182,7 +2184,16 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
                 </Button>
               )}
 
-              <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
+              <Dialog open={showEndDialog} onOpenChange={(open) => {
+                setShowEndDialog(open);
+                if (open && activeTournament) {
+                  // Prepopulate notes with bust level information
+                  setEndData(prev => ({
+                    ...prev,
+                    notes: prev.notes || `Busted on level ${activeTournament.level} (${activeTournament.small_blind}/${activeTournament.big_blind})`
+                  }));
+                }
+              }}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="w-full">
                     <Square className="w-4 h-4 mr-2" />
