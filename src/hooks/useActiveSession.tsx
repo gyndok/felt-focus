@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getCurrentLocalDateTime, getCurrentLocalDate } from '@/utils/dateHelpers';
 
 export const useActiveSession = (userId: string | undefined) => {
   const [activeSession, setActiveSession] = useState<any>(null);
@@ -58,9 +59,9 @@ export const useActiveSession = (userId: string | undefined) => {
         .insert({
           user_id: userId,
           is_active: true,
-          started_at: new Date().toISOString(),
+          started_at: getCurrentLocalDateTime(),
           // Set default values for required fields
-          date: new Date().toISOString().split('T')[0],
+          date: getCurrentLocalDate(),
           location: 'Live Session',
           stakes: '1/2',
           game_type: 'NLHE',

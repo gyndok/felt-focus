@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { getCurrentLocalDateTime } from '@/utils/dateHelpers';
 import type { Database } from '@/integrations/supabase/types';
 
 type Tournament = Database['public']['Tables']['tournaments']['Row'];
@@ -53,7 +54,7 @@ export const useTournaments = () => {
       // End any existing active tournaments first
       await supabase
         .from('tournaments')
-        .update({ status: 'finished', ended_at: new Date().toISOString() })
+        .update({ status: 'finished', ended_at: getCurrentLocalDateTime() })
         .eq('user_id', user.id)
         .eq('status', 'active');
 
@@ -145,7 +146,7 @@ export const useTournaments = () => {
     try {
       const updates: TournamentUpdate = {
         status: finalPosition ? 'finished' : 'eliminated',
-        ended_at: new Date().toISOString(),
+        ended_at: getCurrentLocalDateTime(),
         final_position: finalPosition,
         prize_won: prizeWon
       };
@@ -179,7 +180,7 @@ export const useTournaments = () => {
 
   const pauseTournament = async (tournamentId: string) => {
     try {
-      const pausedAt = new Date().toISOString();
+      const pausedAt = getCurrentLocalDateTime();
       
       const { error } = await supabase
         .from('tournaments')
@@ -203,7 +204,7 @@ export const useTournaments = () => {
       const tournament = tournaments.find(t => t.id === tournamentId);
       if (!tournament) throw new Error('Tournament not found');
 
-      const resumedAt = new Date().toISOString();
+      const resumedAt = getCurrentLocalDateTime();
       const pausedDuration = tournament.paused_at 
         ? Math.floor((new Date(resumedAt).getTime() - new Date(tournament.paused_at).getTime()) / 1000)
         : 0;
