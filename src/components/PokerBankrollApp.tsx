@@ -1214,7 +1214,7 @@ const PokerBankrollApp = () => {
                          <div className="flex items-start justify-between gap-3">
                            <div className="space-y-2 flex-1 cursor-pointer" onClick={() => setSelectedSession(session)}>
                               <div className="font-semibold flex items-center gap-2 text-sm">
-                                {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
+                                {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} ${session.stakes}`}
                                 <Badge variant="outline" className="text-xs">
                                   {session.type.toUpperCase()}
                                 </Badge>
@@ -1751,7 +1751,7 @@ const PokerBankrollApp = () => {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1 cursor-pointer" onClick={() => setSelectedSession(session)}>
                       <div className="font-semibold flex items-center gap-2">
-                        {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} $${session.stakes}`}
+                        {session.type === 'cash' ? `${session.game_type} ${session.stakes}` : `${session.game_type} ${session.stakes}`}
                         <Badge variant="outline" className="text-xs">
                           {session.type.toUpperCase()}
                         </Badge>
