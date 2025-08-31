@@ -111,7 +111,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
     
     // Money bubble calculations
     const percentPaid = activeTournament.percent_paid || 15; // Use stored value or default to 15%
-    const playersInMoney = activeTournament.total_players ? Math.floor((activeTournament.total_players * percentPaid) / 100) : 0;
+    const playersInMoney = activeTournament.total_players ? Math.ceil((activeTournament.total_players * percentPaid) / 100) : 0;
     const totalChipsInPlay = activeTournament.total_players ? activeTournament.starting_chips * activeTournament.total_players : 0;
     const avgStackAtBubble = playersInMoney > 0 && totalChipsInPlay > 0 ? totalChipsInPlay / (playersInMoney + 1) : 0;
     
