@@ -16,6 +16,7 @@ import { useTournaments, type Tournament } from '@/hooks/useTournaments';
 import { usePokerSessions } from '@/hooks/usePokerSessions';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useActiveTournament } from '@/hooks/useActiveTournament';
+import { timestampToLocalDate } from '@/utils/dateHelpers';
 
 interface LiveTournamentProps {
   onSessionAdded?: () => void;
@@ -334,7 +335,7 @@ const LiveTournament = ({ onSessionAdded }: LiveTournamentProps) => {
       const profit = prizeWon - activeTournament.buy_in;
       const duration = endedTournament.ended_at && activeTournament.started_at ? (new Date(endedTournament.ended_at).getTime() - new Date(activeTournament.started_at).getTime()) / (1000 * 60 * 60) : 0;
       await addSession({
-        date: new Date(activeTournament.started_at).toISOString().split('T')[0],
+        date: timestampToLocalDate(activeTournament.started_at),
         type: 'mtt',
         game_type: activeTournament.game_type,
         stakes: `$${activeTournament.buy_in}`,

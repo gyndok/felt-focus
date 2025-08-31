@@ -1,4 +1,5 @@
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { format } from 'date-fns';
 
 /**
  * Formats a date string (YYYY-MM-DD) for display without timezone conversion
@@ -45,4 +46,16 @@ export function getCurrentLocalDate(): string {
   const day = String(zonedTime.getDate()).padStart(2, '0');
   
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Converts a timestamp to local date string (YYYY-MM-DD)
+ * This ensures the date represents the actual day for the user, not UTC day
+ */
+export function timestampToLocalDate(timestamp: string | Date): string {
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const date = new Date(timestamp);
+  const zonedTime = toZonedTime(date, userTimeZone);
+  
+  return format(zonedTime, 'yyyy-MM-dd');
 }
