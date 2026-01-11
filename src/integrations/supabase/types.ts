@@ -315,10 +315,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      delete_user_account: {
-        Args: Record<PropertyKey, never> | { user_id_to_delete: string }
-        Returns: undefined
-      }
+      delete_user_account:
+        | { Args: never; Returns: undefined }
+        | { Args: { user_id_to_delete: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
